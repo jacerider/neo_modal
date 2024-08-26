@@ -1,0 +1,832 @@
+:root {
+  --modal-max-width: 100%;
+  --modal-padding-t: 0px;
+  --modal-content-padding: 1.5rem;
+  --modal-content-header-padding: 1rem 1.5rem;
+}
+
+body.neo-modal--body-lock,
+body.has-neo-modal--loader {
+  @apply overflow-hidden;
+}
+
+.neo-modal-template {
+  @apply hidden;
+
+  .neo-modal & {
+    @apply block;
+  }
+}
+
+.neo-modal {
+  @apply fixed z-40;
+  top: var(--drupal-displace-offset-top, 0px);
+  right: var(--drupal-displace-offset-right, 0px);
+  bottom: var(--drupal-displace-offset-bottom, 0px);
+  left: var(--drupal-displace-offset-left, 0px);
+}
+
+.neo-modal--backdrop {
+  @apply fixed z-40 h-full w-full;
+  top: var(--drupal-displace-offset-top, 0px);
+  right: var(--drupal-displace-offset-right, 0px);
+  bottom: var(--drupal-displace-offset-bottom, 0px);
+  left: var(--drupal-displace-offset-left, 0px);
+  background: var(--modal-backdrop-bg, rgb(var(--color-base-950) / 0.9));
+  transition-duration: var(--animate-duration);
+}
+
+.neo-modal--loader {
+  @apply fixed z-50 flex items-center justify-center;
+  top: var(--drupal-displace-offset-top, 0px);
+  right: var(--drupal-displace-offset-right, 0px);
+  bottom: var(--drupal-displace-offset-bottom, 0px);
+  left: var(--drupal-displace-offset-left, 0px);
+
+  > div {
+    @apply rounded-xl p-4;
+    background: var(--modal-loader-bg, rgb(var(--color-base-950) / 0.9));
+  }
+}
+
+.neo-modal--spinner {
+  @apply relative box-border block h-10 w-10;
+  color: var(--modal-loader-color, rgb(var(--color-white)));
+  div {
+    @apply absolute box-border rounded-full border-2 border-current opacity-100;
+    animation: neoModalSpin 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+    &:nth-child(2) {
+      animation-delay: -0.5s;
+    }
+  }
+}
+
+.neo-modal--nav {
+  @apply pointer-events-none fixed z-10 flex w-24 cursor-pointer items-center overflow-hidden;
+  top: var(--drupal-displace-offset-top, 0px);
+  bottom: var(--drupal-displace-offset-bottom, 0px);
+
+  &:before {
+    @apply absolute left-0 top-0 block h-full w-full;
+    content: '';
+    opacity: 0;
+    transition: opacity;
+    transition-duration: calc(var(--animate-duration) * 0.8);
+    transition-timing-function: cubic-bezier(0.6, 0, 0.4, 1);
+  }
+
+  a {
+    @apply pointer-events-auto relative z-10 flex h-12 w-14 items-center justify-center opacity-80 shadow-lg transition-opacity;
+    background: var(--modal-nav-bg, rgb(var(--color-base-950) / 0.95));
+
+    span {
+      @apply block border-2 border-t-0 -indent-96;
+      border-color: var(--modal-nav-color, rgb(var(--color-base-content-950)));
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+    }
+  }
+
+  &:hover {
+    &:before {
+      opacity: 0.6;
+    }
+
+    a {
+      opacity: 1;
+    }
+  }
+
+  &.neo-modal--prev {
+    @apply left-0 justify-start;
+
+    a {
+      @apply rounded-r-full;
+
+      span {
+        @apply -mr-2 h-5 w-5 border-2 -indent-96;
+        transform: rotate(-135deg);
+      }
+    }
+
+    &:before {
+      background: linear-gradient(
+        90deg,
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 1),
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 0.6) 30%,
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 0.05) 80%,
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 0)
+      );
+      background-blend-mode: darken;
+    }
+  }
+
+  &.neo-modal--next {
+    @apply right-0 justify-end;
+
+    a {
+      @apply rounded-l-full;
+
+      span {
+        @apply -ml-2 h-5 w-5 border-2 -indent-96;
+        transform: rotate(45deg);
+      }
+    }
+
+    &:before {
+      background: linear-gradient(
+        270deg,
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 1),
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 0.6) 30%,
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 0.05) 80%,
+        rgb(var(--modal-nav-bg, var(--color-shadow-950)) / 0)
+      );
+    }
+  }
+}
+
+// Applies to a header no matter where it is.
+.neo-modal--header {
+  @apply relative flex items-center justify-center shadow-lg;
+  background: var(--modal-header-bg, rgb(var(--color-base-950)));
+  color: var(--modal-header-color, rgb(var(--color-base-content-950)));
+
+  // When in global scope.
+  .neo-modal--header-global & {
+    @apply fixed z-20 text-center;
+    top: var(--drupal-displace-offset-top, 0px);
+    width: calc(
+      100vw - var(--drupal-displace-offset-left, 0px) - var(
+          --drupal-displace-offset-right,
+          0px
+        )
+    );
+
+    > div {
+      @apply min-h-10;
+    }
+  }
+
+  // When in content scope.
+  .neo-modal--header-content & {
+    @apply shrink-0 grow-0;
+  }
+}
+
+.neo-modal--header-start {
+  @apply mr-auto flex items-center p-2;
+
+  .neo-modal--header-content & {
+    padding: var(--modal-content-header-padding);
+    padding-right: 0;
+  }
+}
+
+.neo-modal--header-center {
+  @apply flex w-full justify-center p-2;
+
+  .neo-modal--header-content & {
+    padding: var(--modal-content-header-padding);
+
+    &:first-child {
+      @apply justify-start;
+    }
+  }
+}
+
+.neo-modal--header-end {
+  @apply ml-auto flex items-center justify-end p-2;
+
+  .neo-modal--header-content & {
+    padding: var(--modal-content-header-padding);
+    padding-left: 0;
+  }
+}
+
+.neo-modal--header-out {
+  @apply absolute top-0 z-10;
+  background: var(--modal-header-bg, rgb(var(--color-base-950)));
+}
+
+.neo-modal--header-start-out {
+  @apply right-full;
+
+  .neo-modal--header-content.neo-modal--flush &,
+  .neo-modal--header-global & {
+    @apply left-0 right-auto;
+  }
+}
+
+.neo-modal--header-end-out {
+  @apply left-full;
+
+  .neo-modal--header-content.neo-modal--flush &,
+  .neo-modal--header-global & {
+    @apply left-auto right-0;
+  }
+}
+
+.neo-modal--numeration {
+  @apply whitespace-nowrap text-xs leading-none;
+
+  .neo-modal--header-global:not(.neo-modal--flush) & {
+    @apply text-xs leading-none;
+  }
+}
+
+.neo-modal--label {
+  @apply flex items-center justify-center;
+
+  &.has-icon .neo-modal--title {
+    @apply text-left;
+  }
+
+  h2 {
+    // Global scope.
+    .neo-modal--header-global & {
+      @apply text-sm leading-none;
+    }
+
+    // Content scope.
+    .neo-modal--header-content & {
+      @apply text-lg leading-none;
+    }
+  }
+
+  h5 {
+    span {
+      @apply font-light opacity-60;
+    }
+
+    // Global scope.
+    .neo-modal--header-global & {
+      @apply text-xs leading-none;
+    }
+
+    // Content scope.
+    .neo-modal--header-content & {
+      @apply text-xs leading-none;
+    }
+  }
+
+  .neo-modal--icon {
+    @apply mr-2;
+
+    i {
+      @apply opacity-60;
+    }
+  }
+
+  &.has-subtitle {
+    .neo-modal--icon {
+      .neo-modal--header-global & {
+        @apply text-xs;
+      }
+
+      .neo-modal--header-content & {
+        @apply text-xs;
+      }
+    }
+
+    &.has-title {
+      h5 {
+        .neo-modal--header-global & {
+          @apply mt-px;
+        }
+
+        .neo-modal--header-content & {
+          @apply mt-1;
+        }
+      }
+
+      .neo-modal--icon {
+        .neo-modal--header-global & {
+          @apply text-xl;
+        }
+
+        .neo-modal--header-content & {
+          @apply text-3xl;
+        }
+      }
+    }
+  }
+}
+
+.neo-modal--close {
+  @apply block leading-none;
+
+  > span {
+    @apply opacity-80 transition-opacity;
+  }
+
+  &:hover {
+    > span {
+      @apply opacity-100;
+    }
+  }
+
+  .neo-modal--header-global & {
+    @apply px-2 text-2xl first:pl-0 last:pr-0;
+    color: var(--modal-header-color, rgb(var(--color-base-content-950)));
+  }
+
+  .neo-modal--header-content & {
+    @apply text-3xl;
+    color: var(--modal-header-color, rgb(var(--color-base-content-950)));
+  }
+
+  .neo-modal--header-content .neo-modal--header-start-out &,
+  .neo-modal--header-content .neo-modal--header-end-out & {
+    @apply p-2;
+  }
+}
+
+// Footer.
+.neo-modal--footer {
+  @apply pointer-events-none fixed bottom-0 left-0 z-20 flex w-full items-center justify-center;
+  bottom: calc(5px + var(--drupal-displace-offset-bottom, 0px));
+}
+
+.neo-modal--footer-inner {
+  @apply pointer-events-auto flex gap-6 rounded-full px-6 py-2 text-xl shadow-lg;
+  background: var(--modal-footer-bg, rgb(var(--color-base-950) / 0.95));
+
+  a {
+    @apply block cursor-pointer opacity-80 transition-opacity hover:opacity-100;
+    color: var(--modal-footer-color, rgb(var(--color-base-content-950)));
+  }
+}
+
+.neo-modal--container {
+  @apply absolute left-0 top-0 z-10 box-content flex h-full w-full flex-col;
+  max-height: calc(
+    100vh - var(--drupal-displace-offset-top, 0px) - var(
+        --drupal-displace-offset-bottom,
+        0px
+      )
+  );
+  transition: opacity, transform;
+  transition-duration: calc(var(--animate-duration) * 0.8);
+  transition-timing-function: cubic-bezier(0.6, 0, 0.4, 1);
+
+  [data-neo-modal--depth] & {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+
+  [data-neo-modal--depth='1'] & {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+
+  [data-neo-modal--depth='2'] & {
+    opacity: 0.1;
+    transform: scale(0.85);
+  }
+
+  .neo-modal--header-global & {
+    max-height: calc(
+      100vh - var(--drupal-displace-offset-top, 0px) - var(
+          --drupal-displace-offset-bottom,
+          0px
+        )
+    );
+    box-sizing: border-box;
+    padding-top: var(--modal-padding-t);
+  }
+
+  .neo-modal--global-scroll & {
+    @apply overflow-y-auto overflow-x-hidden;
+  }
+
+  .neo-modal--attach & {
+    @apply overflow-visible;
+  }
+
+  .neo-modal--fit & {
+    @apply overflow-hidden;
+  }
+
+  .neo-modal--placement-top &,
+  .neo-modal--placement-bottom &,
+  .neo-modal--placement-center & {
+    @apply items-center;
+  }
+
+  .neo-modal--placement-top-start &,
+  .neo-modal--placement-left-start &,
+  .neo-modal--placement-bottom-start &,
+  .neo-modal--placement-left-end &,
+  .neo-modal--placement-left & {
+    @apply items-start;
+  }
+
+  .neo-modal--placement-top-end,
+  .neo-modal--placement-right-start &,
+  .neo-modal--placement-bottom-end &,
+  .neo-modal--placement-right-end &,
+  .neo-modal--placement-right & {
+    @apply items-end;
+  }
+
+  .neo-modal--no-scroll.neo-modal--placement-center &,
+  .neo-modal--no-scroll.neo-modal--placement-left &,
+  .neo-modal--no-scroll.neo-modal--placement-right & {
+    @apply justify-center;
+  }
+
+  .neo-modal--no-scroll.neo-modal--placement-bottom &,
+  .neo-modal--no-scroll.neo-modal--placement-bottom-start &,
+  .neo-modal--no-scroll.neo-modal--placement-bottom-end &,
+  .neo-modal--no-scroll.neo-modal--placement-left-end &,
+  .neo-modal--no-scroll.neo-modal--placement-right-end & {
+    @apply justify-end;
+  }
+}
+
+.neo-modal--content-footer {
+  background: var(--modal-content-footer-bg, rgb(var(--color-base-200)));
+}
+
+.neo-modal--actions {
+  @apply flex gap-4 p-4;
+
+  .neo-modal--btn {
+    @apply m-0 block whitespace-nowrap;
+  }
+}
+
+.neo-modal--content--container {
+  @apply relative;
+  max-width: calc(
+    100vw - var(--drupal-displace-offset-left, 0px) - var(
+        --drupal-displace-offset-right,
+        0px
+      )
+  );
+
+  .neo-modal--content-scroll & {
+    max-height: 100%;
+  }
+
+  .neo-modal--header-global & {
+    transition: transform;
+    transition-duration: calc(var(--animate-duration) * 0.8);
+    transition-timing-function: cubic-bezier(0.6, 0, 0.4, 1);
+  }
+
+  .neo-modal--attach & {
+    transition: none;
+  }
+
+  .neo-modal--header-global.neo-modal--focus & {
+    transform: translateY(calc(-1 * var(--modal-padding-t) / 2));
+  }
+
+  .neo-modal--no-click & {
+    pointer-events: none;
+  }
+}
+
+.neo-modal--content-block {
+  @apply flex h-full flex-col;
+  max-width: calc(
+    100vw - var(--drupal-displace-offset-left, 0px) - var(
+        --drupal-displace-offset-right,
+        0px
+      )
+  );
+
+  .neo-modal--width-full & {
+    width: calc(
+      100vw - var(--drupal-displace-offset-left, 0px) - var(
+          --drupal-displace-offset-right,
+          0px
+        )
+    );
+  }
+
+  .neo-modal--height-full & {
+    min-height: calc(
+      100vh - var(--drupal-displace-offset-top, 0px) - var(
+          --drupal-displace-offset-bottom,
+          0px
+        ) - var(--modal-padding-t, 0px)
+    );
+  }
+
+  .neo-modal--content-scroll & {
+    max-height: calc(
+      100vh - var(--drupal-displace-offset-top, 0px) - var(
+          --drupal-displace-offset-bottom,
+          0px
+        )
+    );
+  }
+}
+
+.neo-modal--content-wrapper {
+  @apply relative flex h-full flex-col;
+  background: var(--modal-content-bg, rgb(var(--color-base-50)));
+  color: var(--modal-content-color, rgb(var(--color-base-content-50)));
+
+  .neo-modal--content-scroll & {
+    @apply basis-full overflow-hidden;
+  }
+
+  &:before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: block;
+    height: var(--modal-content-padding);
+    background: linear-gradient(
+      to bottom,
+      var(--modal-content-bg, rgb(var(--color-base-50))),
+      rgb(var(--color-base-50) / 0)
+    );
+    content: '';
+  }
+
+  &:after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    height: var(--modal-content-padding);
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--color-base-50) / 0),
+      var(--modal-content-bg, rgb(var(--color-base-50)))
+    );
+    content: '';
+  }
+
+  .neo-modal--no-click & {
+    // When the modal is not clickable, we don't use a background color.
+    @apply bg-transparent;
+  }
+}
+
+.neo-modal--content {
+  @apply h-full;
+  padding: var(--modal-content-padding);
+
+  .neo-modal--content-scroll & {
+    @apply basis-full overflow-y-auto overflow-x-hidden;
+  }
+
+  .neo-modal--draggable & {
+    @apply cursor-grab;
+  }
+
+  .neo-modal--fit & {
+    > *,
+    > picture img {
+      width: auto;
+      max-height: calc(
+        100vh - var(--drupal-displace-offset-top, 0px) - var(
+            --drupal-displace-offset-bottom,
+            0px
+          ) - var(--modal-padding-t, 0px) - var(--modal-content-padding, 0px) - var(
+            --modal-content-padding,
+            0px
+          )
+      );
+    }
+  }
+}
+
+.neo-modal--video {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  pointer-events: all;
+
+  &::before {
+    display: block;
+    padding-top: var(--modal-aspect-ratio);
+    content: '';
+  }
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    // padding: var(--modal-content-padding);
+  }
+}
+
+.neo-modal--iframe {
+  @apply h-full w-full;
+
+  .neo-modal--focus & {
+    @apply pointer-events-none;
+  }
+}
+
+.neo-modal--ratio-1x1 {
+  --modal-aspect-ratio: 100%;
+  max-width: calc(min(var(--modal-max-width), (100vh - 60px)));
+}
+
+.neo-modal--ratio-4x3 {
+  --modal-aspect-ratio: calc(3 / 4 * 100%);
+  max-width: calc(min(var(--modal-max-width), (100vh - 60px) * 4 / 3));
+}
+
+.neo-modal--ratio-16x9 {
+  --modal-aspect-ratio: calc(9 / 16 * 100%);
+  max-width: calc(min(var(--modal-max-width), (100vh - 60px) * 16 / 9));
+}
+
+.neo-modal--ratio-21x9 {
+  --modal-aspect-ratio: calc(9 / 21 * 100%);
+  max-width: calc(min(var(--modal-max-width), (100vh - 60px) * 21 / 9));
+}
+
+/* Body Transitions */
+.neo-modal--body-transition {
+  backface-visibility: hidden;
+  transition: all 0.3s 0.1s;
+}
+
+.neo-modal--body-scale {
+  transform: scale3d(0.95, 0.95, 1);
+  transition: all 0.3s;
+}
+
+.neo-modal--body-blur {
+  filter: blur(3px);
+  transition: all 0.3s;
+}
+
+.has-neo-modal-trigger-overlay {
+  @apply relative;
+
+  &:hover {
+    .neo-modal--trigger-overlay {
+      &::before {
+        @apply opacity-100;
+      }
+    }
+
+    .neo-modal--trigger-overlay-inner {
+      @apply scale-100 bg-transparent shadow-none;
+    }
+
+    // .neo-modal--trigger-overlay-icon + .neo-modal--trigger-overlay-title {
+    //   @apply h-auto w-100 opacity-100;
+    // }
+  }
+}
+
+.neo-modal--trigger-overlay {
+  @apply absolute left-0 top-0 flex h-full w-full items-center justify-center;
+  color: var(--modal-trigger-overlay-color, rgb(var(--color-base-content-950)));
+
+  &::before {
+    @apply absolute left-0 top-0 h-full w-full opacity-0 transition-opacity duration-300;
+    background-color: var(
+      --modal-trigger-overlay-bg,
+      rgb(var(--color-base-950) / 0.7)
+    );
+    content: '';
+  }
+}
+
+.neo-modal--trigger-overlay-inner {
+  @apply relative z-10 flex scale-75 flex-col items-center rounded p-2 text-center shadow transition-all duration-300;
+  background-color: var(
+    --modal-trigger-overlay-bg,
+    rgb(var(--color-base-950) / 0.8)
+  );
+}
+
+.neo-modal--trigger-overlay-icon {
+  @apply text-5xl;
+}
+
+.neo-modal--trigger-overlay-title {
+  @apply text-xs;
+
+  .neo-modal--trigger-overlay-icon-only & {
+    @apply hidden;
+  }
+}
+
+.tippy-box[data-theme~='modal'] {
+  background-color: var(--modal-tooltip-bg, rgb(var(--color-base-950)));
+
+  &[data-placement^='top'] > .tippy-arrow::before {
+    border-top-color: var(--modal-tooltip-bg, rgb(var(--color-base-950)));
+  }
+  &[data-placement^='bottom'] > .tippy-arrow::before {
+    border-bottom-color: var(--modal-tooltip-bg, rgb(var(--color-base-950)));
+  }
+  &[data-placement^='left'] > .tippy-arrow::before {
+    border-left-color: var(--modal-tooltip-bg, rgb(var(--color-base-950)));
+  }
+  &[data-placement^='right'] > .tippy-arrow::before {
+    border-right-color: var(--modal-tooltip-bg, rgb(var(--color-base-950)));
+  }
+  .tippy-content {
+    @apply text-xs;
+    color: var(--modal-tooltip-color, rgb(var(--color-base-content-950)));
+  }
+}
+
+.neo-modal--zoom {
+  // overflow: hidden;
+
+  img {
+    animation-duration: var(--animate-duration);
+    animation-timing-function: cubic-bezier(0.17, 0.67, 0.22, 1.22);
+  }
+}
+
+.neo-modal--zoom-1to2 img {
+  animation-name: neoModalZoom1to2;
+  transform: scale(1.5);
+}
+
+.neo-modal--zoom-2to1 img {
+  animation-name: neoModalZoom2to1;
+  transform: scale(1);
+}
+
+.neo-modal--zoom-2to3 img {
+  animation-name: neoModalZoom2to3;
+  transform: scale(2);
+}
+
+.neo-modal--zoom-3to2 img {
+  animation-name: neoModalZoom3to2;
+  transform: scale(1.5);
+}
+
+@keyframes neoModalZoom1to2 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.5);
+  }
+}
+
+@keyframes neoModalZoom2to1 {
+  0% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes neoModalZoom2to3 {
+  0% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(2);
+  }
+}
+
+@keyframes neoModalZoom3to2 {
+  0% {
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1.5);
+  }
+}
+
+@keyframes neoModalSpin {
+  0% {
+    @apply left-4 top-4 h-2 w-2 opacity-0;
+  }
+  4.9% {
+    @apply left-4 top-4 h-2 w-2 opacity-0;
+  }
+  5% {
+    @apply left-4 top-4 h-2 w-2 opacity-100;
+  }
+  100% {
+    @apply left-0 top-0 h-10 w-10 opacity-0;
+  }
+}
+
+// @keyframes neoModalSlideOutLeft {
+//   to {
+//     opacity: 0;
+//     transform: translate3d(-100%, 0, 0px);
+//     visibility: hidden;
+//   }
+// }
+// .neo-animate--slideOutLeft {
+//   animation-name: slideOutLeft;
+// }

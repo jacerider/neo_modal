@@ -1,0 +1,4 @@
+services:
+  neo_modal.settings:
+    parent: neo_settings.repository
+    arguments: ['neo_modal']

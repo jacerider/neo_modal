@@ -1,0 +1,26 @@
+{
+  "name": "jacerider/neo_modal",
+  "description": "Provides modal API for elements and fields.",
+  "type": "drupal-module",
+  "license": "proprietary",
+  "homepage": "https://github.com/jacerider/neo_modal",
+  "authors": [
+    {
+      "name": "Cyle Carlson (JaceRider)",
+      "email": "jacerider@gmail.com",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/jacerider/neo_modal/issues",
+    "source": "https://github.com/jacerider/neo_modal"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/core": "^10.3",
+    "jacerider/neo": "^1",
+    "jacerider/neo_settings": "^1",
+    "jacerider/neo_icon": "^1",
+    "jacerider/neo_tooltip": "^1"
+  }
+}

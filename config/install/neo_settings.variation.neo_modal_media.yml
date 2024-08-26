@@ -1,0 +1,15 @@
+uuid: ef906ea1-c4e3-4086-8af8-7d9e728bd47d
+langcode: en
+status: true
+dependencies: {  }
+id: neo_modal_media
+label: Media
+parent: null
+plugin: neo_modal
+settings:
+  numeration: 1
+  fit: 1
+  contentPadding: '0'
+weight: 0
+visibility: {  }
+lock: true

@@ -1,0 +1,15 @@
+uuid: bcf197e6-8eda-41b8-8dce-46fae0b1d671
+langcode: en
+status: true
+dependencies: {  }
+id: neo_modal_dialog
+label: Dialog
+parent: ''
+plugin: neo_modal
+settings:
+  smartActions: 1
+  headerInContent: 1
+  contentScroll: 1
+weight: 0
+visibility: {  }
+lock: true

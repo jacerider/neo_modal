@@ -1,0 +1,114 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Neo | Modal module.
+ */
+
+use Drupal\neo_icon\IconElement;
+
+/**
+ * Implements hook_theme().
+ */
+function neo_modal_theme(): array {
+  return [
+    'neo_modal' => [
+      'render element' => 'element',
+    ],
+    'neo_modal_trigger_overlay' => [
+      'variables' => [
+        'title' => '',
+        'icon' => '',
+        'attributes' => [],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements template_preprocess().
+ */
+function template_preprocess_neo_modal(&$variables) {
+  $variables['has_parent'] = FALSE;
+  $element = $variables['element'];
+  // Ensure #attributes is set.
+  $element += ['#attributes' => []];
+
+  // Special handling for form elements.
+  if (isset($element['#array_parents'])) {
+    // Assign an html ID.
+    if (!isset($element['#attributes']['id'])) {
+      $element['#attributes']['id'] = $element['#id'];
+    }
+    $variables['has_parent'] = TRUE;
+  }
+
+  $variables['children'] = $element['#children'];
+  $variables['attributes'] = $element['#attributes'];
+}
+
+/**
+ * Implements hook_library_info_alter().
+ */
+function neo_modal_library_info_alter(&$libraries, $extension) {
+  if ($extension == 'core') {
+    $path = '/' . \Drupal::service('extension.list.module')->getPath('neo') . '/dist';
+
+    $libraries['drupal.dialog']['js'] = [];
+    // A library with no js or css will not be added to the page when
+    // aggregation is enabled. So we add a js file that does nothing.
+    $libraries['drupal.dialog']['js'][$path . '/js/na.js'] = ['minified' => TRUE];
+    $libraries['drupal.dialog']['dependencies'][] = 'neo_modal/modal';
+
+    $libraries['drupal.dialog.ajax']['js'] = [];
+    // A library with no js or css will not be added to the page when
+    // aggregation is enabled. So we add a js file that does nothing.
+    $libraries['drupal.dialog.ajax']['js'][$path . '/js/na.js'] = ['minified' => TRUE];
+    $libraries['drupal.dialog.ajax']['dependencies'][] = 'neo_modal/modal.dialog.ajax';
+    $libraries['drupal.dialog.ajax']['dependencies'] = array_values(array_filter($libraries['drupal.dialog.ajax']['dependencies'], function ($value) {
+      return $value !== 'core/jquery';
+    }));
+  }
+}
+
+/**
+ * Implements hook_ajax_render_alter().
+ */
+function neo_modal_ajax_render_alter(array &$data) {
+  foreach ($data as $delta => $command) {
+    if ($command['command'] == 'openDialog') {
+      /** @var \Drupal\neo_settings\SettingsRepositoryInterface $settingsRepository */
+      $settingsRepository = \Drupal::service('neo_modal.settings');
+      $settings = $settingsRepository->get('dialog');
+      if ($settings) {
+        $data[$delta]['settings'] = $settings->getDiffValues() + $settings->getDiffConfig();
+      }
+      if (!empty($command['dialogOptions'])) {
+        if (!empty($command['dialogOptions']['title'])) {
+          $iconElement = new IconElement($command['dialogOptions']['title'], NULL, NULL, ['any']);
+          if ($icon = $iconElement->getIcon()) {
+            $data[$delta]['settings']['icon'] = $icon->getSelector();
+          }
+          $data[$delta]['settings']['title'] = $command['dialogOptions']['title'];
+        }
+        if (!empty($command['dialogOptions']['width']) && $command['dialogOptions']['width'] != 'auto') {
+          $data[$delta]['settings']['width'] = $command['dialogOptions']['width'];
+        }
+        if (!empty($command['dialogOptions']['height']) && $command['dialogOptions']['height'] != 'auto') {
+          $data[$delta]['settings']['height'] = $command['dialogOptions']['height'];
+        }
+        if (!empty($command['dialogOptions']['position']['my'])) {
+          $data[$delta]['settings']['placement'] = str_replace(' ', '-', str_replace('top', 'start', str_replace('bottom', 'end', $command['dialogOptions']['position']['my'])));
+        }
+        if (!empty($command['dialogOptions']['classes'])) {
+          if (in_array('media-library-widget-modal', $command['dialogOptions']['classes'])) {
+            $data[$delta]['settings']['width'] = '100%';
+            $data[$delta]['settings']['height'] = '100%';
+          }
+          $data[$delta]['settings']['modalClasses'] = implode(' ', $command['dialogOptions']['classes']);
+        }
+      }
+    }
+  }
+
+}

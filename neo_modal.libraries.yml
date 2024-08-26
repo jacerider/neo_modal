@@ -1,0 +1,29 @@
+modal:
+  version: VERSION
+  neo: { group: contrib }
+  css:
+    component:
+      src/css/modal.scss: { minified: true }
+  js:
+    src/js/modal.ts: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - neo/animate
+    - neo/library.popper
+    - neo/library.body-scroll-lock
+    - neo_tooltip/library.tippy
+
+modal.ajax:
+  version: VERSION
+  neo: { group: contrib }
+  js:
+    src/js/modal.ajax.ts: {}
+  dependencies:
+    - neo_modal/modal
+
+modal.dialog.ajax:
+  version: VERSION
+  neo: { group: contrib }
+  js:
+    src/js/modal.dialog.ajax.ts: {}
