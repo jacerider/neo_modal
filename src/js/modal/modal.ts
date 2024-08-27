@@ -1304,7 +1304,6 @@ class NeoModal {
         wrapper.classList.add('neo-modal--ratio');
         wrapper.classList.add('neo-modal--ratio-' + this.options.videoRatio);
         wrapper.classList.add('bg-black');
-        // this.options.contentColorBg = 'transparent';
         this.canClickContent = false;
         let stringAutoplay:string;
         if (videoObj.type == 'vimeo' || videoObj.type == 'youtube') {
