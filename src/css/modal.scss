@@ -567,6 +567,11 @@ body.has-neo-modal--loader {
   .neo-modal--no-click & {
     // When the modal is not clickable, we don't use a background color.
     @apply bg-transparent;
+
+    &:before,
+    &:after {
+      display: none;
+    }
   }
 }
 
