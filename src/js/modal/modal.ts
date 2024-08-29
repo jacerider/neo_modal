@@ -1757,6 +1757,7 @@ class NeoModal {
     this.isOpen = true;
     this.originalOptions = Object.assign({}, this.options);
     this.eventBeforeOpen.trigger(this);
+    window.dispatchEvent(new Event('dialog:beforecreate'));
     this.buildStack();
     this.build().then(() => {
       setTimeout(() => {
@@ -1767,6 +1768,7 @@ class NeoModal {
 
   protected doOpen():void {
     this.eventOpen.trigger(this);
+    window.dispatchEvent(new Event('dialog:aftercreate'));
     this.watchInterval = setInterval(this.watch.bind(this), 200);
     this.modal?.style.setProperty('visibility', '');
     this.modal?.style.setProperty('pointer-events', '');
@@ -1866,6 +1868,7 @@ class NeoModal {
   public close():void {
     this.isOpen = false;
     this.eventBeforeClose.trigger(this);
+    window.dispatchEvent(new Event('dialog:beforeclose'));
     clearInterval(this.watchInterval as ReturnType<typeof setInterval>);
     this.doClose().then(() => {
       this.finishClose();
@@ -1942,6 +1945,7 @@ class NeoModal {
 
   protected finishClose():void {
     this.eventAfterClose.trigger(this);
+    window.dispatchEvent(new Event('dialog:afterclose'));
     if (this.contentPlaceholder) {
       const content = this.contentInner?.querySelector('.neo-modal-template');
       if (content) {

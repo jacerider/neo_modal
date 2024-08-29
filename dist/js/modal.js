@@ -686,7 +686,7 @@ const p = class p {
     this.isOpen ? this.close() : this.open();
   }
   open() {
-    this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), this.buildStack(), this.build().then(() => {
+    this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), window.dispatchEvent(new Event("dialog:beforecreate")), this.buildStack(), this.build().then(() => {
       setTimeout(() => {
         this.doOpen();
       });
@@ -694,7 +694,7 @@ const p = class p {
   }
   doOpen() {
     var e, i;
-    this.eventOpen.trigger(this), this.watchInterval = setInterval(this.watch.bind(this), 200), (e = this.modal) == null || e.style.setProperty("visibility", ""), (i = this.modal) == null || i.style.setProperty("pointer-events", ""), this.transitionBodyIn();
+    this.eventOpen.trigger(this), window.dispatchEvent(new Event("dialog:aftercreate")), this.watchInterval = setInterval(this.watch.bind(this), 200), (e = this.modal) == null || e.style.setProperty("visibility", ""), (i = this.modal) == null || i.style.setProperty("pointer-events", ""), this.transitionBodyIn();
     const t = document.querySelectorAll(".neo-modal");
     this.depth = t.length;
     for (let o = 0; o < t.length; o++) {
@@ -720,7 +720,7 @@ const p = class p {
     e ? e.focus() : this.options.trigger && this.options.trigger.blur(), this.buildTooltips();
   }
   close() {
-    this.isOpen = !1, this.eventBeforeClose.trigger(this), clearInterval(this.watchInterval), this.doClose().then(() => {
+    this.isOpen = !1, this.eventBeforeClose.trigger(this), window.dispatchEvent(new Event("dialog:beforeclose")), clearInterval(this.watchInterval), this.doClose().then(() => {
       this.finishClose();
     }), this.options.trigger && this.options.trigger.focus();
   }
@@ -743,7 +743,7 @@ const p = class p {
   }
   finishClose() {
     var t, e;
-    if (this.eventAfterClose.trigger(this), this.contentPlaceholder) {
+    if (this.eventAfterClose.trigger(this), window.dispatchEvent(new Event("dialog:afterclose")), this.contentPlaceholder) {
       const i = (t = this.contentInner) == null ? void 0 : t.querySelector(".neo-modal-template");
       i && ((e = this.contentPlaceholder.parentNode) == null || e.replaceChild(i, this.contentPlaceholder));
     }
