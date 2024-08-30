@@ -1584,7 +1584,7 @@ class NeoModal {
         });
       }
       else {
-        this.contentInner.querySelectorAll('input[type=submit], button, .neo-modal--btn').forEach((button) => {
+        this.contentInner.querySelectorAll('form > input[type=submit], form > button, .neo-modal--btn').forEach((button) => {
           buttons.push(button as HTMLElement);
         });
       }

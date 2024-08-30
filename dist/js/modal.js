@@ -633,7 +633,7 @@ const p = class p {
           i.push(a);
         });
       } else
-        this.contentInner.querySelectorAll("input[type=submit], button, .neo-modal--btn").forEach((n) => {
+        this.contentInner.querySelectorAll("form > input[type=submit], form > button, .neo-modal--btn").forEach((n) => {
           i.push(n);
         });
       i.length && (i.forEach((n) => {
