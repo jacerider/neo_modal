@@ -515,7 +515,7 @@ class NeoModal {
     if (this.modal) {
       this.modal.querySelectorAll('.neo-modal--tooltip:not(.neo-modal--tooltip-processed)').forEach((el) => {
         el.classList.add('neo-modal--tooltip-processed');
-        tippy(el);
+        tippy(el, {touch: false});
       });
     }
   }

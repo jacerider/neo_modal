@@ -257,7 +257,7 @@ const p = class p {
   }
   buildTooltips() {
     this.modal && this.modal.querySelectorAll(".neo-modal--tooltip:not(.neo-modal--tooltip-processed)").forEach((t) => {
-      t.classList.add("neo-modal--tooltip-processed"), tippy(t);
+      t.classList.add("neo-modal--tooltip-processed"), tippy(t, { touch: !1 });
     });
   }
   attachModal() {
