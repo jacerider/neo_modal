@@ -331,10 +331,18 @@ class NeoModal {
     this.defaults = Object.assign({}, this.defaults, options);
   }
 
-  public static closeTop():void {
+  public static getTop():NeoModal|null {
     const modal = document.querySelector<HTMLElement>('.neo-modal:last-child') as neoModal.NeoModalElement;
     if (modal && modal.neoModal) {
-      modal.neoModal.close();
+      return modal.neoModal;
+    }
+    return null;
+  }
+
+  public static closeTop():void {
+    const neoModal = this.getTop();
+    if (neoModal) {
+      neoModal.close();
     }
   }
 
@@ -497,7 +505,6 @@ class NeoModal {
   protected buildModal():void {
     this.buildHeader();
     this.buildFooter();
-    this.buildContentFooter();
     if (this.modal) {
       this.modal.querySelectorAll('[data-neo-modal-close]').forEach((el) => {
         el.addEventListener('click', e => {
@@ -1152,9 +1159,17 @@ class NeoModal {
         this.eventContentLoaded.trigger(this);
         this.hideLoader();
         this.bindContentEvents();
+        this.buildContentFooter();
         resolve();
       });
     });
+  }
+
+  public refreshContent():void {
+    if (this.contentBlock) {
+      this.contentBlock.querySelector('.neo-modal--content-footer')?.remove();
+    }
+    this.buildContentFooter();
   }
 
   protected bindContentEvents():void {
@@ -1757,7 +1772,6 @@ class NeoModal {
     this.isOpen = true;
     this.originalOptions = Object.assign({}, this.options);
     this.eventBeforeOpen.trigger(this);
-    window.dispatchEvent(new Event('dialog:beforecreate'));
     this.buildStack();
     this.build().then(() => {
       setTimeout(() => {
@@ -1768,7 +1782,6 @@ class NeoModal {
 
   protected doOpen():void {
     this.eventOpen.trigger(this);
-    window.dispatchEvent(new Event('dialog:aftercreate'));
     this.watchInterval = setInterval(this.watch.bind(this), 200);
     this.modal?.style.setProperty('visibility', '');
     this.modal?.style.setProperty('pointer-events', '');
@@ -1868,7 +1881,6 @@ class NeoModal {
   public close():void {
     this.isOpen = false;
     this.eventBeforeClose.trigger(this);
-    window.dispatchEvent(new Event('dialog:beforeclose'));
     clearInterval(this.watchInterval as ReturnType<typeof setInterval>);
     this.doClose().then(() => {
       this.finishClose();
@@ -1945,7 +1957,6 @@ class NeoModal {
 
   protected finishClose():void {
     this.eventAfterClose.trigger(this);
-    window.dispatchEvent(new Event('dialog:afterclose'));
     if (this.contentPlaceholder) {
       const content = this.contentInner?.querySelector('.neo-modal-template');
       if (content) {

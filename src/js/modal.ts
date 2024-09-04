@@ -2,6 +2,16 @@ import { NeoModal } from './modal/modal';
 
 (function (Drupal, drupalSettings, once) {
 
+  class DrupalDialogEvent extends Event {
+    dialog:NeoModal;
+    settings:drupal.IDrupalSettings|null;
+    constructor(type:string, dialog:NeoModal, settings:drupal.IDrupalSettings|null = null) {
+      super(`dialog:${type}`, { bubbles: true });
+      this.dialog = dialog;
+      this.settings = settings;
+    }
+  }
+
   const defaultOptions = {
     iconClasses: 'neo-icon neo-icon-font',
   };
@@ -11,7 +21,18 @@ import { NeoModal } from './modal/modal';
   NeoModal.setDefaultOptions(defaultOptions);
 
   Drupal.behaviors.neoModal = {
-    attach: (context:HTMLElement) => {
+    attach: (context:HTMLElement, ) => {
+
+      // Rebuild content footer for content that may have changed within the
+      // top modal.
+      const modal = NeoModal.getTop();
+      if (modal) {
+        const content = modal.getContent();
+        if (content && content.children[0] && !content.children[0].classList.contains('neo-modal--processed')) {
+          modal.refreshContent();
+        }
+      }
+
       once('neo.modal', '.use-neo-modal', context).forEach(el => {
         const options:any = {};
         options['trigger'] = el;
@@ -29,61 +50,8 @@ import { NeoModal } from './modal/modal';
           }
           return '';
         };
-        // if (typeof Drupal.behaviors.neoLoader !== 'undefined') {
-        //   options['loader'] = (movement:neoModal.Movement) => {
-        //     if (movement === 'in') {
-        //       Drupal.behaviors.neoLoader.show();
-        //     }
-        //     else if (movement === 'out') {
-        //       Drupal.behaviors.neoLoader.hide();
-        //     }
-        //   }
-        // }
-        // Events as options.
-        // options['onBeforeOpen'] = () => {
-        //   Drupal.behaviors.neoLoader.show();
-        // };
-        // options['onOpen'] = () => {
-        //   Drupal.behaviors.neoLoader.hide();
-        // };
-        // options['onContentLoaded'] = (content:HTMLElement) => {
-        //   Drupal.attachBehaviors(content, drupalSettings);
-        // };
-        // options['onAfterOpen'] = () => {
-        //   console.log('option: after open');
-        // };
-        // options['onBeforeClose'] = () => {
-        //   console.log('option: before close');
-        // };
-        // options['onClose'] = () => {
-        //   console.log('option: close');
-        // };
-        // options['onAfterClose'] = () => {
-        //   console.log('option: after close');
-        // };
-        // Events as listeners.
 
         new NeoModal(options);
-
-        // console.log(drupalSettings);
-        // modal.beforeOpenEvent().on(() => {
-        //   console.log('event: before open');
-        // });
-        // modal.openEvent().on(() => {
-        //   console.log('event: open');
-        // });
-        // modal.afterOpenEvent().on(() => {
-        //   console.log('event: after open');
-        // });
-        // modal.beforeCloseEvent().on(() => {
-        //   console.log('event: before close');
-        // });
-        // modal.closeEvent().on(() => {
-        //   console.log('event: close');
-        // });
-        // modal.afterCloseEvent().on(() => {
-        //   console.log('event: after close');
-        // });
       });
     }
   };
@@ -94,12 +62,22 @@ import { NeoModal } from './modal/modal';
       modal.event('onContentLoaded').on(() => {
         const content = modal.getContent();
         if (content) {
+          content.children[0]?.classList.add('neo-modal--processed');
           Drupal.attachBehaviors(content, drupalSettings);
         }
       });
+      modal.event('onBeforeOpen').on(() => {
+        window.dispatchEvent(new DrupalDialogEvent('beforecreate', modal, drupalSettings));
+      });
+      modal.event('onOpen').on(() => {
+        window.dispatchEvent(new DrupalDialogEvent('aftercreate', modal, drupalSettings));
+      });
+      modal.event('onClose').on(() => {
+        window.dispatchEvent(new DrupalDialogEvent('beforeclose', modal, drupalSettings));
+      });
       modal.event('onAfterClose').on(() => {
+        window.dispatchEvent(new DrupalDialogEvent('afterclose', modal, drupalSettings));
         const content = modal.getContent();
-        console.log('afer close', content);
         if (content) {
           Drupal.detachBehaviors(content, drupalSettings);
         }
