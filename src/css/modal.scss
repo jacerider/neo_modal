@@ -671,7 +671,7 @@ body.has-neo-modal--loader {
 }
 
 .has-neo-modal-trigger-overlay {
-  @apply relative;
+  @apply relative block;
 
   &:hover {
     .neo-modal--trigger-overlay {

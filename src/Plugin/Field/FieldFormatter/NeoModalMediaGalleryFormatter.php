@@ -81,8 +81,23 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
    */
   public static function defaultSettings() {
     return [
-      'thumbnail' => [],
-      'full' => [],
+      'thumbnail' => [
+        'dimensions' => [
+          'sm' => [
+            'width' => 640,
+            'height' => '',
+          ],
+        ],
+      ],
+      'full' => [
+        'dimensions' => [
+          'sm' => [
+            'width' => 1600,
+            'height' => '',
+          ],
+        ],
+      ],
+      'thumbnail_title' => '',
       'modal_variation' => '',
       'modal_title' => '',
       'modal_group' => '',
@@ -122,6 +137,13 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
       '#default_value' => $this->getSetting('full'),
     ];
 
+    $element['thumbnail_title'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Thumbnail Title'),
+      '#options' => $this->getTitleOptions(),
+      '#default_value' => $this->getSetting('thumbnail_title'),
+    ];
+
     $element['modal_variation'] = [
       '#type' => 'neo_settings_variation',
       '#title' => $this->t('Modal Preset'),
@@ -132,7 +154,7 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
     $element['modal_title'] = [
       '#type' => 'select',
       '#title' => $this->t('Modal Title'),
-      '#options' => $this->getMediaTitleOptions(),
+      '#options' => $this->getTitleOptions(),
       '#default_value' => $this->getSetting('modal_title'),
     ];
 
@@ -152,7 +174,7 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
    * @return array
    *   The media title options.
    */
-  protected function getMediaTitleOptions() {
+  protected function getTitleOptions() {
     return [
       '' => 'None',
       'media_title' => 'Media Title',
@@ -189,6 +211,13 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
       }
     }
 
+    if ($this->getSetting('thumbnail_title')) {
+      $summary[] = $this->t('<strong>@label</strong> @value', [
+        '@label' => $this->t('Thumbnail Title'),
+        '@value' => $this->getTitleOptions()[$this->getSetting('thumbnail_title')] ?? 'None',
+      ]);
+    }
+
     if ($this->getSetting('modal_variation')) {
       $options = NeoSettingsVariation::getOptions('neo_modal.settings');
       $summary[] = $this->t('<strong>@label</strong> @value', [
@@ -200,7 +229,7 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
     if ($this->getSetting('modal_title')) {
       $summary[] = $this->t('<strong>@label</strong> @value', [
         '@label' => $this->t('Modal Title'),
-        '@value' => $this->getMediaTitleOptions()[$this->getSetting('modal_title')] ?? 'None',
+        '@value' => $this->getTitleOptions()[$this->getSetting('modal_title')] ?? 'None',
       ]);
     }
 
@@ -224,9 +253,36 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
     $fullDimensions = $fullSettings['dimensions'] ?? [];
 
     foreach ($media_items as $delta => $media) {
-      $thumbnail = NeoImage::createFromEntity($media);
+      /** @var \Drupal\media\MediaInterface $media */
+      $title = '';
+      switch ($this->getSetting('thumbnail_title')) {
+        case 'media_title':
+          $title = $media->label();
+          break;
+
+        case 'image_alt':
+          $title = $elements[$delta]['image']['#alt'];
+          break;
+
+        case 'image_title':
+          $title = $elements[$delta]['image']['#title'];
+          break;
+      }
+
+      $thumbnail = NeoImage::createFromEntity($media, $title);
       $thumbnail->autoFromDimensions($thumbnailDimensions);
-      $elements[$delta] = $thumbnail->toRenderable();
+      $elements[$delta]['image'] = $thumbnail->toRenderable();
+
+      if ($title) {
+        $elements[$delta]['title'] = [
+          '#type' => 'html_tag',
+          '#tag' => 'div',
+          '#value' => $title,
+          '#attributes' => [
+            'class' => ['neo-modal-media-gallery-title'],
+          ],
+        ];
+      }
 
       if (!empty($fullDimensions)) {
         $full = NeoImage::createFromEntity($media);
@@ -239,15 +295,17 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
             break;
 
           case 'image_alt':
-            $modal->setTitle($elements[$delta]['#alt']);
+            $modal->setTitle($elements[$delta]['image']['#alt']);
             break;
 
           case 'image_title':
-            $modal->setTitle($elements[$delta]['#title']);
+            $modal->setTitle($elements[$delta]['image']['#title']);
             break;
         }
         if (in_array($media->bundle(), ['remote_video', 'video'])) {
           $modal->setTriggerOverlay(t('View Video'), 'play-circle');
+          $videoUrl = $media->getSource()->getSourceFieldValue($media);
+          $modal->setVideo($videoUrl);
         }
         $modal->applyTo($elements[$delta]);
       }
