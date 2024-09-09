@@ -1848,7 +1848,7 @@ class Modal {
     foreach ($this->libraries as $library) {
       $attachments['library'][] = $library;
     }
-    if ($globalOptions = $this->getSettings()->getDiffConfig()) {
+    if ($globalOptions = $this->getSettings()->getDiffConfigValues()) {
       $attachments['drupalSettings']['neoModal']['defaults'] = $globalOptions;
     }
     return $attachments;

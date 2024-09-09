@@ -81,7 +81,7 @@ function neo_modal_ajax_render_alter(array &$data) {
       $settingsRepository = \Drupal::service('neo_modal.settings');
       $settings = $settingsRepository->get('dialog');
       if ($settings) {
-        $data[$delta]['settings'] = $settings->getDiffValues() + $settings->getDiffConfig();
+        $data[$delta]['settings'] = $settings->getDiffValues() + $settings->getDiffConfigValues();
       }
       if (!empty($command['dialogOptions'])) {
         if (!empty($command['dialogOptions']['title'])) {
