@@ -727,14 +727,16 @@ const u = class u {
     }) : this.finishOpen();
   }
   finishOpen() {
-    var i, o;
+    var o, n, a;
     this.options.navKeyboard && (document.body.addEventListener("keydown", this.onKeyboardDown.bind(this)), document.body.addEventListener("keyup", this.onKeyboardUp.bind(this))), this.options.fit && (document.body.addEventListener("mousemove", this.focusWatch.bind(this), !1), this.focusWatch());
-    const t = "a[href], button, input:not([type=hidden]), textarea, select, details, [tabindex]", e = ((i = this.modal) == null ? void 0 : i.querySelector(
+    const t = "a[href], details, [tabindex]", e = "input:not([type=hidden]), textarea, select, button", i = ((o = this.contentInner) == null ? void 0 : o.querySelector(
+      e
+    )) || ((n = this.modal) == null ? void 0 : n.querySelector(
       t
-    )) || ((o = this.contentInner) == null ? void 0 : o.querySelector(
+    )) || ((a = this.contentInner) == null ? void 0 : a.querySelector(
       t
     ));
-    e ? e.focus() : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this);
+    i ? i.focus() : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this);
   }
   close() {
     var t;

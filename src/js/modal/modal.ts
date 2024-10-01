@@ -1875,8 +1875,11 @@ class NeoModal {
       this.focusWatch();
     }
 
-    const focusableElements = 'a[href], button, input:not([type=hidden]), textarea, select, details, [tabindex]';
-    const keyboardfocusableElement = this.modal?.querySelector<HTMLElement>(
+    const focusableElements = 'a[href], details, [tabindex]';
+    const focusableFormElements = 'input:not([type=hidden]), textarea, select, button';
+    const keyboardfocusableElement = this.contentInner?.querySelector<HTMLElement>(
+      focusableFormElements
+    ) || this.modal?.querySelector<HTMLElement>(
       focusableElements
     ) || this.contentInner?.querySelector<HTMLElement>(
       focusableElements
