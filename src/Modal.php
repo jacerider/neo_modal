@@ -75,6 +75,41 @@ class Modal {
   protected string|null $height = NULL;
 
   /**
+   * The z-index of the modal.
+   *
+   * @var int|null
+   */
+  protected int|null $zIndex = NULL;
+
+  /**
+   * The displace top of the modal.
+   *
+   * @var string|null
+   */
+  protected string|null $displaceTop = NULL;
+
+  /**
+   * The displace right of the modal.
+   *
+   * @var string|null
+   */
+  protected string|null $displaceRight = NULL;
+
+  /**
+   * The displace bottom of the modal.
+   *
+   * @var string|null
+   */
+  protected string|null $displaceBottom = NULL;
+
+  /**
+   * The displace left of the modal.
+   *
+   * @var string|null
+   */
+  protected string|null $displaceLeft = NULL;
+
+  /**
    * Whether the modal has a backdrop.
    *
    * @var bool|null
@@ -199,6 +234,13 @@ class Modal {
    * @var bool|null
    */
   protected $fit = NULL;
+
+  /**
+   * Flag indicating whether the modal should be nested.
+   *
+   * @var bool|null
+   */
+  protected $nest = NULL;
 
   /**
    * The flag indicating wheter the modal is draggable.
@@ -373,7 +415,7 @@ class Modal {
    *
    * @var string|null
    */
-  protected string|null $contentAnimationOut = NULL;
+  protected string|null $contentAnimateOut = NULL;
 
   /**
    * The content animation out speed.
@@ -782,6 +824,71 @@ class Modal {
   }
 
   /**
+   * Sets the z-index of the modal.
+   *
+   * @param int $value
+   *   The z-index value.
+   *
+   * @return $this
+   */
+  public function setZindex(int $value):self {
+    $this->zIndex = $value;
+    return $this;
+  }
+
+  /**
+   * Sets the displace left of the modal.
+   *
+   * @param string $value
+   *   The displace left value. Example: 0px, 1rem.
+   *
+   * @return $this
+   */
+  public function setDisplaceTop(string $value):self {
+    $this->displaceTop = $value;
+    return $this;
+  }
+
+  /**
+   * Sets the displace right of the modal.
+   *
+   * @param string $value
+   *   The displace right value. Example: 0px, 1rem.
+   *
+   * @return $this
+   */
+  public function setDisplaceRight(string $value):self {
+    $this->displaceRight = $value;
+    return $this;
+  }
+
+  /**
+   * Sets the displace bottom of the modal.
+   *
+   * @param string $value
+   *   The displace bottom value. Example: 0px, 1rem.
+   *
+   * @return $this
+   */
+  public function setDisplaceBottom(string $value):self {
+    $this->displaceBottom = $value;
+    return $this;
+  }
+
+  /**
+   * Sets the displace left of the modal.
+   *
+   * @param string $value
+   *   The displace left value. Example: 0px, 1rem.
+   *
+   * @return $this
+   */
+  public function setDisplaceLeft(string $value):self {
+    $this->displaceLeft = $value;
+    return $this;
+  }
+
+  /**
    * Sets whether the modal has a backdrop.
    *
    * @param bool $backdrop
@@ -1039,6 +1146,21 @@ class Modal {
    */
   public function setFit(bool $fit = TRUE):self {
     $this->fit = $fit;
+    return $this;
+  }
+
+  /**
+   * Sets whether the modal should be nested.
+   *
+   * If TRUE, a modal will stack on top of another already-open modal.
+   *
+   * @param bool $nest
+   *   TRUE if the modal is nested, FALSE otherwise.
+   *
+   * @return $this
+   */
+  public function setNest(bool $nest = TRUE):self {
+    $this->nest = $nest;
     return $this;
   }
 
@@ -1508,9 +1630,9 @@ class Modal {
    *
    * @return $this
    */
-  public function setContentAnimationOut(string $value):self {
+  public function setContentAnimateOut(string $value):self {
     if (isset(static::getAnimationsOut()[$value])) {
-      $this->contentAnimationOut = $value;
+      $this->contentAnimateOut = $value;
     }
     return $this;
   }
@@ -1767,6 +1889,11 @@ class Modal {
       'colorScheme',
       'width',
       'height',
+      'zIndex',
+      'displaceTop',
+      'displaceRight',
+      'displaceBottom',
+      'displaceLeft',
       'title',
       'subtitle',
       'icon',
@@ -1793,7 +1920,7 @@ class Modal {
       'contentAnimateIn',
       'contentAnimateInSpeed',
       'contentAnimateInDelay',
-      'contentAnimationOut',
+      'contentAnimateOut',
       'contentAnimateOutSpeed',
       'contentAnimateOutDelay',
     ] as $key) {
@@ -1810,6 +1937,7 @@ class Modal {
       'smartActions' => FALSE,
       'numeration' => FALSE,
       'fit' => FALSE,
+      'nest' => TRUE,
       'bodyLock' => TRUE,
       'downloadLink' => TRUE,
       'shareLink' => TRUE,
@@ -1954,7 +2082,8 @@ class Modal {
    * @return array
    *   The renderable array.
    */
-  public function buildContent(mixed $build, $tag = 'template'):array {
+  public function buildContent(mixed $build = NULL, $tag = 'template'):array {
+    $build = $build ?? $this->content;
     if (is_string($build) || $build instanceof MarkupInterface) {
       $build = [
         '#type' => 'markup',

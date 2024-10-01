@@ -29,15 +29,6 @@ use Drupal\neo_settings\Plugin\SettingsBase;
  */
 class ModalSettings extends SettingsBase {
 
-  // /**
-  //  * {@inheritdoc}
-  //  */
-  // public static function defaultFormConfig() {
-  //   return [
-  //     'mode' => 'simple',
-  //   ] + parent::defaultFormConfig();
-  // }
-
   /**
    * {@inheritdoc}
    *
@@ -121,6 +112,7 @@ class ModalSettings extends SettingsBase {
     $modal->applyTo($level2['nested']);
     $modal = new Modal($level2);
     $modal->setColorScheme('secondary-solid-dark');
+    // $modal->setBackdrop(FALSE);
     $modal->applyTo($level1['nested']);
     $modal = new Modal($level1);
     // $modal->setColorScheme('primary-solid');
@@ -307,7 +299,7 @@ class ModalSettings extends SettingsBase {
     ];
 
     $form['header']['icon'] = [
-      '#type' => 'neo_icon',
+      '#type' => 'neo_icon_select',
       '#title' => $this->t('Icon'),
       '#description' => $this->t('The icon of the modal.'),
       '#default_value' => $this->getValue('icon'),

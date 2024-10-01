@@ -3,10 +3,16 @@ appendTo: ''
 appendToClosest: ''
 width: 'auto'
 height: 'auto'
+zIndex: ''
+displaceTop: ''
+displaceRight: ''
+displaceBottom: ''
+displaceLeft: ''
 group: ''
 smartActions: 0
 numeration: 0
 fit: 0
+nest: 1
 drag: 1
 bodyLock: 1
 header: 1

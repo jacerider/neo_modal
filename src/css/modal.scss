@@ -3,6 +3,11 @@
   --modal-padding-t: 0px;
   --modal-content-padding: 1.5rem;
   --modal-content-header-padding: 1rem 1.5rem;
+  --modal-displace-top: var(--drupal-displace-offset-top);
+  --modal-displace-right: var(--drupal-displace-offset-right);
+  --modal-displace-bottom: var(--drupal-displace-offset-bottom);
+  --modal-displace-left: var(--drupal-displace-offset-left);
+  --modal-z-index: 40;
 }
 
 body.neo-modal--body-lock,
@@ -19,29 +24,32 @@ body.has-neo-modal--loader {
 }
 
 .neo-modal {
-  @apply fixed z-40;
-  top: var(--drupal-displace-offset-top, 0px);
-  right: var(--drupal-displace-offset-right, 0px);
-  bottom: var(--drupal-displace-offset-bottom, 0px);
-  left: var(--drupal-displace-offset-left, 0px);
+  @apply fixed;
+  z-index: var(--modal-z-index, 40);
+  top: var(--modal-displace-top, 0px);
+  right: var(--modal-displace-right, 0px);
+  bottom: var(--modal-displace-bottom, 0px);
+  left: var(--modal-displace-left, 0px);
 }
 
 .neo-modal--backdrop {
-  @apply fixed z-40 h-full w-full;
-  top: var(--drupal-displace-offset-top, 0px);
-  right: var(--drupal-displace-offset-right, 0px);
-  bottom: var(--drupal-displace-offset-bottom, 0px);
-  left: var(--drupal-displace-offset-left, 0px);
+  @apply fixed h-full w-full;
+  z-index: var(--modal-z-index, 40);
+  top: var(--modal-displace-top, 0px);
+  right: var(--modal-displace-right, 0px);
+  bottom: var(--modal-displace-bottom, 0px);
+  left: var(--modal-displace-left, 0px);
   background: var(--modal-backdrop-bg, rgb(var(--color-base-950) / 0.9));
   transition-duration: var(--animate-duration);
+  transition-property: background-color;
 }
 
 .neo-modal--loader {
   @apply fixed z-50 flex items-center justify-center;
-  top: var(--drupal-displace-offset-top, 0px);
-  right: var(--drupal-displace-offset-right, 0px);
-  bottom: var(--drupal-displace-offset-bottom, 0px);
-  left: var(--drupal-displace-offset-left, 0px);
+  top: var(--modal-displace-top, 0px);
+  right: var(--modal-displace-right, 0px);
+  bottom: var(--modal-displace-bottom, 0px);
+  left: var(--modal-displace-left, 0px);
 
   > div {
     @apply rounded-xl p-4;
@@ -51,7 +59,7 @@ body.has-neo-modal--loader {
 
 .neo-modal--spinner {
   @apply relative box-border block h-10 w-10;
-  color: var(--modal-loader-color, rgb(var(--color-white)));
+  color: var(--modal-loader-color, rgb(var(--color-base-content-950)));
   div {
     @apply absolute box-border rounded-full border-2 border-current opacity-100;
     animation: neoModalSpin 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
@@ -63,8 +71,8 @@ body.has-neo-modal--loader {
 
 .neo-modal--nav {
   @apply pointer-events-none fixed z-10 flex w-24 cursor-pointer items-center overflow-hidden;
-  top: var(--drupal-displace-offset-top, 0px);
-  bottom: var(--drupal-displace-offset-bottom, 0px);
+  top: var(--modal-displace-top, 0px);
+  bottom: var(--modal-displace-bottom, 0px);
 
   &:before {
     @apply absolute left-0 top-0 block h-full w-full;
@@ -98,7 +106,8 @@ body.has-neo-modal--loader {
   }
 
   &.neo-modal--prev {
-    @apply left-0 justify-start;
+    @apply justify-start;
+    left: var(--modal-displace-left, 0px);
 
     a {
       @apply rounded-r-full;
@@ -122,7 +131,8 @@ body.has-neo-modal--loader {
   }
 
   &.neo-modal--next {
-    @apply right-0 justify-end;
+    @apply justify-end;
+    right: var(--modal-displace-right, 0px);
 
     a {
       @apply rounded-l-full;
@@ -154,12 +164,9 @@ body.has-neo-modal--loader {
   // When in global scope.
   .neo-modal--header-global & {
     @apply fixed z-20 text-center;
-    top: var(--drupal-displace-offset-top, 0px);
+    top: var(--modal-displace-top, 0px);
     width: calc(
-      100vw - var(--drupal-displace-offset-left, 0px) - var(
-          --drupal-displace-offset-right,
-          0px
-        )
+      100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
     );
 
     > div {
@@ -316,7 +323,14 @@ body.has-neo-modal--loader {
   @apply block leading-none;
 
   > span {
-    @apply opacity-80 transition-opacity;
+    @apply block opacity-80 transition;
+  }
+
+  &:active,
+  &:focus {
+    > span {
+      @apply z-10 rounded ring ring-primary;
+    }
   }
 
   &:hover {
@@ -344,7 +358,7 @@ body.has-neo-modal--loader {
 // Footer.
 .neo-modal--footer {
   @apply pointer-events-none fixed bottom-0 left-0 z-20 flex w-full items-center justify-center;
-  bottom: calc(5px + var(--drupal-displace-offset-bottom, 0px));
+  bottom: calc(5px + var(--modal-displace-bottom, 0px));
 }
 
 .neo-modal--footer-inner {
@@ -360,10 +374,7 @@ body.has-neo-modal--loader {
 .neo-modal--container {
   @apply absolute left-0 top-0 z-10 box-content flex h-full w-full flex-col;
   max-height: calc(
-    100vh - var(--drupal-displace-offset-top, 0px) - var(
-        --drupal-displace-offset-bottom,
-        0px
-      )
+    100vh - var(--modal-displace-top, 0px) - var(--modal-displace-bottom, 0px)
   );
   transition: opacity, transform;
   transition-duration: calc(var(--animate-duration) * 0.8);
@@ -386,10 +397,7 @@ body.has-neo-modal--loader {
 
   .neo-modal--header-global & {
     max-height: calc(
-      100vh - var(--drupal-displace-offset-top, 0px) - var(
-          --drupal-displace-offset-bottom,
-          0px
-        )
+      100vh - var(--modal-displace-top, 0px) - var(--modal-displace-bottom, 0px)
     );
     box-sizing: border-box;
     padding-top: var(--modal-padding-t);
@@ -459,10 +467,7 @@ body.has-neo-modal--loader {
 .neo-modal--content--container {
   @apply relative;
   max-width: calc(
-    100vw - var(--drupal-displace-offset-left, 0px) - var(
-        --drupal-displace-offset-right,
-        0px
-      )
+    100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
   );
 
   .neo-modal--content-scroll & {
@@ -491,44 +496,35 @@ body.has-neo-modal--loader {
 .neo-modal--content-block {
   @apply flex h-full flex-col;
   max-width: calc(
-    100vw - var(--drupal-displace-offset-left, 0px) - var(
-        --drupal-displace-offset-right,
-        0px
-      )
+    100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
   );
 
   .neo-modal--width-full & {
     width: calc(
-      100vw - var(--drupal-displace-offset-left, 0px) - var(
-          --drupal-displace-offset-right,
-          0px
-        )
+      100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
     );
   }
 
   .neo-modal--height-full & {
     min-height: calc(
-      100vh - var(--drupal-displace-offset-top, 0px) - var(
-          --drupal-displace-offset-bottom,
+      100vh - var(--modal-displace-top, 0px) - var(--modal-displace-bottom, 0px) - var(
+          --modal-padding-t,
           0px
-        ) - var(--modal-padding-t, 0px)
+        )
     );
   }
 
   .neo-modal--content-scroll & {
     max-height: calc(
-      100vh - var(--drupal-displace-offset-top, 0px) - var(
-          --drupal-displace-offset-bottom,
-          0px
-        )
+      100vh - var(--modal-displace-top, 0px) - var(--modal-displace-bottom, 0px)
     );
   }
 }
 
 .neo-modal--content-wrapper {
   @apply relative flex h-full flex-col;
-  background: var(--modal-content-bg, rgb(var(--color-base-50)));
-  color: var(--modal-content-color, rgb(var(--color-base-content-50)));
+  background: var(--modal-content-bg, rgb(var(--color-base-0)));
+  color: var(--modal-content-color, rgb(var(--color-base-content-0)));
 
   .neo-modal--content-scroll & {
     @apply basis-full overflow-hidden;
@@ -543,8 +539,8 @@ body.has-neo-modal--loader {
     height: var(--modal-content-padding);
     background: linear-gradient(
       to bottom,
-      var(--modal-content-bg, rgb(var(--color-base-50))),
-      rgb(var(--color-base-50) / 0)
+      var(--modal-content-bg, rgb(var(--color-base-0))),
+      rgb(var(--color-base-0) / 0)
     );
     content: '';
   }
@@ -558,8 +554,8 @@ body.has-neo-modal--loader {
     height: var(--modal-content-padding);
     background: linear-gradient(
       to bottom,
-      rgb(var(--color-base-50) / 0),
-      var(--modal-content-bg, rgb(var(--color-base-50)))
+      rgb(var(--color-base-0) / 0),
+      var(--modal-content-bg, rgb(var(--color-base-0)))
     );
     content: '';
   }
@@ -592,8 +588,8 @@ body.has-neo-modal--loader {
     > picture img {
       width: auto;
       max-height: calc(
-        100vh - var(--drupal-displace-offset-top, 0px) - var(
-            --drupal-displace-offset-bottom,
+        100vh - var(--modal-displace-top, 0px) - var(
+            --modal-displace-bottom,
             0px
           ) - var(--modal-padding-t, 0px) - var(--modal-content-padding, 0px) - var(
             --modal-content-padding,
@@ -683,10 +679,6 @@ body.has-neo-modal--loader {
     .neo-modal--trigger-overlay-inner {
       @apply scale-100 bg-transparent shadow-none;
     }
-
-    // .neo-modal--trigger-overlay-icon + .neo-modal--trigger-overlay-title {
-    //   @apply h-auto w-100 opacity-100;
-    // }
   }
 }
 

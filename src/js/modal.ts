@@ -14,6 +14,19 @@ import { NeoModal } from './modal/modal';
 
   const defaultOptions = {
     iconClasses: 'neo-icon neo-icon-font',
+    onContentLoaded: (modal:NeoModal) => {
+      const content = modal.getContent();
+      if (content) {
+        content.children[0]?.classList.add('neo-modal--processed');
+        Drupal.attachBehaviors(content, drupalSettings);
+      }
+    },
+    onAfterClose: (modal:NeoModal) => {
+      const content = modal.getContent();
+      if (content) {
+        Drupal.detachBehaviors(content, drupalSettings);
+      }
+    }
   };
   if (typeof drupalSettings.neoModal !== 'undefined' && typeof drupalSettings.neoModal.defaults !== 'undefined') {
     Object.assign(defaultOptions, drupalSettings.neoModal.defaults);
@@ -59,13 +72,6 @@ import { NeoModal } from './modal/modal';
   Drupal.neoModal = {
     open: (options:any) => {
       const modal = new NeoModal(options);
-      modal.event('onContentLoaded').on(() => {
-        const content = modal.getContent();
-        if (content) {
-          content.children[0]?.classList.add('neo-modal--processed');
-          Drupal.attachBehaviors(content, drupalSettings);
-        }
-      });
       modal.event('onBeforeOpen').on(() => {
         window.dispatchEvent(new DrupalDialogEvent('beforecreate', modal, drupalSettings));
       });
@@ -77,10 +83,6 @@ import { NeoModal } from './modal/modal';
       });
       modal.event('onAfterClose').on(() => {
         window.dispatchEvent(new DrupalDialogEvent('afterclose', modal, drupalSettings));
-        const content = modal.getContent();
-        if (content) {
-          Drupal.detachBehaviors(content, drupalSettings);
-        }
       });
       modal.open();
     },

@@ -30,11 +30,17 @@ class NeoModal {
     placement: 'center',
     width: 'auto',
     height: 'auto',
+    zIndex: null,
+    displaceTop: '',
+    displaceRight: '',
+    displaceBottom: '',
+    displaceLeft: '',
     image: null,
     video: null,
     iframe: null,
     group: null,
     fit: false,
+    nest: true,
     drag: true,
     bodyLock: true,
     downloadLink: true,
@@ -214,6 +220,11 @@ class NeoModal {
     'colorScheme',
     'width',
     'height',
+    'zIndex',
+    'displaceTop',
+    'displaceRight',
+    'displaceBottom',
+    'displaceLeft',
     'image',
     'video',
     'iframe',
@@ -221,6 +232,7 @@ class NeoModal {
     'smartActions',
     'numeration',
     'fit',
+    'nest',
     'drag',
     'bodyLock',
     'backdrop',
@@ -905,15 +917,23 @@ class NeoModal {
    */
   public buildStack():void {
     this.buildWrapper();
-    const insert = this.buildBackdrop();
+    const backdropInsert = this.buildBackdrop();
     if (this.wrapper) {
-      this.wrapper.removeAttribute('class');
+      this.wrapper.className = 'neo-modals';
       this.wrapper.removeAttribute('style');
-      this.wrapper.classList.add('neo-modals');
       if (this.options.wrapperClasses) {
         this.options.wrapperClasses.split(' ').forEach((className) => {
           this.wrapper?.classList.add(className);
         });
+      }
+      ['top', 'right', 'bottom', 'left'].forEach((direction) => {
+        const key = 'displace' + direction.charAt(0).toUpperCase() + direction.slice(1) as keyof neoModal.NeoModalOptions;
+        if (this.wrapper && typeof this.options[key] === 'string') {
+          this.wrapper.style.setProperty('--modal-displace-' + direction, this.options[key] as string);
+        }
+      });
+      if (this.options.zIndex) {
+        this.wrapper.style.setProperty('--modal-z-index', this.options.zIndex + '');
       }
       if (this.options.backdropColorBg) {
         this.wrapper.style.setProperty('--modal-backdrop-bg', this.options.backdropColorBg);
@@ -923,19 +943,18 @@ class NeoModal {
       }
     }
     if (this.backdrop) {
-      this.backdrop.removeAttribute('class');
+      this.backdrop.className = 'neo-modal--backdrop';
       this.backdrop.removeAttribute('style');
-      this.backdrop.classList.add('neo-modal--backdrop');
       if (this.options.backdropClasses) {
         this.options.backdropClasses.split(' ').forEach((className) => {
           this.backdrop?.classList.add(className);
         });
       }
     }
-    if (insert) {
+    if (backdropInsert) {
       if (this.wrapper && this.backdrop) {
-        if (!this.options.backdrop) {
-          this.backdrop.style.setProperty('visibility', 'hidden');
+        if (this.options.backdrop) {
+          this.backdrop.style.setProperty('visibility', '');
         }
         this.wrapper.appendChild(this.backdrop);
         this.animateIn(this.backdrop, 'backdrop');
@@ -973,9 +992,6 @@ class NeoModal {
         appendTo.appendChild(this.wrapper);
       }
     }
-    // if (this.backdrop) {
-    //   this.animateIn(this.backdrop, 'backdrop');
-    // }
     return this.wrapper;
   }
 
@@ -984,10 +1000,6 @@ class NeoModal {
       this.wrapper.remove();
       this.wrapper = null;
       this.globalDestroy();
-
-      // if (this.backdrop) {
-      //   this.animateOut(this.backdrop, 'backdrop');
-      // }
     }
   }
 
@@ -997,6 +1009,7 @@ class NeoModal {
     if (!this.backdrop) {
       insert = true;
       this.backdrop = document.createElement('div');
+      this.backdrop.className = 'neo-modal--backdrop';
     }
     return insert;
   }
@@ -1769,6 +1782,9 @@ class NeoModal {
   }
 
   public open():void {
+    if (!this.options.nest) {
+      NeoModal.closeTop();
+    }
     this.isOpen = true;
     this.originalOptions = Object.assign({}, this.options);
     this.eventBeforeOpen.trigger(this);
@@ -1789,7 +1805,7 @@ class NeoModal {
     this.transitionBodyIn();
 
     // Nest other modals.
-    const modals = document.querySelectorAll<HTMLElement>('.neo-modal');
+    const modals = document.querySelectorAll<HTMLElement>('.neo-modal:not(.neo-modal--closing)');
     this.depth = modals.length;
     for (let i = 0; i < modals.length; i++) {
       const delta = modals.length - (i + 1);
@@ -1804,7 +1820,6 @@ class NeoModal {
 
     if (this.header) {
       if (!this.options.headerInContent) {
-        console.log('wtf');
         this.animateIn(this.header, 'header');
       }
       else if (this.headerStartOut || this.headerEndOut) {
@@ -1850,8 +1865,6 @@ class NeoModal {
   }
 
   protected finishOpen():void {
-    this.eventAfterOpen.trigger(this);
-
     if (this.options.navKeyboard) {
       document.body.addEventListener('keydown', this.onKeyboardDown.bind(this));
       document.body.addEventListener('keyup', this.onKeyboardUp.bind(this));
@@ -1863,9 +1876,9 @@ class NeoModal {
     }
 
     const focusableElements = 'a[href], button, input:not([type=hidden]), textarea, select, details, [tabindex]';
-    const keyboardfocusableElement = this.contentInner?.querySelector<HTMLElement>(
+    const keyboardfocusableElement = this.modal?.querySelector<HTMLElement>(
       focusableElements
-    ) || this.modal?.querySelector<HTMLElement>(
+    ) || this.contentInner?.querySelector<HTMLElement>(
       focusableElements
     );
     if (keyboardfocusableElement) {
@@ -1876,10 +1889,12 @@ class NeoModal {
     }
 
     this.buildTooltips();
+    this.eventAfterOpen.trigger(this);
   }
 
   public close():void {
     this.isOpen = false;
+    this.modal?.classList.add('neo-modal--closing');
     this.eventBeforeClose.trigger(this);
     clearInterval(this.watchInterval as ReturnType<typeof setInterval>);
     this.doClose().then(() => {
@@ -1956,7 +1971,6 @@ class NeoModal {
   }
 
   protected finishClose():void {
-    this.eventAfterClose.trigger(this);
     if (this.contentPlaceholder) {
       const content = this.contentInner?.querySelector('.neo-modal-template');
       if (content) {
@@ -1979,7 +1993,9 @@ class NeoModal {
       document.body.removeEventListener('keydown', this.onKeyboardDown);
       document.body.removeEventListener('keyup', this.onKeyboardUp);
     }
+    this.wrapper = null;
     document.body.removeEventListener('mousemove', this.focusWatch);
+    this.eventAfterClose.trigger(this);
   }
 
   protected globalInit():void {
@@ -2143,7 +2159,6 @@ class NeoModal {
       el.addEventListener('animationend', parentCallback);
       el.addEventListener('animationcancel', parentCallback);
       el.style.display = '';
-      el.classList.add('neo-animate--animated');
       el.classList.add('neo-animate--' + animation);
       if (speed || typeof this.options[animationSpeed] === 'string') {
         el.classList.add('neo-animate--' + (speed || this.options[animationSpeed]));
@@ -2151,6 +2166,7 @@ class NeoModal {
       if (typeof this.options[animationDelay] === 'string') {
         el.classList.add('neo-animate--delay-' + this.options[animationDelay]);
       }
+      el.classList.add('neo-animate--animated');
     }
     else if (callback) {
       callback();

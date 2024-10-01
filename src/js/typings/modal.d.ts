@@ -27,11 +27,17 @@ declare namespace neoModal {
     placement:Placement;
     width:number|string|Size;
     height:number|string|Size;
+    zIndex:number|string|null;
+    displaceTop:string;
+    displaceRight:string;
+    displaceBottom:string;
+    displaceLeft:string;
     image:string|null;
     video:string|null;
     iframe:string|null;
     group:string|null;
     fit:boolean;
+    nest:boolean;
     drag:boolean;
     bodyLock:boolean;
     downloadLink:boolean;
