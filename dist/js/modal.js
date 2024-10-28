@@ -1,6 +1,6 @@
 var g = Object.defineProperty;
 var v = (c, t, e) => t in c ? g(c, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : c[t] = e;
-var s = (c, t, e) => (v(c, typeof t != "symbol" ? t + "" : t, e), e);
+var s = (c, t, e) => v(c, typeof t != "symbol" ? t + "" : t, e);
 class h {
   constructor() {
     s(this, "handlers", []);
@@ -495,8 +495,7 @@ const u = class u {
         const o = this.options.content(this.options.trigger);
         o instanceof HTMLElement ? (this.contentPlaceholder = document.createElement("template"), this.contentPlaceholder.classList.add("neo-modal--content-placeholder"), (i = o.parentNode) == null || i.insertBefore(this.contentPlaceholder, o), e.appendChild(o)) : e.innerHTML = o;
       }
-    } else
-      typeof this.options.content == "string" ? (e = document.createElement("div"), e.innerHTML = this.options.content) : this.contentInner = this.options.content;
+    } else typeof this.options.content == "string" ? (e = document.createElement("div"), e.innerHTML = this.options.content) : this.contentInner = this.options.content;
     if (e.childElementCount) {
       const o = e.firstElementChild;
       if (o)
@@ -582,8 +581,7 @@ const u = class u {
           if (l && r) {
             const d = Math.max(e.offsetWidth, o.offsetWidth);
             e.style.minWidth = d + "px", o.style.minWidth = d + "px";
-          } else
-            l ? i.style.marginRight = e.offsetWidth + "px" : i.style.marginLeft = o.offsetWidth + "px";
+          } else l ? i.style.marginRight = e.offsetWidth + "px" : i.style.marginLeft = o.offsetWidth + "px";
         }, 100)), this.header;
     }
     return null;
@@ -729,8 +727,8 @@ const u = class u {
   finishOpen() {
     var o, n, a;
     this.options.navKeyboard && (document.body.addEventListener("keydown", this.onKeyboardDown.bind(this)), document.body.addEventListener("keyup", this.onKeyboardUp.bind(this))), this.options.fit && (document.body.addEventListener("mousemove", this.focusWatch.bind(this), !1), this.focusWatch());
-    const t = "a[href], details, [tabindex]", e = "input:not([type=hidden]), textarea, select, button", i = ((o = this.contentInner) == null ? void 0 : o.querySelector(
-      e
+    const t = "a[href], details, [tabindex]", i = ((o = this.contentInner) == null ? void 0 : o.querySelector(
+      "input:not([type=hidden]), textarea, select, button"
     )) || ((n = this.modal) == null ? void 0 : n.querySelector(
       t
     )) || ((a = this.contentInner) == null ? void 0 : a.querySelector(
@@ -846,8 +844,7 @@ const u = class u {
         t.removeEventListener("animationend", f), t.removeEventListener("animationcancel", f), t.classList.remove("neo-animate--animated"), t.classList.remove("neo-animate--" + p), typeof this.options[r] == "string" && t.classList.remove("neo-animate--" + this.options[r]), typeof this.options[d] == "string" && t.classList.remove("neo-animate--delay-" + this.options[d]), i === "out" && (t.style.display = "none"), o && o();
       };
       t.addEventListener("animationend", f), t.addEventListener("animationcancel", f), t.style.display = "", t.classList.add("neo-animate--" + p), (n || typeof this.options[r] == "string") && t.classList.add("neo-animate--" + (n || this.options[r])), typeof this.options[d] == "string" && t.classList.add("neo-animate--delay-" + this.options[d]), t.classList.add("neo-animate--animated");
-    } else
-      o && o();
+    } else o && o();
   }
   animateIn(t, e, i, o) {
     this.animate(t, e, "in", i, o);
