@@ -64,7 +64,7 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
     // A library with no js or css will not be added to the page when
     // aggregation is enabled. So we add a js file that does nothing.
     $libraries['drupal.dialog.ajax']['js'][$path . '/js/na.js'] = ['minified' => TRUE];
-    $libraries['drupal.dialog.ajax']['dependencies'][] = 'neo_modal/modal.dialog.ajax';
+    $libraries['drupal.dialog.ajax']['dependencies'][] = 'neo_modal/modal-dialog-ajax';
     $libraries['drupal.dialog.ajax']['dependencies'] = array_values(array_filter($libraries['drupal.dialog.ajax']['dependencies'], function ($value) {
       return $value !== 'core/jquery';
     }));

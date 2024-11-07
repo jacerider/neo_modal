@@ -29,7 +29,7 @@ class NeoModalCloseCommand implements CommandInterface, CommandWithAttachedAsset
    */
   public function __construct() {
     $content = [];
-    $content['#attached']['library'][] = 'neo_modal/modal.ajax';
+    $content['#attached']['library'][] = 'neo_modal/modal-ajax';
     $this->content = $content;
   }
 

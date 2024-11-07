@@ -824,7 +824,7 @@ class ModalSettings extends SettingsBase {
       '#value' => 'Ajax',
       // '#attached' => [
       //   'library' => [
-      //     'neo_modal/modal.ajax',
+      //     'neo_modal/modal-ajax',
       //   ],
       // ],
       '#ajax' => [

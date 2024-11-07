@@ -44,7 +44,7 @@ class NeoModalCommand implements CommandInterface, CommandWithAttachedAssetsInte
     if (!is_array($content)) {
       $content = ['#markup' => $content];
     }
-    $content['#attached']['library'][] = 'neo_modal/modal.ajax';
+    $content['#attached']['library'][] = 'neo_modal/modal-ajax';
     $this->content = $content;
     $this->settings = $settings;
   }

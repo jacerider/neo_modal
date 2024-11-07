@@ -14,16 +14,16 @@ modal:
     - neo/library.body-scroll-lock
     - neo_tooltip/library.tippy
 
-modal.ajax:
+modal-ajax:
   version: VERSION
   neo: { group: contrib }
   js:
-    src/js/modal.ajax.ts: {}
+    src/js/modal-ajax.ts: {}
   dependencies:
     - neo_modal/modal
 
-modal.dialog.ajax:
+modal-dialog-ajax:
   version: VERSION
   neo: { group: contrib }
   js:
-    src/js/modal.dialog.ajax.ts: {}
+    src/js/modal-dialog-ajax.ts: {}
