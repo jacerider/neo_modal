@@ -40,7 +40,9 @@ import { NeoModal } from "./modal/modal";
         };
         // Close any existing. May need to be reworked. Doing this just for
         // views_ui right now.
-        Drupal.neoModal.close();
+        if (typeof options.nest === 'undefined' || options.nest === false) {
+          Drupal.neoModal.close();
+        }
         Drupal.neoModal.open(options);
       }
     } as drupal.Core.IAjaxCommand;
