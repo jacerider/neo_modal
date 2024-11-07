@@ -9,7 +9,7 @@
             s.close(), l.preventDefault(), l.stopPropagation();
           });
         });
-      }, o.neoModal.close(), o.neoModal.open(e);
+      }, (typeof e.nest > "u" || e.nest === !1) && o.neoModal.close(), o.neoModal.open(e);
     }
   }, o.AjaxCommands.prototype.closeDialog = function(n, t, a) {
     o.neoModal && o.neoModal.close();
