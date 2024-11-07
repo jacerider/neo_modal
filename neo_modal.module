@@ -104,6 +104,7 @@ function neo_modal_ajax_render_alter(array &$data) {
           if (in_array('media-library-widget-modal', $command['dialogOptions']['classes'])) {
             $data[$delta]['settings']['width'] = '100%';
             $data[$delta]['settings']['height'] = '100%';
+            $data[$delta]['settings']['nest'] = TRUE;
           }
           $data[$delta]['settings']['modalClasses'] = implode(' ', $command['dialogOptions']['classes']);
         }
