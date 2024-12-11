@@ -240,6 +240,13 @@ class ModalSettings extends SettingsBase {
       '#default_value' => $this->getValue('loader'),
     ];
 
+    $form['features']['inputFocus'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Input Focus'),
+      '#description' => $this->t('Focus the first available input field when the modal is opened.'),
+      '#default_value' => $this->getValue('inputFocus'),
+    ];
+
     $form['features']['bodyLock'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Body Lock'),

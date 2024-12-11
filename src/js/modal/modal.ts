@@ -42,6 +42,7 @@ class NeoModal {
     fit: false,
     nest: true,
     drag: true,
+    inputFocus: true,
     bodyLock: true,
     downloadLink: true,
     shareLink: true,
@@ -234,6 +235,7 @@ class NeoModal {
     'fit',
     'nest',
     'drag',
+    'inputFocus',
     'bodyLock',
     'backdrop',
     'header',
@@ -276,6 +278,7 @@ class NeoModal {
   ];
   protected loader:HTMLElement|null = null;
   protected loading:boolean = false;
+  protected trigger:HTMLElement|null = null;
   protected wrapper:HTMLElement|null = null;
   protected modal:neoModal.NeoModalElement|null = null;
   protected backdrop:HTMLElement|null = null;
@@ -321,6 +324,7 @@ class NeoModal {
   private eventPrev = new Signal<NeoModal, void>();
   private eventAfterPrev = new Signal<NeoModal, void>();
   private eventContentLoaded = new Signal<NeoModal, void>();
+  private observer:MutationObserver|null = null;
 
   /**
    * Construct.
@@ -1785,6 +1789,9 @@ class NeoModal {
     if (!this.options.nest) {
       NeoModal.closeTop();
     }
+    if (!this.options.trigger) {
+      this.trigger = document.activeElement as HTMLElement;
+    }
     this.isOpen = true;
     this.originalOptions = Object.assign({}, this.options);
     this.eventBeforeOpen.trigger(this);
@@ -1877,15 +1884,18 @@ class NeoModal {
 
     const focusableElements = 'a[href], details, [tabindex]';
     const focusableFormElements = 'input:not([type=hidden]), textarea, select, button';
-    const keyboardfocusableElement = this.contentInner?.querySelector<HTMLElement>(
+    const focusableElement = (this.options.inputFocus === true ? this.contentInner?.querySelector<HTMLElement>(
       focusableFormElements
-    ) || this.modal?.querySelector<HTMLElement>(
+    ) : null) || this.modal?.querySelector<HTMLElement>(
       focusableElements
     ) || this.contentInner?.querySelector<HTMLElement>(
       focusableElements
     );
-    if (keyboardfocusableElement) {
-      keyboardfocusableElement.focus();
+    if (focusableElement) {
+      focusableElement.focus();
+      if (focusableElement instanceof HTMLInputElement) {
+        focusableElement.select();
+      }
     }
     else if (this.options.trigger) {
       this.options.trigger.blur();
@@ -1893,12 +1903,31 @@ class NeoModal {
 
     this.buildTooltips();
     this.eventAfterOpen.trigger(this);
+
+    if (this.contentInner) {
+      // Watch for changes in the content.
+      const callback = (mutationsList:any, _observer:any) => {
+        for(const mutation of mutationsList) {
+          if (mutation.type === 'childList') {
+            this.refreshContent();
+          }
+        }
+      };
+      this.observer = new MutationObserver(callback);
+      this.observer.observe(this.contentInner, {
+        childList: true, // Watch for addition/removal of child nodes
+        subtree: true, // Watch for changes to descendants of the target node
+      });
+    }
   }
 
   public close():void {
     this.isOpen = false;
     this.modal?.classList.add('neo-modal--closing');
     this.eventBeforeClose.trigger(this);
+    if (this.observer) {
+      this.observer.disconnect();
+    }
     clearInterval(this.watchInterval as ReturnType<typeof setInterval>);
     this.doClose().then(() => {
       this.finishClose();
@@ -1906,6 +1935,10 @@ class NeoModal {
 
     if (this.options.trigger) {
       this.options.trigger.focus();
+    }
+    else if (this.trigger) {
+      console.log(this.trigger);
+      this.trigger.focus();
     }
   }
 

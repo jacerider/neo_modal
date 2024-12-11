@@ -17,7 +17,6 @@ import { NeoModal } from './modal/modal';
     onContentLoaded: (modal:NeoModal) => {
       const content = modal.getContent();
       if (content) {
-        content.children[0]?.classList.add('neo-modal--processed');
         Drupal.attachBehaviors(content, drupalSettings);
       }
     },
@@ -35,17 +34,6 @@ import { NeoModal } from './modal/modal';
 
   Drupal.behaviors.neoModal = {
     attach: (context:HTMLElement, ) => {
-
-      // Rebuild content footer for content that may have changed within the
-      // top modal.
-      const modal = NeoModal.getTop();
-      if (modal) {
-        const content = modal.getContent();
-        if (content && content.children[0] && !content.children[0].classList.contains('neo-modal--processed')) {
-          modal.refreshContent();
-        }
-      }
-
       once('neo.modal', '.use-neo-modal', context).forEach(el => {
         const options:any = {};
         options['trigger'] = el;

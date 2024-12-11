@@ -243,14 +243,21 @@ class Modal {
   protected $nest = NULL;
 
   /**
-   * The flag indicating wheter the modal is draggable.
+   * The flag indicating whether the modal is draggable.
    *
    * @var bool|null
    */
   protected $drag = NULL;
 
   /**
-   * The flag indicating wheter the body should be locked.
+   * The flag indicating whether an available input should be focused on open.
+   *
+   * @var bool|null
+   */
+  protected $inputFocus = NULL;
+
+  /**
+   * The flag indicating whether the body should be locked.
    *
    * @var bool|null
    */
@@ -1178,6 +1185,19 @@ class Modal {
   }
 
   /**
+   * Sets whether an available input should be focused on open.
+   *
+   * @param bool $inputFocus
+   *   TRUE if an available input should be focused on open, FALSE otherwise.
+   *
+   * @return $this
+   */
+  public function setInputFocus(bool $inputFocus = TRUE):self {
+    $this->inputFocus = $inputFocus;
+    return $this;
+  }
+
+  /**
    * Sets whether the body should be locked.
    *
    * @param bool $bodyLock
@@ -1938,6 +1958,7 @@ class Modal {
       'numeration' => FALSE,
       'fit' => FALSE,
       'nest' => TRUE,
+      'inputFocus' => TRUE,
       'bodyLock' => TRUE,
       'downloadLink' => TRUE,
       'shareLink' => TRUE,

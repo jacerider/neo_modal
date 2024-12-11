@@ -39,6 +39,7 @@ declare namespace neoModal {
     fit:boolean;
     nest:boolean;
     drag:boolean;
+    inputFocus:boolean;
     bodyLock:boolean;
     downloadLink:boolean;
     shareLink:boolean;

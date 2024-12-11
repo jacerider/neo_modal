@@ -64,6 +64,7 @@ const u = class u {
       "fit",
       "nest",
       "drag",
+      "inputFocus",
       "bodyLock",
       "backdrop",
       "header",
@@ -151,6 +152,7 @@ const u = class u {
     s(this, "eventPrev", new h());
     s(this, "eventAfterPrev", new h());
     s(this, "eventContentLoaded", new h());
+    s(this, "observer", null);
     s(this, "focused", !1);
     s(this, "focusing", !1);
     s(this, "focusTimeout", null);
@@ -537,12 +539,12 @@ const u = class u {
         if (i.type == "vimeo" || i.type == "youtube") {
           let l;
           n = this.options.videoAutoplay ? "?rel=0&autoplay=1" : "?rel=0";
-          let p = n + this.getUrlParameter(this.options.video);
+          let d = n + this.getUrlParameter(this.options.video);
           i.type == "vimeo" ? l = "https://player.vimeo.com/video/" : i.type == "youtube" && (l = "https://www.youtube-nocookie.com/embed/");
           const r = document.createElement("iframe");
           return r.onload = () => {
             t(e);
-          }, r.classList.add("neo-modal--iframe"), r.setAttribute("webkitallowfullscreen", ""), r.setAttribute("mozallowfullscreen", ""), r.setAttribute("allowfullscreen", ""), r.setAttribute("allow", "autoplay"), r.setAttribute("frameborder", "0"), r.setAttribute("src", l + i.id + p), o.appendChild(r), e.appendChild(o), ["auto"].includes(this.options.width) && this.content && (this.content.style.width = "calc(100% - 6rem)"), this.shareUrl = this.options.video, this.downloadUrl = this.options.video, this.copyUrl = this.options.video, e;
+          }, r.classList.add("neo-modal--iframe"), r.setAttribute("webkitallowfullscreen", ""), r.setAttribute("mozallowfullscreen", ""), r.setAttribute("allowfullscreen", ""), r.setAttribute("allow", "autoplay"), r.setAttribute("frameborder", "0"), r.setAttribute("src", l + i.id + d), o.appendChild(r), e.appendChild(o), ["auto"].includes(this.options.width) && this.content && (this.content.style.width = "calc(100% - 6rem)"), this.shareUrl = this.options.video, this.downloadUrl = this.options.video, this.copyUrl = this.options.video, e;
         }
         const a = document.createElement("video");
         a.setAttribute("src", this.options.video), a.innerText = "Your browser does not support the video tag.", this.options.videoAutoplay && a.setAttribute("autoplay", ""), o.appendChild(a), e.appendChild(o);
@@ -575,12 +577,12 @@ const u = class u {
       n && i.appendChild(n), this.buildCloseButton(), this.closeButton && (this.options.closeButton === "start" ? e.appendChild(this.closeButton) : this.options.closeButton === "start-out" ? this.headerStartOut.appendChild(this.closeButton) : this.options.closeButton === "end" ? o.appendChild(this.closeButton) : this.options.closeButton === "end-out" && this.headerEndOut.appendChild(this.closeButton));
       const a = this.buildNumeration();
       a && (this.options.numerationPlacement === "start" ? e.appendChild(a) : this.options.numerationPlacement === "end" && o.prepend(a));
-      const l = e.childNodes.length > 0, p = i.childNodes.length > 0, r = o.childNodes.length > 0;
-      if (l && t.appendChild(e), p && t.appendChild(i), r && t.appendChild(o), this.headerStartOut.childNodes.length > 0 ? t.appendChild(this.headerStartOut) : this.headerStartOut = null, this.headerEndOut.childNodes.length > 0 ? t.appendChild(this.headerEndOut) : this.headerEndOut = null, t.childNodes.length > 0)
-        return this.header = t, this.options.headerInContent ? this.contentBlock && this.contentBlock.prepend(this.header) : this.modal && (this.modal.appendChild(this.header), p && (l || r) && setTimeout(() => {
+      const l = e.childNodes.length > 0, d = i.childNodes.length > 0, r = o.childNodes.length > 0;
+      if (l && t.appendChild(e), d && t.appendChild(i), r && t.appendChild(o), this.headerStartOut.childNodes.length > 0 ? t.appendChild(this.headerStartOut) : this.headerStartOut = null, this.headerEndOut.childNodes.length > 0 ? t.appendChild(this.headerEndOut) : this.headerEndOut = null, t.childNodes.length > 0)
+        return this.header = t, this.options.headerInContent ? this.contentBlock && this.contentBlock.prepend(this.header) : this.modal && (this.modal.appendChild(this.header), d && (l || r) && setTimeout(() => {
           if (l && r) {
-            const d = Math.max(e.offsetWidth, o.offsetWidth);
-            e.style.minWidth = d + "px", o.style.minWidth = d + "px";
+            const p = Math.max(e.offsetWidth, o.offsetWidth);
+            e.style.minWidth = p + "px", o.style.minWidth = p + "px";
           } else l ? i.style.marginRight = e.offsetWidth + "px" : i.style.marginLeft = o.offsetWidth + "px";
         }, 100)), this.header;
     }
@@ -727,18 +729,29 @@ const u = class u {
   finishOpen() {
     var o, n, a;
     this.options.navKeyboard && (document.body.addEventListener("keydown", this.onKeyboardDown.bind(this)), document.body.addEventListener("keyup", this.onKeyboardUp.bind(this))), this.options.fit && (document.body.addEventListener("mousemove", this.focusWatch.bind(this), !1), this.focusWatch());
-    const t = "a[href], details, [tabindex]", i = ((o = this.contentInner) == null ? void 0 : o.querySelector(
+    const t = "a[href], details, [tabindex]", i = (this.options.inputFocus === !0 ? (o = this.contentInner) == null ? void 0 : o.querySelector(
       "input:not([type=hidden]), textarea, select, button"
-    )) || ((n = this.modal) == null ? void 0 : n.querySelector(
+    ) : null) || ((n = this.modal) == null ? void 0 : n.querySelector(
       t
     )) || ((a = this.contentInner) == null ? void 0 : a.querySelector(
       t
     ));
-    i ? i.focus() : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this);
+    if (i ? (i.focus(), i instanceof HTMLInputElement && i.select()) : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this), this.contentInner) {
+      const l = (d, r) => {
+        for (const p of d)
+          p.type === "childList" && this.refreshContent();
+      };
+      this.observer = new MutationObserver(l), this.observer.observe(this.contentInner, {
+        childList: !0,
+        // Watch for addition/removal of child nodes
+        subtree: !0
+        // Watch for changes to descendants of the target node
+      });
+    }
   }
   close() {
     var t;
-    this.isOpen = !1, (t = this.modal) == null || t.classList.add("neo-modal--closing"), this.eventBeforeClose.trigger(this), clearInterval(this.watchInterval), this.doClose().then(() => {
+    this.isOpen = !1, (t = this.modal) == null || t.classList.add("neo-modal--closing"), this.eventBeforeClose.trigger(this), this.observer && this.observer.disconnect(), clearInterval(this.watchInterval), this.doClose().then(() => {
       this.finishClose();
     }), this.options.trigger && this.options.trigger.focus();
   }
@@ -840,10 +853,10 @@ const u = class u {
   animate(t, e, i, o, n) {
     const a = i.charAt(0).toUpperCase() + i.slice(1), l = e + "Animate" + a;
     if (typeof this.options[l] == "string") {
-      const p = this.options[l], r = e + "Animate" + a + "Speed", d = e + "Animate" + a + "Delay", f = () => {
-        t.removeEventListener("animationend", f), t.removeEventListener("animationcancel", f), t.classList.remove("neo-animate--animated"), t.classList.remove("neo-animate--" + p), typeof this.options[r] == "string" && t.classList.remove("neo-animate--" + this.options[r]), typeof this.options[d] == "string" && t.classList.remove("neo-animate--delay-" + this.options[d]), i === "out" && (t.style.display = "none"), o && o();
+      const d = this.options[l], r = e + "Animate" + a + "Speed", p = e + "Animate" + a + "Delay", f = () => {
+        t.removeEventListener("animationend", f), t.removeEventListener("animationcancel", f), t.classList.remove("neo-animate--animated"), t.classList.remove("neo-animate--" + d), typeof this.options[r] == "string" && t.classList.remove("neo-animate--" + this.options[r]), typeof this.options[p] == "string" && t.classList.remove("neo-animate--delay-" + this.options[p]), i === "out" && (t.style.display = "none"), o && o();
       };
-      t.addEventListener("animationend", f), t.addEventListener("animationcancel", f), t.style.display = "", t.classList.add("neo-animate--" + p), (n || typeof this.options[r] == "string") && t.classList.add("neo-animate--" + (n || this.options[r])), typeof this.options[d] == "string" && t.classList.add("neo-animate--delay-" + this.options[d]), t.classList.add("neo-animate--animated");
+      t.addEventListener("animationend", f), t.addEventListener("animationcancel", f), t.style.display = "", t.classList.add("neo-animate--" + d), (n || typeof this.options[r] == "string") && t.classList.add("neo-animate--" + (n || this.options[r])), typeof this.options[p] == "string" && t.classList.add("neo-animate--delay-" + this.options[p]), t.classList.add("neo-animate--animated");
     } else o && o();
   }
   animateIn(t, e, i, o) {
@@ -897,6 +910,7 @@ s(u, "colorDefaults", {
   fit: !1,
   nest: !0,
   drag: !0,
+  inputFocus: !0,
   bodyLock: !0,
   downloadLink: !0,
   shareLink: !0,
@@ -1026,19 +1040,18 @@ let m = u;
 window.NeoModal = m;
 (function(c, t, e) {
   class i extends Event {
-    constructor(l, p, r = null) {
+    constructor(l, d, r = null) {
       super(`dialog:${l}`, { bubbles: !0 });
       s(this, "dialog");
       s(this, "settings");
-      this.dialog = p, this.settings = r;
+      this.dialog = d, this.settings = r;
     }
   }
   const o = {
     iconClasses: "neo-icon neo-icon-font",
     onContentLoaded: (n) => {
-      var l;
       const a = n.getContent();
-      a && ((l = a.children[0]) == null || l.classList.add("neo-modal--processed"), c.attachBehaviors(a, t));
+      a && c.attachBehaviors(a, t);
     },
     onAfterClose: (n) => {
       const a = n.getContent();
@@ -1047,17 +1060,12 @@ window.NeoModal = m;
   };
   typeof t.neoModal < "u" && typeof t.neoModal.defaults < "u" && Object.assign(o, t.neoModal.defaults), m.setDefaultOptions(o), c.behaviors.neoModal = {
     attach: (n) => {
-      const a = m.getTop();
-      if (a) {
-        const l = a.getContent();
-        l && l.children[0] && !l.children[0].classList.contains("neo-modal--processed") && a.refreshContent();
-      }
-      e("neo.modal", ".use-neo-modal", n).forEach((l) => {
-        const p = {};
-        p.trigger = l, p.content = (r) => {
-          let d = r.nextElementSibling;
-          return d && d.tagName === "TEMPLATE" ? d.innerHTML : d && d.classList.contains("neo-modal-template") ? d : (d = r.querySelector(".neo-modal-template"), d && d.tagName === "TEMPLATE" ? d.innerHTML : "");
-        }, new m(p);
+      e("neo.modal", ".use-neo-modal", n).forEach((a) => {
+        const l = {};
+        l.trigger = a, l.content = (d) => {
+          let r = d.nextElementSibling;
+          return r && r.tagName === "TEMPLATE" ? r.innerHTML : r && r.classList.contains("neo-modal-template") ? r : (r = d.querySelector(".neo-modal-template"), r && r.tagName === "TEMPLATE" ? r.innerHTML : "");
+        }, new m(l);
       });
     }
   }, c.neoModal = {
