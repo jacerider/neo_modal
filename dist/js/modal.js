@@ -107,6 +107,7 @@ const u = class u {
     ]);
     s(this, "loader", null);
     s(this, "loading", !1);
+    s(this, "trigger", null);
     s(this, "wrapper", null);
     s(this, "modal", null);
     s(this, "backdrop", null);
@@ -703,7 +704,7 @@ const u = class u {
     this.isOpen ? this.close() : this.open();
   }
   open() {
-    this.options.nest || u.closeTop(), this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), this.buildStack(), this.build().then(() => {
+    this.options.nest || u.closeTop(), this.options.trigger || (this.trigger = document.activeElement), this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), this.buildStack(), this.build().then(() => {
       setTimeout(() => {
         this.doOpen();
       });
@@ -753,7 +754,7 @@ const u = class u {
     var t;
     this.isOpen = !1, (t = this.modal) == null || t.classList.add("neo-modal--closing"), this.eventBeforeClose.trigger(this), this.observer && this.observer.disconnect(), clearInterval(this.watchInterval), this.doClose().then(() => {
       this.finishClose();
-    }), this.options.trigger && this.options.trigger.focus();
+    }), this.options.trigger ? this.options.trigger.focus() : this.trigger && (console.log(this.trigger), this.trigger.focus());
   }
   doClose() {
     return new Promise((t) => {
