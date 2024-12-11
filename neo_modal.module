@@ -109,7 +109,7 @@ function neo_modal_ajax_render_alter(array &$data) {
           $data[$delta]['settings']['modalClasses'] = implode(' ', $command['dialogOptions']['classes']);
         }
         if (!empty($command['dialogOptions']['neo'])) {
-          if ($command['dialogOptions']['neo']['icon']) {
+          if ($command['dialogOptions']['neo']['icon'] ?? NULL) {
             $iconElement = new IconElement('', $command['dialogOptions']['neo']['icon'], NULL, ['any']);
             unset($command['dialogOptions']['neo']['icon']);
             if ($icon = $iconElement->getIcon()) {
