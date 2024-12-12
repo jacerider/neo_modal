@@ -121,5 +121,16 @@ function neo_modal_ajax_render_alter(array &$data) {
       }
     }
   }
+}
 
+/**
+ * Implements hook_menu_local_actions_alter().
+ */
+function neo_modal_menu_local_actions_alter(&$local_actions) {
+  foreach ($local_actions as $id => $action) {
+    if (isset($action['modal'])) {
+      $local_actions[$id]['modal'] = is_array($local_actions[$id]['modal']) ? $local_actions[$id]['modal'] : [];
+      $local_actions[$id]['class'] = '\Drupal\neo_modal\Plugin\Menu\LocalAction\ModalLocalAction';
+    }
+  }
 }
