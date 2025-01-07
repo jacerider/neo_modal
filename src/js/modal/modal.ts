@@ -1883,7 +1883,7 @@ class NeoModal {
     }
 
     const focusableElements = 'a[href], details, [tabindex]';
-    const focusableFormElements = 'input:not([type=hidden]), textarea, select, button';
+    const focusableFormElements = 'input:not([type=hidden]):not([type=checkbox]), textarea, select, button';
     const focusableElement = (this.options.inputFocus === true ? this.contentInner?.querySelector<HTMLElement>(
       focusableFormElements
     ) : null) || this.modal?.querySelector<HTMLElement>(
@@ -1937,7 +1937,6 @@ class NeoModal {
       this.options.trigger.focus();
     }
     else if (this.trigger) {
-      console.log(this.trigger);
       this.trigger.focus();
     }
   }

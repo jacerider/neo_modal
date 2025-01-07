@@ -731,7 +731,7 @@ const u = class u {
     var o, n, a;
     this.options.navKeyboard && (document.body.addEventListener("keydown", this.onKeyboardDown.bind(this)), document.body.addEventListener("keyup", this.onKeyboardUp.bind(this))), this.options.fit && (document.body.addEventListener("mousemove", this.focusWatch.bind(this), !1), this.focusWatch());
     const t = "a[href], details, [tabindex]", i = (this.options.inputFocus === !0 ? (o = this.contentInner) == null ? void 0 : o.querySelector(
-      "input:not([type=hidden]), textarea, select, button"
+      "input:not([type=hidden]):not([type=checkbox]), textarea, select, button"
     ) : null) || ((n = this.modal) == null ? void 0 : n.querySelector(
       t
     )) || ((a = this.contentInner) == null ? void 0 : a.querySelector(
@@ -754,7 +754,7 @@ const u = class u {
     var t;
     this.isOpen = !1, (t = this.modal) == null || t.classList.add("neo-modal--closing"), this.eventBeforeClose.trigger(this), this.observer && this.observer.disconnect(), clearInterval(this.watchInterval), this.doClose().then(() => {
       this.finishClose();
-    }), this.options.trigger ? this.options.trigger.focus() : this.trigger && (console.log(this.trigger), this.trigger.focus());
+    }), this.options.trigger ? this.options.trigger.focus() : this.trigger && this.trigger.focus();
   }
   doClose() {
     return new Promise((t) => {
