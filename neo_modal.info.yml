@@ -7,5 +7,4 @@ core_version_requirement: ^10.3 || ^11
 dependencies:
   - neo:neo
   - neo_settings:neo_settings
-  - neo_icon:neo_icon
   - neo_tooltip:neo_tooltip
