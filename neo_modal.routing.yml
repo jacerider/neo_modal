@@ -1,0 +1,38 @@
+neo_modal.api.block.view:
+  path: '/api/modal/block/{block}/{arg}'
+  defaults:
+    _title: 'View'
+    _controller: '\Drupal\neo_modal\Controller\NeoModalBlockController'
+    arg: NULL
+  requirements:
+    _entity_access: 'block.view'
+
+neo_modal.api.account.login:
+  path: '/api/modal/block/{block}/login'
+  defaults:
+    _controller: '\Drupal\neo_modal\Controller\NeoModalAccountController::login'
+    _title: 'Log in'
+  requirements:
+    _user_is_logged_in: 'FALSE'
+  options:
+    _maintenance_access: TRUE
+
+neo_modal.api.account.register:
+  path: '/api/modal/block/{block}/register'
+  defaults:
+    _controller: '\Drupal\neo_modal\Controller\NeoModalAccountController::register'
+    _title: 'Create an account'
+  requirements:
+    _access_user_register: 'TRUE'
+  options:
+    _maintenance_access: TRUE
+
+neo_modal.api.account.password:
+  path: '/api/modal/block/{block}/password'
+  defaults:
+    _controller: '\Drupal\neo_modal\Controller\NeoModalAccountController::password'
+    _title: 'Log in'
+  requirements:
+    _access: 'TRUE'
+  options:
+    _maintenance_access: TRUE
