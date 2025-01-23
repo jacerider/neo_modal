@@ -25,25 +25,20 @@ use Drupal\neo_settings\Plugin\SettingsBase;
  *   variation_label_plural = "presets",
  *   variation_conditions = false,
  *   variation_ordering = false,
+ *   variation_scope = "scope",
  * )
  */
 class ModalSettings extends SettingsBase {
 
   /**
    * {@inheritdoc}
-   *
-   * Instance settings are settings that are set both in the base form and the
-   * variation form. They are editable in both forms and the values are merged
-   * together.
    */
-  protected function buildForm(array $form, FormStateInterface $form_state) {
-    $form = parent::buildForm($form, $form_state);
+  public function buildPreview() {
+    $build = [];
 
-    $mode = $this->getFormConfigValue('mode');
+    $build['#type'] = 'container';
 
-    $form['#type'] = 'container';
-
-    $form['simple'] = [
+    $build['simple'] = [
       '#type' => 'link',
       '#title' => 'Simple',
       '#url' => Url::fromRoute('<front>'),
@@ -108,17 +103,20 @@ class ModalSettings extends SettingsBase {
       ],
     ];
     $modal = new Modal($level3);
+    $modal->setTitle('Level 3');
     $modal->setColorScheme('accent-solid');
     $modal->applyTo($level2['nested']);
     $modal = new Modal($level2);
+    $modal->setTitle('Level 2');
     $modal->setColorScheme('secondary-solid-dark');
     // $modal->setBackdrop(FALSE);
     $modal->applyTo($level1['nested']);
     $modal = new Modal($level1);
+    $modal->setTitle('Level 1');
     // $modal->setColorScheme('primary-solid');
-    $modal->applyTo($form['simple']);
+    $modal->applyTo($build['simple']);
 
-    $form['media'] = [
+    $build['media'] = [
       '#type' => 'fieldset',
       '#title' => 'Media',
       '#attributes' => [
@@ -149,7 +147,7 @@ class ModalSettings extends SettingsBase {
     ];
     foreach ($images as $delta => $image) {
       $path = $image['path'];
-      $form['media'][$delta] = [
+      $build['media'][$delta] = [
         '#type' => 'link',
         '#title' => [
           '#markup' => '<img src="' . $path . '&w=140&h=140" alt="Image" />',
@@ -168,10 +166,10 @@ class ModalSettings extends SettingsBase {
       // $modal->setCloseButton(FALSE);
       // $modal->setContentScroll();
       $modal->setImage($path . '&w=1600');
-      $modal->applyTo($form['media'][$delta]);
+      $modal->applyTo($build['media'][$delta]);
     }
 
-    $form['media']['youtube'] = [
+    $build['media']['youtube'] = [
       '#type' => 'link',
       '#title' => [
         '#type' => 'inline_template',
@@ -191,9 +189,9 @@ class ModalSettings extends SettingsBase {
     // $modal->setFit();
     $modal->setVideo('https://www.youtube.com/watch?v=9bZkp7q19f0');
     $modal->setTriggerOverlay(t('Watch Video'), 'play-circle');
-    $modal->applyTo($form['media']['youtube']);
+    $modal->applyTo($build['media']['youtube']);
 
-    $form['media']['vimeo'] = [
+    $build['media']['vimeo'] = [
       '#type' => 'link',
       '#title' => [
         '#type' => 'inline_template',
@@ -211,12 +209,25 @@ class ModalSettings extends SettingsBase {
     // $modal->setGroup('video');
     $modal->setVideo('https://vimeo.com/951533874');
     $modal->setTriggerOverlay(t('Watch Video'), 'play-circle', TRUE);
-    $modal->applyTo($form['media']['vimeo']);
+    $modal->applyTo($build['media']['vimeo']);
+
+    return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Instance settings are settings that are set both in the base form and the
+   * variation form. They are editable in both forms and the values are merged
+   * together.
+   */
+  protected function buildForm(array $form, FormStateInterface $form_state) {
+    // $mode = $this->getFormConfigValue('mode');
+    $form = parent::buildForm($form, $form_state);
 
     $parents = $form['#parents'];
     $form['tabs'] = [
       '#type' => 'vertical_tabs',
-      '#title' => $this->t('Modal Settings'),
     ];
 
     $form['features'] = [
@@ -266,6 +277,13 @@ class ModalSettings extends SettingsBase {
       '#title' => $this->t('Smart Actions'),
       '#description' => $this->t('Automatically add form actions and buttons to the modal content footer.'),
       '#default_value' => $this->getValue('smartActions'),
+    ];
+
+    $form['features']['modalClasses'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Classes'),
+      '#description' => $this->t('Additional classes that will be added to the modal element.'),
+      '#default_value' => $this->getValue('modalClasses'),
     ];
 
     $form['header'] = [
