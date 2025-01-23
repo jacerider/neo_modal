@@ -6,6 +6,7 @@
  */
 
 use Drupal\neo_icon\IconElement;
+use Drupal\neo_modal\Modal;
 
 /**
  * Implements hook_theme().
@@ -20,6 +21,20 @@ function neo_modal_theme(): array {
         'title' => '',
         'icon' => '',
         'attributes' => [],
+      ],
+    ],
+    'neo_modal_account' => [
+      'variables' => [
+        'title' => '',
+        'message' => '',
+        'menu_account' => [],
+        'menu_tools' => [],
+        'login' => [],
+        'register_title' => '',
+        'register' => [],
+        'user' => [],
+        'logout' => [],
+        'link' => [],
       ],
     ],
   ];
@@ -77,19 +92,15 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
 function neo_modal_ajax_render_alter(array &$data) {
   foreach ($data as $delta => $command) {
     if ($command['command'] == 'openDialog') {
-      /** @var \Drupal\neo_settings\SettingsRepositoryInterface $settingsRepository */
-      $settingsRepository = \Drupal::service('neo_modal.settings');
-      $settings = $settingsRepository->get('dialog');
-      if ($settings) {
-        $data[$delta]['settings'] = $settings->getDiffValues() + $settings->getDiffConfigValues();
-      }
       if (!empty($command['dialogOptions'])) {
         if (!empty($command['dialogOptions']['title'])) {
-          $iconElement = new IconElement($command['dialogOptions']['title'], NULL, NULL, ['any']);
-          if ($icon = $iconElement->getIcon()) {
-            $data[$delta]['settings']['icon'] = $icon->getSelector();
-          }
           $data[$delta]['settings']['title'] = $command['dialogOptions']['title'];
+          if (empty($command['dialogOptions']['neo']['icon'])) {
+            $iconElement = new IconElement($command['dialogOptions']['title'], NULL, NULL, ['any']);
+            if ($icon = $iconElement->getIcon()) {
+              $data[$delta]['settings']['icon'] = $icon->getSelector();
+            }
+          }
         }
         if (!empty($command['dialogOptions']['width']) && $command['dialogOptions']['width'] != 'auto') {
           $data[$delta]['settings']['width'] = $command['dialogOptions']['width'];
@@ -109,15 +120,12 @@ function neo_modal_ajax_render_alter(array &$data) {
           $data[$delta]['settings']['modalClasses'] = implode(' ', $command['dialogOptions']['classes']);
         }
         if (!empty($command['dialogOptions']['neo'])) {
-          if ($command['dialogOptions']['neo']['icon'] ?? NULL) {
-            $iconElement = new IconElement('', $command['dialogOptions']['neo']['icon'], NULL, ['any']);
-            unset($command['dialogOptions']['neo']['icon']);
-            if ($icon = $iconElement->getIcon()) {
-              $command['dialogOptions']['neo']['icon'] = $icon->getSelector();
-            }
-          }
           $data[$delta]['settings'] += $command['dialogOptions']['neo'];
+          unset($data[$delta]['settings']['neo']);
         }
+
+        $modal = new Modal(NULL, $data[$delta]['settings'], $data[$delta]['settings']['preset'] ?? 'dialog');
+        $data[$delta]['settings'] = $modal->getValues() + $data[$delta]['settings'];
       }
     }
   }
