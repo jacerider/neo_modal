@@ -1,0 +1,37 @@
+<div{{ attributes.addClass('flex flex-col h-full') }}>
+  <div class="flex flex-col gap-4 p-6">
+    {% if message %}
+      <div>{{ message }}</div>
+    {% endif %}
+    {% if user %}
+      <div>{{ user }}</div>
+    {% endif %}
+    {% if login %}
+      <div>{{ login|neo_class('btn btn-primary w-full') }}</div>
+    {% endif %}
+    {% if link %}
+      <div>{{ link|neo_class('btn btn-outline w-full') }}</div>
+    {% endif %}
+    {% if menu_account %}
+      <div>{{ menu_account|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
+    {% endif %}
+    {% if menu_tools %}
+      <div class="pt-2">{{ menu_tools|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
+    {% endif %}
+  </div>
+  {% if register %}
+    <div class="bg-base-500 text-base-content-500 scheme-primary-solid p-6 text-center mt-auto">
+      {% if register_title %}
+        <h3 class="text-xl mb-6">{{ register_title }}</h3>
+      {% endif %}
+      <div>{{ register|neo_class('btn btn-primary w-full') }}</div>
+    </div>
+  {% endif %}
+  {% if logout %}
+    <div class="p-6 mt-auto">
+      {% if logout %}
+        <div>{{ logout|neo_class('btn btn-primary w-full') }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
