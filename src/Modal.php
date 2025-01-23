@@ -40,6 +40,13 @@ class Modal {
   protected Attribute $triggerAttributes;
 
   /**
+   * The modal classes.
+   *
+   * @var array|null
+   */
+  protected array|null $modalClasses = NULL;
+
+  /**
    * The append to selector.
    *
    * @var string|null
@@ -490,22 +497,28 @@ class Modal {
     if ($content) {
       $this->setContent($content);
     }
-    if ($preset) {
-      $this->setSettingsVariationId($preset);
-    }
-    $options += $this->getSettings()->getDiffValues();
+    $options += $this->getSettings($options, $preset)->getDiffValues();
     if (!empty($options)) {
       $class = new \ReflectionClass($this);
       foreach ($options as $key => $option) {
         $method = 'set' . ucfirst($key);
         if (method_exists($this, $method)) {
-          $param = $class->getMethod($method)->getParameters()[0]->getType();
+          $param = (string) $class->getMethod($method)->getParameters()[0]->getType();
+          $option = match ($param) {
+            'string' => (string) $option,
+            'int' => (int) $option,
+            'bool' => (bool) $option,
+            default => $option,
+          };
           if ((string) $param === 'bool') {
             $option = (bool) $option;
           }
           $this->$method($option);
         }
       }
+    }
+    if (!empty($options['scope'])) {
+      $this->addModalClass('neo-modal--scoped');
     }
   }
 
@@ -750,15 +763,28 @@ class Modal {
   }
 
   /**
-   * Set preset.
+   * Set the modal classes.
    *
-   * @param string $preset
-   *   The preset.
+   * @param string $classes
+   *   The modal classes.
    *
    * @return $this
    */
-  public function setPreset(string $preset):self {
-    $this->setSettingsVariationId($preset);
+  public function setModalClasses(string $classes):self {
+    $this->modalClasses = explode(' ', $classes);
+    return $this;
+  }
+
+  /**
+   * Add a modal class.
+   *
+   * @param string $class
+   *   The modal class.
+   *
+   * @return $this
+   */
+  public function addModalClass(string $class):self {
+    $this->modalClasses[] = $class;
     return $this;
   }
 
@@ -797,10 +823,12 @@ class Modal {
    * @return $this
    */
   public function setColorScheme(string $colorScheme):self {
-    if (substr($colorScheme, 0, 7) !== 'scheme-') {
-      $colorScheme = 'scheme-' . $colorScheme;
+    if ($colorScheme) {
+      if (substr($colorScheme, 0, 7) !== 'scheme-') {
+        $colorScheme = 'scheme-' . $colorScheme;
+      }
+      $this->colorScheme = str_replace('_', '-', $colorScheme);
     }
-    $this->colorScheme = str_replace('_', '-', $colorScheme);
     return $this;
   }
 
@@ -1878,31 +1906,39 @@ class Modal {
   }
 
   /**
-   * Returns the attributes for the modal trigger.
+   * Get the setting values.
    *
-   * @return \Drupal\Core\Template\Attribute
-   *   The attributes.
+   * These are the values that differ from the global modal settings.
+   *
+   * @return array
+   *   The setting values.
    */
-  public function getTriggerAttributes():Attribute {
-    $attributes = $this->triggerAttributes;
+  public function getValues(): array {
+    $settings = [];
 
     if ($this->appendToClosest && $this->appendToClosest !== $this->getSettings()->getDiffConfigValue('appendToClosest')) {
-      $attributes->setAttribute('data-neo-modal-appendToClosest', $this->appendToClosest);
+      $settings['appendToClosest'] = $this->appendToClosest;
     }
     elseif ($this->appendTo && $this->appendTo !== $this->getSettings()->getDiffConfigValue('appendTo')) {
-      $attributes->setAttribute('data-neo-modal-appendTo', $this->appendTo);
+      $settings['appendTo'] = $this->appendTo;
     }
     if ($this->attach && $this->attach !== $this->getSettings()->getDiffConfigValue('attach')) {
-      $attributes->setAttribute('data-neo-modal-attach', $this->attach);
+      $settings['attach'] = $this->attach;
       if ($this->attachPlacement && $this->attachPlacement !== $this->getSettings()->getDiffConfigValue('attachPlacement')) {
-        $attributes->setAttribute('data-neo-modal-attachPlacement', $this->attachPlacement);
+        $settings['attachPlacement'] = $this->attachPlacement;
       }
     }
     if (!is_null($this->header) && (bool) $this->header !== (bool) $this->getSettings()->getDiffConfigValue('header', TRUE)) {
-      $attributes->setAttribute('data-neo-modal-header', (bool) $this->header ? 'true' : 'false');
+      $settings['header'] = (bool) $this->header ? 'true' : 'false';
     }
     elseif (!is_null($this->headerInContent) && (bool) $this->headerInContent !== (bool) $this->getSettings()->getDiffConfigValue('headerInContent', FALSE)) {
-      $attributes->setAttribute('data-neo-modal-headerInContent', (bool) $this->headerInContent ? 'true' : 'false');
+      $settings['headerInContent'] = (bool) $this->headerInContent ? 'true' : 'false';
+    }
+    if (!is_null($this->modalClasses)) {
+      $value = implode(' ', $this->modalClasses);
+      if ($value && $value !== $this->getSettings()->getDiffConfigValue('modalClasses')) {
+        $settings['modalClasses'] = $value;
+      }
     }
     // String options.
     foreach ([
@@ -1945,7 +1981,7 @@ class Modal {
       'contentAnimateOutDelay',
     ] as $key) {
       if (!is_null($this->$key) && $this->$key !== $this->getSettings()->getDiffConfigValue($key)) {
-        $attributes->setAttribute('data-neo-modal-' . $key, $this->$key);
+        $settings[$key] = $this->$key;
       }
     }
     // Boolean options.
@@ -1967,10 +2003,24 @@ class Modal {
       'bodyTransitionBlur' => FALSE,
     ] as $key => $default) {
       if (!is_null($this->$key) && (bool) $this->$key !== (bool) $this->getSettings()->getDiffConfigValue($key, $default)) {
-        $attributes->setAttribute('data-neo-modal-' . $key, (bool) $this->$key ? 'true' : 'false');
+        $settings[$key] = (bool) $this->$key ? 'true' : 'false';
       }
     }
-    return new Attribute($attributes);
+    return $settings;
+  }
+
+  /**
+   * Returns the attributes for the modal trigger.
+   *
+   * @return \Drupal\Core\Template\Attribute
+   *   The attributes.
+   */
+  public function getTriggerAttributes():Attribute {
+    $attributes = $this->triggerAttributes;
+    foreach ($this->getValues() as $key => $value) {
+      $attributes->setAttribute('data-neo-modal-' . $key, $value);
+    }
+    return $attributes;
   }
 
   /**
