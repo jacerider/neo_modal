@@ -30,6 +30,8 @@ body.has-neo-modal--loader {
   right: var(--modal-displace-right, 0px);
   bottom: var(--modal-displace-bottom, 0px);
   left: var(--modal-displace-left, 0px);
+  // Forms within modals should have no spacing.
+  --form-spacing: 0;
 }
 
 .neo-modal--backdrop {
@@ -380,6 +382,14 @@ body.has-neo-modal--loader {
   transition-duration: calc(var(--animate-duration) * 0.8);
   transition-timing-function: cubic-bezier(0.6, 0, 0.4, 1);
 
+  [class*=' neo-modal--placement-right'][data-neo-modal--depth] & {
+    transform-origin: right;
+  }
+
+  [class*=' neo-modal--placement-left'][data-neo-modal--depth] & {
+    transform-origin: left;
+  }
+
   [data-neo-modal--depth] & {
     opacity: 0;
     transform: scale(0.75);
@@ -507,10 +517,10 @@ body.has-neo-modal--loader {
 
   .neo-modal--height-full & {
     min-height: calc(
-      100vh - var(--modal-displace-top, 0px) - var(--modal-displace-bottom, 0px) - var(
-          --modal-padding-t,
+      100vh - var(--modal-displace-top, 0px) - var(
+          --modal-displace-bottom,
           0px
-        )
+        ) - var(--modal-padding-t, 0px)
     );
   }
 
@@ -591,10 +601,10 @@ body.has-neo-modal--loader {
         100vh - var(--modal-displace-top, 0px) - var(
             --modal-displace-bottom,
             0px
-          ) - var(--modal-padding-t, 0px) - var(--modal-content-padding, 0px) - var(
+          ) - var(--modal-padding-t, 0px) - var(
             --modal-content-padding,
             0px
-          )
+          ) - var(--modal-content-padding, 0px)
       );
     }
   }
