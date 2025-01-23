@@ -1,4 +1,6 @@
+scope: 0
 scheme: ''
+modalClasses: ''
 appendTo: ''
 appendToClosest: ''
 width: 'auto'

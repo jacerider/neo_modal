@@ -1,0 +1,20 @@
+uuid: 90ac99a5-d3ce-403c-aa2b-7800bba569a6
+langcode: en
+status: true
+dependencies: {  }
+id: neo_modal_shelf_right
+label: 'Shelf: Right'
+parent: ''
+plugin: neo_modal
+settings:
+  scope: 0
+  width: 460px
+  height: 100%
+  headerInContent: 1
+  contentScroll: 1
+  placement: right
+  contentAnimateIn: slideInRight
+  contentAnimateOut: slideOutRight
+weight: 0
+visibility: {  }
+lock: false
