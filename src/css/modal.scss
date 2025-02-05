@@ -583,12 +583,27 @@ body.has-neo-modal--loader {
   @apply h-full;
   padding: var(--modal-content-padding);
 
-  > form {
-    border: none;
-    box-shadow: none;
+  form {
+    &.card {
+      border: none;
+      background: none;
+      box-shadow: none;
+    }
 
     > .form--inner {
       margin: 0;
+    }
+
+    &:first-child {
+      > .form--inner {
+        @apply -mt-form-item;
+      }
+    }
+
+    &:last-child {
+      > .form--inner {
+        @apply -mb-form-item;
+      }
     }
   }
 
