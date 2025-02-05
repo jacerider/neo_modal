@@ -3,6 +3,7 @@
 namespace Drupal\neo_modal\Plugin\Block;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -150,7 +151,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
    * Process the modal settings.
    */
   public function processModalSettings(&$form, FormStateInterface $form_state, &$complete_form) {
-    $modalVariation = $form_state->getValue(['settings', 'modal_preset'], $this->configuration['modal_preset']);
+    $modalVariation = $form_state->getValue(array_merge($form['#parents'], ['modal_preset']), $this->configuration['modal_preset']);
     $form['modal_preset'] = [
       '#type' => 'neo_settings_variation',
       '#title' => $this->t('Modal Preset'),
@@ -176,7 +177,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
    * Ajax callback for the block form.
    */
   public static function blockFormAjax($form, FormStateInterface $form_state) {
-    return $form['settings'];
+    return NestedArray::getValue($form, array_slice($form_state->getTriggeringElement()['#array_parents'], 0, -1));
   }
 
   /**
@@ -205,15 +206,16 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
    */
   public function build() {
     $modal = $this->buildModal();
+    $blockId = $this->configuration['block_id'];
     $build = [
       '#type' => 'link',
       '#title' => $this->icon($this->configuration['trigger_text'], $this->configuration['trigger_icon'])
         ->iconPosition($this->configuration['trigger_icon_position']),
-      '#url' => Url::fromRoute('neo_modal.api.block.view', [
-        'block' => $this->configuration['block_id'],
-      ]),
+      '#url' => $blockId ? Url::fromRoute('neo_modal.api.block.view', [
+        'block' => $blockId,
+      ]) : Url::fromRoute('<current>'),
     ];
-    if ($this->configuration['modal_ajax']) {
+    if ($blockId && $this->configuration['modal_ajax']) {
       $build['#type'] = 'neo_modal_link';
       $build['#modal'] = $modal->getValues();
       $build['#modal_preset'] = $this->configuration['modal_preset'];
@@ -342,6 +344,9 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
         $theme = $block->getTheme();
       }
     }
+    if (!$theme) {
+      $theme = \Drupal::config('system.theme')->get('default');
+    }
     $count = 0;
     foreach ($this->getBlockOptions($theme) as $id => $label) {
       $status = isset($settings[$id]);
@@ -370,7 +375,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
    * Given the menu form values, clean them into a simple array.
    */
   public static function validateBlocks($element, FormStateInterface $form_state) {
-    $values = $form_state->getValue($element['#parents']);
+    $values = $form_state->getValue($element['#parents']) ?: [];
     $values = array_filter($values, function ($value) {
       return $value['status'] == 1;
     });

@@ -293,6 +293,7 @@ class NeoModal {
   protected headerStartOut:HTMLElement|null = null;
   protected headerEndOut:HTMLElement|null = null;
   protected footer:HTMLElement|null = null;
+  protected footerContent:HTMLElement|null = null;
   protected title:HTMLElement|null = null;
   protected subtitle:HTMLElement|null = null;
   protected icon:HTMLElement|null = null;
@@ -639,6 +640,12 @@ class NeoModal {
 
   public size():void {
     if (this.container && this.modal) {
+      const rect = this.modal.getBoundingClientRect();
+      this.modal.style.setProperty('--modal-t', rect.top + 'px');
+      this.modal.style.setProperty('--modal-r', window.innerWidth - rect.right + 'px');
+      this.modal.style.setProperty('--modal-b', window.innerHeight - rect.bottom + 'px');
+      this.modal.style.setProperty('--modal-l', rect.left + 'px');
+
       if (this.options.placement && !this.options.attach) {
         // We remove placement so scroll can be properly calculated.
         this.modal.classList.remove('neo-modal--placement-' + this.options.placement);
@@ -656,6 +663,13 @@ class NeoModal {
         this.modal.classList.add('neo-modal--placement-' + this.options.placement);
       }
       if (this.content) {
+        if (this.contentWrapper) {
+          const rectContent = this.contentWrapper.getBoundingClientRect();
+          this.modal.style.setProperty('--modal-content-t', rectContent.top + 'px');
+          this.modal.style.setProperty('--modal-content-r', rect.right - rectContent.right + 'px');
+          this.modal.style.setProperty('--modal-content-b', rect.bottom - rectContent.bottom + 'px');
+          this.modal.style.setProperty('--modal-content-l', rectContent.left + 'px');
+        }
         let offsetWidth = this.content.clientWidth;
         if (this.headerStartOut && this.headerEndOut) {
           offsetWidth += this.headerStartOut.clientWidth + this.headerEndOut.clientWidth;
@@ -676,6 +690,15 @@ class NeoModal {
         else if (this.modal.classList.contains('neo-modal--flush')) {
           this.modal.classList.remove('neo-modal--flush');
         }
+        // if (this.header) {
+        //   this.modal.style.setProperty('--modal-header-h', this.header.clientHeight + 'px');
+        // }
+        // if (this.footerContent) {
+        //   this.modal.style.setProperty('--modal-footer-h', this.footerContent.clientHeight + 'px');
+        // }
+        // else if (this.footer) {
+        //   this.modal.style.setProperty('--modal-footer-h', this.footer.clientHeight + 'px');
+        // }
       }
     }
   }
@@ -1598,6 +1621,10 @@ class NeoModal {
   }
 
   protected buildContentFooter():HTMLElement|null {
+    if (this.footerContent) {
+      this.footerContent.remove();
+      this.footerContent = null;
+    }
     const footer = document.createElement('div');
     footer.classList.add('neo-modal--content-footer');
 
@@ -1646,6 +1673,7 @@ class NeoModal {
     if (footer.childNodes.length > 0) {
       if (this.contentBlock) {
         this.contentBlock.append(footer);
+        this.footerContent = footer;
       }
     }
     return null;

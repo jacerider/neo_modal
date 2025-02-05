@@ -30,8 +30,6 @@ body.has-neo-modal--loader {
   right: var(--modal-displace-right, 0px);
   bottom: var(--modal-displace-bottom, 0px);
   left: var(--modal-displace-left, 0px);
-  // Forms within modals should have no spacing.
-  --form-spacing: 0;
 }
 
 .neo-modal--backdrop {
@@ -584,6 +582,15 @@ body.has-neo-modal--loader {
 .neo-modal--content {
   @apply h-full;
   padding: var(--modal-content-padding);
+
+  > form {
+    border: none;
+    box-shadow: none;
+
+    > .form--inner {
+      margin: 0;
+    }
+  }
 
   .neo-modal--content-scroll & {
     @apply basis-full overflow-y-auto overflow-x-hidden;

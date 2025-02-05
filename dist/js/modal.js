@@ -122,6 +122,7 @@ const u = class u {
     s(this, "headerStartOut", null);
     s(this, "headerEndOut", null);
     s(this, "footer", null);
+    s(this, "footerContent", null);
     s(this, "title", null);
     s(this, "subtitle", null);
     s(this, "icon", null);
@@ -309,9 +310,16 @@ const u = class u {
     }
   }
   size() {
-    if (this.container && this.modal && (this.options.placement && !this.options.attach && this.modal.classList.remove("neo-modal--placement-" + this.options.placement), !this.options.fit && this.container.scrollHeight > this.container.clientHeight ? (this.modal.classList.remove("neo-modal--no-scroll"), this.modal.classList.add("neo-modal--scroll")) : (this.modal.classList.remove("neo-modal--scroll"), this.modal.classList.add("neo-modal--no-scroll")), this.options.placement && !this.options.attach && this.modal.classList.add("neo-modal--placement-" + this.options.placement), this.content)) {
-      let t = this.content.clientWidth;
-      this.headerStartOut && this.headerEndOut ? t += this.headerStartOut.clientWidth + this.headerEndOut.clientWidth : this.headerStartOut ? t += this.headerStartOut.clientWidth * 2 : this.headerEndOut && (t += this.headerEndOut.clientWidth * 2), this.container.clientWidth <= t ? this.modal.classList.contains("neo-modal--flush") || this.modal.classList.add("neo-modal--flush") : this.modal.classList.contains("neo-modal--flush") && this.modal.classList.remove("neo-modal--flush");
+    if (this.container && this.modal) {
+      const t = this.modal.getBoundingClientRect();
+      if (this.modal.style.setProperty("--modal-t", t.top + "px"), this.modal.style.setProperty("--modal-r", window.innerWidth - t.right + "px"), this.modal.style.setProperty("--modal-b", window.innerHeight - t.bottom + "px"), this.modal.style.setProperty("--modal-l", t.left + "px"), this.options.placement && !this.options.attach && this.modal.classList.remove("neo-modal--placement-" + this.options.placement), !this.options.fit && this.container.scrollHeight > this.container.clientHeight ? (this.modal.classList.remove("neo-modal--no-scroll"), this.modal.classList.add("neo-modal--scroll")) : (this.modal.classList.remove("neo-modal--scroll"), this.modal.classList.add("neo-modal--no-scroll")), this.options.placement && !this.options.attach && this.modal.classList.add("neo-modal--placement-" + this.options.placement), this.content) {
+        if (this.contentWrapper) {
+          const i = this.contentWrapper.getBoundingClientRect();
+          this.modal.style.setProperty("--modal-content-t", i.top + "px"), this.modal.style.setProperty("--modal-content-r", t.right - i.right + "px"), this.modal.style.setProperty("--modal-content-b", t.bottom - i.bottom + "px"), this.modal.style.setProperty("--modal-content-l", i.left + "px");
+        }
+        let e = this.content.clientWidth;
+        this.headerStartOut && this.headerEndOut ? e += this.headerStartOut.clientWidth + this.headerEndOut.clientWidth : this.headerStartOut ? e += this.headerStartOut.clientWidth * 2 : this.headerEndOut && (e += this.headerEndOut.clientWidth * 2), this.container.clientWidth <= e ? this.modal.classList.contains("neo-modal--flush") || this.modal.classList.add("neo-modal--flush") : this.modal.classList.contains("neo-modal--flush") && this.modal.classList.remove("neo-modal--flush");
+      }
     }
   }
   watch() {
@@ -640,6 +648,7 @@ const u = class u {
     return null;
   }
   buildContentFooter() {
+    this.footerContent && (this.footerContent.remove(), this.footerContent = null);
     const t = document.createElement("div");
     if (t.classList.add("neo-modal--content-footer"), this.contentInner && this.options.smartActions) {
       const e = document.createElement("div");
@@ -662,7 +671,7 @@ const u = class u {
         }), e.appendChild(a);
       }), t.appendChild(e));
     }
-    return t.childNodes.length > 0 && this.contentBlock && this.contentBlock.append(t), null;
+    return t.childNodes.length > 0 && this.contentBlock && (this.contentBlock.append(t), this.footerContent = t), null;
   }
   buildLabel() {
     const t = document.createElement("div");
