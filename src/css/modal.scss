@@ -593,18 +593,6 @@ body.has-neo-modal--loader {
     > .form--inner {
       margin: 0;
     }
-
-    &:first-child {
-      > .form--inner {
-        @apply -mt-form-item;
-      }
-    }
-
-    &:last-child {
-      > .form--inner {
-        @apply -mb-form-item;
-      }
-    }
   }
 
   .neo-modal--content-scroll & {
