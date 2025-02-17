@@ -481,6 +481,13 @@ class Modal {
   protected $triggerOverlayAttributes;
 
   /**
+   * The modal breakpoints.
+   *
+   * @var string|null
+   */
+  protected string|null $breakpoint = NULL;
+
+  /**
    * Constructs a new Modal.
    *
    * @param string|array $content
@@ -494,9 +501,6 @@ class Modal {
     $this->triggerAttributes = new Attribute([
       'class' => ['use-neo-modal'],
     ]);
-    if ($content) {
-      $this->setContent($content);
-    }
     $options += $this->getSettings($options, $preset)->getDiffValues();
     if (!empty($options)) {
       $class = new \ReflectionClass($this);
@@ -519,6 +523,9 @@ class Modal {
     }
     if (!empty($options['scope'])) {
       $this->addModalClass('neo-modal--scoped');
+    }
+    if ($content) {
+      $this->setContent($content);
     }
   }
 
@@ -2020,6 +2027,13 @@ class Modal {
     foreach ($this->getValues() as $key => $value) {
       $attributes->setAttribute('data-neo-modal-' . $key, $value);
     }
+    if ($this->breakpoint) {
+      $attributes->addClass(match($this->breakpoint) {
+        'md' => 'md:hidden',
+        'lg' => 'lg:hidden',
+        default => NULL,
+      });
+    }
     return $attributes;
   }
 
@@ -2032,6 +2046,13 @@ class Modal {
   public function getModalAttributes():Attribute {
     $attributes = [];
     $attributes['class'][] = 'neo-modal-template';
+    if ($this->breakpoint) {
+      $attributes['class'][] = match($this->breakpoint) {
+        'md' => 'md:block',
+        'lg' => 'lg:block',
+        default => NULL,
+      };
+    }
     return new Attribute($attributes);
   }
 
@@ -2077,13 +2098,20 @@ class Modal {
     return $this;
   }
 
+  public function setBreakpoint(string $breakpoint):self {
+    if (in_array($breakpoint, ['md', 'lg'])) {
+      $this->breakpoint = $breakpoint;
+    }
+    return $this;
+  }
+
   /**
    * Prepare the build.
    *
    * @param string|array $build
    *   The renderable array.
    */
-  protected function buildTrigger($build) {
+  protected function buildTrigger($build, array $triggerAttributes = []) {
     if (is_string($build) || $build instanceof MarkupInterface) {
       $build = [
         '#markup' => $build,
@@ -2133,6 +2161,9 @@ class Modal {
     $build['#attributes']['class'][] = 'neo-modal--trigger';
     $attribute = new Attribute($build['#attributes']);
     $attribute->merge($this->getTriggerAttributes());
+    if ($triggerAttributes) {
+      $attribute->merge(new Attribute($triggerAttributes));
+    }
     $build['#attributes'] = $attribute->toArray();
     foreach ($this->getAttachments() as $attachmentType => $attachments) {
       foreach ($attachments as $key => $attachment) {
@@ -2161,6 +2192,10 @@ class Modal {
         '#markup' => $build,
       ];
     }
+    if (isset($this->breakpoint)) {
+      // If we are using breakpoints, we cannot use template tag.
+      $tag = 'div';
+    }
     $build['#prefix'] = Markup::create('<' . $tag . (string) $this->getModalAttributes() . '>');
     $build['#suffix'] = Markup::create('</' . $tag . '>');
     return $build;
@@ -2172,8 +2207,8 @@ class Modal {
    * @param string|array $build
    *   The renderable array.
    */
-  public function applyTo(mixed &$build):void {
-    $build = $this->buildTrigger($build);
+  public function applyTo(mixed &$build, array $attributes = []):void {
+    $build = $this->buildTrigger($build, $attributes);
     $build = [
       'trigger' => $build,
     ];
