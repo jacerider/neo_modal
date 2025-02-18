@@ -2048,8 +2048,8 @@ class Modal {
     $attributes['class'][] = 'neo-modal-template';
     if ($this->breakpoint) {
       $attributes['class'][] = match($this->breakpoint) {
-        'md' => 'md:block',
-        'lg' => 'lg:block',
+        'md' => 'md:!block',
+        'lg' => 'lg:!block',
         default => NULL,
       };
     }

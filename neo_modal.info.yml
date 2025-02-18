@@ -1,5 +1,6 @@
 name: 'Neo | Modal'
 type: module
+neo: true
 description: 'Provides modal API for elements and fields.'
 package: Neo
 version: 0.0.0
