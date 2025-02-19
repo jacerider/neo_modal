@@ -1,0 +1,19 @@
+uuid: a2ea7fef-9bf4-4ceb-9b2d-5b05a5c344c2
+langcode: en
+status: true
+dependencies: {  }
+id: neo_modal_shelf_top
+label: 'Shelf: Top'
+parent: ''
+plugin: neo_modal
+settings:
+  scope: 0
+  width: 1200px
+  headerInContent: 1
+  contentScroll: 1
+  placement: top
+  contentAnimateIn: fadeInDown
+  contentAnimateOut: fadeOutUp
+weight: 0
+visibility: {  }
+lock: false
