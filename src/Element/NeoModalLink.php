@@ -42,12 +42,12 @@ class NeoModalLink extends Link {
     if (!empty($element['#modal_preset'])) {
       $modal_settings['preset'] = $element['#modal_preset'];
     }
-    if ($modal_settings) {
-      $element['#attributes']['class'][] = 'use-ajax';
-      $element['#attributes']['data-dialog-type'] = 'modal';
-      $element['#attributes']['data-dialog-options'] = Json::encode(['neo' => $modal_settings]);
-      $element['#attached']['library'][] = 'core/drupal.ajax';
-    }
+    $element['#attributes']['class'][] = 'use-ajax';
+    $element['#attributes']['data-dialog-type'] = 'modal';
+    $element['#attributes']['data-dialog-options'] = Json::encode(['neo' => $modal_settings]);
+    $element['#attached']['library'][] = 'core/drupal.ajax';
+    // if ($modal_settings) {
+    // }
     $element = parent::preRenderLink($element);
     return $element;
   }
