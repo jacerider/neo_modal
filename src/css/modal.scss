@@ -551,6 +551,7 @@ body.has-neo-modal--loader {
       rgb(var(--color-base-0) / 0)
     );
     content: '';
+    pointer-events: none;
   }
 
   &:after {
@@ -566,6 +567,7 @@ body.has-neo-modal--loader {
       var(--modal-content-bg, rgb(var(--color-base-0)))
     );
     content: '';
+    pointer-events: none;
   }
 
   .neo-modal--no-click & {

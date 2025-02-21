@@ -22,6 +22,14 @@ modal-ajax:
   dependencies:
     - neo_modal/modal
 
+links:
+  version: VERSION
+  neo: { group: contrib }
+  js:
+    src/js/modal-link.ts: {}
+  dependencies:
+    - core/drupal.ajax
+
 modal-dialog-ajax:
   version: VERSION
   neo: { group: contrib }

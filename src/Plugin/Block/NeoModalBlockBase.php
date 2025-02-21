@@ -2,13 +2,13 @@
 
 namespace Drupal\neo_modal\Plugin\Block;
 
-use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
+use Drupal\neo\NeoLinkitTrait;
 use Drupal\neo_icon\IconTranslationTrait;
 use Drupal\neo_modal\Modal;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInterface, ContainerFactoryPluginInterface {
 
   use IconTranslationTrait;
+  use NeoLinkitTrait;
 
   /**
    * The entity manager.
@@ -68,6 +69,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       ],
       'trigger_text' => '',
       'trigger_icon' => '',
+      'trigger_url' => '',
       'trigger_icon_position' => 'before',
       'modal_preset' => '',
       'modal_ajax' => FALSE,
@@ -106,6 +108,11 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       '#title' => $this->t('Trigger Icon'),
       '#default_value' => $this->configuration['trigger_icon'],
     ];
+
+    $form['trigger_url'] = [
+      '#title' => $this->t('Trigger URL Override (AJAX only)'),
+      '#description' => $this->t('The optional URL that will be used for users without javascript.'),
+    ] + $this->getLinkitElement($this->configuration['trigger_url']);
 
     $form['trigger_icon_position'] = [
       '#type' => 'select',
@@ -195,6 +202,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
     }
     $this->configuration['trigger_text'] = $form_state->getValue(['trigger_text'], '');
     $this->configuration['trigger_icon'] = $form_state->getValue(['trigger_icon'], '');
+    $this->configuration['trigger_url'] = $form_state->getValue(['trigger_url'], '');
     $this->configuration['trigger_icon_position'] = $form_state->getValue(['trigger_icon_position'], '');
     $this->configuration['modal_ajax'] = $form_state->getValue(['modal_ajax']);
     $this->configuration['modal_preset'] = $form_state->getValue(['modal_preset']);
@@ -207,18 +215,23 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
   public function build() {
     $modal = $this->buildModal();
     $blockId = $this->configuration['block_id'];
+    $url = $blockId ? Url::fromRoute('neo_modal.api.block.view', [
+      'block' => $blockId,
+    ]) : Url::fromRoute('<current>');
     $build = [
       '#type' => 'link',
       '#title' => $this->icon($this->configuration['trigger_text'], $this->configuration['trigger_icon'])
         ->iconPosition($this->configuration['trigger_icon_position']),
-      '#url' => $blockId ? Url::fromRoute('neo_modal.api.block.view', [
-        'block' => $blockId,
-      ]) : Url::fromRoute('<current>'),
+      '#url' => $url,
     ];
     if ($blockId && $this->configuration['modal_ajax']) {
       $build['#type'] = 'neo_modal_link';
       $build['#modal'] = $modal->getValues();
       $build['#modal_preset'] = $this->configuration['modal_preset'];
+      if ($url = $this->configuration['trigger_url']) {
+        $build['#ajax_url'] = $build['#url'];
+        $build['#url'] = Url::fromUserInput($url);
+      }
     }
     else {
       $modal->setContent($this->buildModalContent());

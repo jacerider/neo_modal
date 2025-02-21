@@ -24,8 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class NeoModalAccountBlock extends NeoModalBlockBase {
 
-  use NeoLinkitTrait;
-
   /**
    * The current user.
    *
