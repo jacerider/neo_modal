@@ -3,10 +3,8 @@
 namespace Drupal\neo_modal\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,16 +15,9 @@ use Drupal\neo_modal\Modal;
 use Drupal\neo_settings\Element\NeoSettingsVariation;
 
 /**
- * Plugin implementation of the 'neo_modal_media' formatter.
+ * Plugin implementation of the 'neo_modal_image_gallery' formatter.
  */
-#[FieldFormatter(
-  id: 'neo_modal_media_gallery',
-  label: new TranslatableMarkup('Neo | Modal Gallery'),
-  field_types: [
-    'entity_reference',
-  ]
-)]
-final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
+class NeoModalGalleryBaseFormatter extends EntityReferenceFormatterBase {
 
   /**
    * The renderer service.
@@ -169,15 +160,15 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
   }
 
   /**
-   * Get the media title options.
+   * Get the entity title options.
    *
    * @return array
-   *   The media title options.
+   *   The entity title options.
    */
   protected function getTitleOptions() {
     return [
       '' => 'None',
-      'media_title' => 'Media Title',
+      'entity_title' => 'Media Title',
       'image_alt' => 'Image Alt',
       'image_title' => 'Image Title',
     ];
@@ -246,18 +237,18 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-    $media_items = $this->getEntitiesToView($items, $langcode);
+    $entity_items = $this->getEntitiesToView($items, $langcode);
     $thumbnailSettings = $this->getSetting('thumbnail');
     $thumbnailDimensions = $thumbnailSettings['dimensions'] ?? [];
     $fullSettings = $this->getSetting('full');
     $fullDimensions = $fullSettings['dimensions'] ?? [];
 
-    foreach ($media_items as $delta => $media) {
-      /** @var \Drupal\media\MediaInterface $media */
+    foreach ($entity_items as $delta => $entity) {
+      /** @var \Drupal\media\MediaInterface|\Drupal\file\FileInterface $entity */
       $title = '';
       switch ($this->getSetting('thumbnail_title')) {
-        case 'media_title':
-          $title = $media->label();
+        case 'entity_title':
+          $title = $entity->label();
           break;
 
         case 'image_alt':
@@ -269,7 +260,7 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
           break;
       }
 
-      $thumbnail = NeoImage::createFromEntity($media, $title);
+      $thumbnail = NeoImage::createFromEntity($entity, $title);
       $thumbnail->autoFromDimensions($thumbnailDimensions);
       $elements[$delta]['image'] = $thumbnail->toRenderable();
 
@@ -279,19 +270,19 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
           '#tag' => 'div',
           '#value' => $title,
           '#attributes' => [
-            'class' => ['neo-modal-media-gallery-title'],
+            'class' => ['neo-modal-entity-gallery-title'],
           ],
         ];
       }
 
       if (!empty($fullDimensions)) {
-        $full = NeoImage::createFromEntity($media);
+        $full = NeoImage::createFromEntity($entity);
         $full->autoFromDimensions($fullDimensions);
         $modal = new Modal($full->toRenderable(), [], $this->getSetting('modal_variation'));
         $modal->setGroup($this->getSetting('modal_group') ?: 'gallery');
         switch ($this->getSetting('modal_title')) {
-          case 'media_title':
-            $modal->setTitle($media->label());
+          case 'entity_title':
+            $modal->setTitle($entity->label());
             break;
 
           case 'image_alt':
@@ -302,28 +293,19 @@ final class NeoModalMediaGalleryFormatter extends EntityReferenceFormatterBase {
             $modal->setTitle($elements[$delta]['image']['#title']);
             break;
         }
-        if (in_array($media->bundle(), ['remote_video', 'video'])) {
+        if (in_array($entity->bundle(), ['remote_video', 'video'])) {
           $modal->setTriggerOverlay(t('View Video'), 'play-circle');
-          $videoUrl = $media->getSource()->getSourceFieldValue($media);
+          $videoUrl = $entity->getSource()->getSourceFieldValue($entity);
           $modal->setVideo($videoUrl);
         }
         $modal->applyTo($elements[$delta]);
       }
 
       // Add cacheability of each item in the field.
-      $this->renderer->addCacheableDependency($elements[$delta], $media);
+      $this->renderer->addCacheableDependency($elements[$delta], $entity);
     }
 
     return $elements;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function isApplicable(FieldDefinitionInterface $field_definition) {
-    // This formatter is only available for entity types that reference
-    // media items.
-    return ($field_definition->getFieldStorageDefinition()->getSetting('target_type') == 'media');
   }
 
   /**
