@@ -84,6 +84,19 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
       return $value !== 'core/jquery';
     }));
   }
+  if ($extension == 'focal_point') {
+    // Focal point relies on core.dialog loading JQuery UI. But since we replace
+    // it, we need to add the libraries it needs.
+    $libraries['drupal.focal_point']['js']['/core/assets/vendor/jquery.ui/ui/widgets/draggable-min.js'] = [
+      'weight' => '-11.6',
+      'minified' => TRUE,
+    ];
+    $libraries['drupal.focal_point']['js']['/core/assets/vendor/jquery.ui/ui/widgets/mouse-min.js'] = [
+      'weight' => '-11.7',
+      'minified' => TRUE,
+    ];
+    $libraries['drupal.dialog.ajax']['dependencies'][] = 'core/internal.jquery_ui';
+  }
 }
 
 /**
