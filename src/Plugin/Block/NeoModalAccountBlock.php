@@ -101,6 +101,10 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
     $config['user_welcome'] = TRUE;
     $config['link_anon_text'] = '';
     $config['link_anon_url'] = '';
+    $config['link_anon_modal'] = FALSE;
+    $config['link_auth_text'] = '';
+    $config['link_auth_url'] = '';
+    $config['link_auth_modal'] = FALSE;
     $config['login_display'] = 'form';
     $config['login_text'] = 'Log In';
     $config['register_display'] = 'link';
@@ -230,6 +234,28 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
       '#default_value' => $this->configuration['link_anon_text'],
     ];
     $form['link_anon']['link_anon_url'] = $this->getLinkitElement($this->configuration['link_anon_url']);
+    $form['link_anon']['link_anon_modal'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show in modal'),
+      '#default_value' => $this->configuration['link_anon_modal'],
+    ];
+
+    $form['link_auth'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Extra link for authenticated users'),
+      '#open' => FALSE,
+    ];
+    $form['link_auth']['link_auth_text'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Link text'),
+      '#default_value' => $this->configuration['link_auth_text'],
+    ];
+    $form['link_auth']['link_auth_url'] = $this->getLinkitElement($this->configuration['link_auth_url']);
+    $form['link_auth']['link_auth_modal'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show in modal'),
+      '#default_value' => $this->configuration['link_auth_modal'],
+    ];
 
     return $form;
   }
@@ -266,6 +292,20 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
     $this->configuration['link_anon_url'] = $form_state->getValue([
       'link_anon', 'link_anon_url',
     ]);
+    $this->configuration['link_anon_modal'] = (bool) $form_state->getValue([
+      'link_anon',
+      'link_anon_modal',
+    ], FALSE);
+    $this->configuration['link_auth_text'] = $form_state->getValue([
+      'link_auth', 'link_auth_text',
+    ]);
+    $this->configuration['link_auth_url'] = $form_state->getValue([
+      'link_auth', 'link_auth_url',
+    ]);
+    $this->configuration['link_auth_modal'] = (bool) $form_state->getValue([
+      'link_auth',
+      'link_auth_modal',
+    ], FALSE);
   }
 
   /**
@@ -304,7 +344,7 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
 
       if ($this->configuration['link_anon_text'] && $this->configuration['link_anon_url']) {
         $build['#link'] = [
-          '#type' => 'neo_modal_link',
+          '#type' => !empty($this->configuration['link_anon_modal']) ? 'neo_modal_link' : 'link',
           '#title' => $this->configuration['link_anon_text'],
           '#url' => Url::fromUserInput($this->configuration['link_anon_url']),
           '#modal' => ['nest' => TRUE, 'smartActions' => TRUE] + $this->configuration['modal'],
@@ -353,12 +393,22 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
 
       $build['#title'] = $this->t('Your Account');
 
+      if ($this->configuration['link_auth_text'] && $this->configuration['link_auth_url']) {
+        $build['#link'] = [
+          '#type' => !empty($this->configuration['link_auth_modal']) ? 'neo_modal_link' : 'link',
+          '#title' => $this->configuration['link_auth_text'],
+          '#url' => Url::fromUserInput($this->configuration['link_auth_url']),
+          '#modal' => ['nest' => TRUE, 'smartActions' => TRUE] + $this->configuration['modal'],
+          '#modal_preset' => $this->configuration['modal_preset'],
+        ];
+      }
+
       if ($this->configuration['user_welcome']) {
         $build['#message'] = $this->t('Hello, <span>@name</span>', ['@name' => $user->getDisplayName()]);
       }
 
       if ($this->configuration['user_teaser']) {
-        $build['#user'] = $this->entityTypeManager->getViewBuilder('user')->view($user, 'teaser');
+        $build['#user'] = $this->entityTypeManager->getViewBuilder('user')->view($user, 'compact');
       }
 
       $build['#logout'] = [
