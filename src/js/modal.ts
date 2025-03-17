@@ -1,3 +1,9 @@
+declare global {
+  interface JQuery {
+    dialog(options?:any): JQuery;
+  }
+}
+
 import { NeoModal } from './modal/modal';
 
 (function (Drupal, drupalSettings, once) {
@@ -83,5 +89,38 @@ import { NeoModal } from './modal/modal';
   Drupal.behaviors.dialog.prepareDialogButtons = () => {};
 
 })(Drupal, drupalSettings, once);
+
+if (typeof jQuery === 'function' && typeof jQuery.fn.dialog === 'undefined') {
+  // Provide a jQuery plugin similar to the jQuery UI dialog.
+  jQuery.fn.dialog = function (options?:any): JQuery {
+    if (!Drupal.neoModal) {
+      return this;
+    }
+    if (typeof options === 'string') {
+      if (options === 'destroy') {
+        Drupal.neoModal.close();
+      }
+      return this;
+    }
+    return this.each(function () {
+      if (!Drupal.neoModal) {
+        return;
+      }
+      if (Drupal.neoModal) {
+        options.headerInContent = true;
+        if (options.dialogClass) {
+          options.modalClasses = options.dialogClass;
+        }
+        if (typeof options.closeOnEscape !== 'undefined' && options.closeOnEscape === false) {
+          options.closeButton = false;
+          options.closeOnEscape = false;
+          options.backdropClose = false;
+        }
+        options.content = jQuery(this)[0].outerHTML;
+        Drupal.neoModal.open(options);
+      }
+    });
+  };
+}
 
 export {};
