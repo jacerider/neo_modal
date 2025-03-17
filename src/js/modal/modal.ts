@@ -50,6 +50,7 @@ class NeoModal {
     videoAutoplay: true,
     videoRatio: '16x9',
     smartActions: false,
+    buttons: null,
     content: null,
     contentPadding: '',
     contentScroll: false,
@@ -59,6 +60,7 @@ class NeoModal {
     contentAnimateOut: 'comingOut',
     contentAnimateOutSpeed: 'fastest',
     contentAnimateOutDelay: null,
+    closeOnEscape: true,
     closeButton: 'end',
     closeButtonSvg: '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="neo-modal--close-icon" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M13.854 2.146a.5.5 0 0 1 0 .708l-11 11a.5.5 0 0 1-.708-.708l11-11a.5.5 0 0 1 .708 0Z"/><path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/></svg>',
     closeButtonClasses: '',
@@ -613,6 +615,9 @@ class NeoModal {
                 width += 'px';
               }
             }
+            else if (typeof this.options.width === 'number') {
+              width += 'px';
+            }
             this.content.style.width = width + '';
           }
         }
@@ -690,15 +695,6 @@ class NeoModal {
         else if (this.modal.classList.contains('neo-modal--flush')) {
           this.modal.classList.remove('neo-modal--flush');
         }
-        // if (this.header) {
-        //   this.modal.style.setProperty('--modal-header-h', this.header.clientHeight + 'px');
-        // }
-        // if (this.footerContent) {
-        //   this.modal.style.setProperty('--modal-footer-h', this.footerContent.clientHeight + 'px');
-        // }
-        // else if (this.footer) {
-        //   this.modal.style.setProperty('--modal-footer-h', this.footer.clientHeight + 'px');
-        // }
       }
     }
   }
@@ -711,7 +707,7 @@ class NeoModal {
     if (this.options.fit && !this.focused) {
       this.focusWatch();
     }
-    if (event.key === 'Escape') {
+    if (this.options.closeOnEscape === true && event.key === 'Escape') {
       const modal = document.querySelector<HTMLElement>('.neo-modal:last-child');
       // We may have multiple modals open. Only close the top level.
       if (modal === this.modal) {
@@ -1627,6 +1623,26 @@ class NeoModal {
     }
     const footer = document.createElement('div');
     footer.classList.add('neo-modal--content-footer');
+
+    if (this.options.buttons) {
+      // Smart actions are disabled when buttons are set.
+      this.options.smartActions = false;
+      const actions = document.createElement('div');
+      actions.classList.add('neo-modal--actions');
+      for (const [label, callback] of Object.entries(this.options.buttons)) {
+        const action = document.createElement('button');
+        action.classList.add('neo-modal--btn');
+        action.classList.add('btn');
+        action.innerHTML = label;
+        action.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          callback();
+        });
+        actions.appendChild(action);
+      }
+      footer.appendChild(actions);
+    }
 
     if (this.contentInner && this.options.smartActions) {
       const actions = document.createElement('div');
