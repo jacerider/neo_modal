@@ -16,6 +16,10 @@ declare namespace neoModal {
     navColorBg: string;
   }
 
+  export interface NeoModalButtons {
+    [key: string]: (...args: any[]) => any;
+  }
+
   export interface NeoModalOptions extends NeoModalColorOptions {
     appendTo:HTMLElement|string|null;
     appendToClosest:string|null;
@@ -47,6 +51,7 @@ declare namespace neoModal {
     videoAutoplay:boolean;
     videoRatio:VideoRatio;
     smartActions:boolean;
+    buttons:NeoModalButtons?;
     content:((ref: HTMLElement) => HTMLElement|string)|HTMLElement|string|null;
     contentPadding:string|number;
     contentScroll:boolean;
@@ -58,6 +63,7 @@ declare namespace neoModal {
     contentAnimateOutDelay:AnimationDelay|null;
     contentColor:string;
     contentColorBg:string;
+    closeOnEscape:boolean;
     closeButton:ClosePlacement|boolean;
     closeButtonSvg:string|null;
     closeButtonClasses:string|null;
