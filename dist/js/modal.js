@@ -667,9 +667,13 @@ const u = class u {
       e.classList.add("neo-modal--actions");
       const o = [], i = this.contentInner.querySelectorAll(".form-actions");
       if (i.length > 0) {
-        const n = i[i.length - 1];
-        n.style.display = "none", n.querySelectorAll("input, button, a").forEach((a) => {
-          o.push(a);
+        const n = i[i.length - 1], a = n.closest("form");
+        if (a) {
+          const l = a.dataset.neoSize || null;
+          l && (e.dataset.neoSize = l);
+        }
+        n.style.display = "none", n.querySelectorAll("input, button, a").forEach((l) => {
+          o.push(l);
         });
       } else
         this.contentInner.querySelectorAll("form > input[type=submit], form > button, .neo-modal--btn").forEach((n) => {
@@ -678,7 +682,9 @@ const u = class u {
       o.length && (o.forEach((n) => {
         n.style.display = "none";
         const a = document.createElement("button");
-        a.classList.add("neo-modal--btn"), a.classList.add("btn"), n.classList.contains("button--primary") && a.classList.add("btn-primary"), a.innerHTML = n.getAttribute("value") || n.innerText, a.addEventListener("click", (l) => {
+        n.classList.forEach((l) => {
+          l.startsWith("btn") && a.classList.add(l);
+        }), a.classList.length || (a.classList.add("btn"), n.classList.contains("button--primary") && a.classList.add("btn-primary")), a.classList.add("neo-modal--btn"), a.innerHTML = n.getAttribute("value") || n.innerText, a.addEventListener("click", (l) => {
           l.preventDefault(), l.stopPropagation(), n.dispatchEvent(new Event("mousedown")), n.click(), n.dispatchEvent(new Event("mouseup"));
         }), e.appendChild(a);
       }), t.appendChild(e));

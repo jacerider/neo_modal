@@ -1653,6 +1653,13 @@ class NeoModal {
       const formActions = this.contentInner.querySelectorAll<HTMLElement>('.form-actions');
       if (formActions.length > 0) {
         const lastFormAction = formActions[formActions.length - 1] as HTMLElement;
+        const form = lastFormAction.closest('form');
+        if (form) {
+          const neoSize = form.dataset['neoSize'] || null;
+          if (neoSize) {
+            actions.dataset['neoSize'] = neoSize;
+          }
+        }
         lastFormAction.style.display = 'none';
         lastFormAction.querySelectorAll('input, button, a').forEach((button) => {
           buttons.push(button as HTMLElement);
@@ -1667,11 +1674,18 @@ class NeoModal {
         buttons.forEach((button) => {
           button.style.display = 'none';
           const clone = document.createElement('button');
-          clone.classList.add('neo-modal--btn');
-          clone.classList.add('btn');
-          if (button.classList.contains('button--primary')) {
-            clone.classList.add('btn-primary');
+          button.classList.forEach(className => {
+            if (className.startsWith('btn')) {
+              clone.classList.add(className);
+            }
+          });
+          if (!clone.classList.length) {
+            clone.classList.add('btn');
+            if (button.classList.contains('button--primary')) {
+              clone.classList.add('btn-primary');
+            }
           }
+          clone.classList.add('neo-modal--btn');
           clone.innerHTML = button.getAttribute('value') || button.innerText;
           clone.addEventListener('click', (e) => {
             e.preventDefault();
