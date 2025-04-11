@@ -44,7 +44,8 @@ class NeoModal extends RenderElementBase {
       '#title' => '',
       '#title_attributes' => [],
       '#close' => '',
-      '#options' => [],
+      '#modal' => [],
+      '#modal_preset' => NULL,
       '#optional' => FALSE,
       '#process' => [
         [$class, 'processGroup'],
@@ -115,7 +116,12 @@ class NeoModal extends RenderElementBase {
         ],
       ];
     }
-    $modal = new Modal($content, $element['#options']);
+
+    $options = $element['#modal'] ?: $element['#options'] ?? [];
+    $preset = $element['#modal_preset'] ?: $options['preset'] ?? NULL;
+    unset($options['preset']);
+
+    $modal = new Modal($content, $options, $preset);
     $modal->mergeTriggerAttributes($element['#title_attributes']);
     if (!empty($element['#parents'])) {
       $modal->setSmartActions();

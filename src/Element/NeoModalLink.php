@@ -21,8 +21,8 @@ class NeoModalLink extends Link {
     return [
       '#title' => '',
       '#modal' => [],
-      '#ajax_method' => 'POST',
       '#modal_preset' => NULL,
+      '#ajax_method' => 'POST',
       '#pre_render' => [
         [$class, 'preRenderModalLink'],
       ],
