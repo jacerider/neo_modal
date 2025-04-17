@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\neo_modal;
 
@@ -2098,6 +2098,9 @@ class Modal {
     return $this;
   }
 
+  /**
+   *
+   */
   public function setBreakpoint(string $breakpoint):self {
     if (in_array($breakpoint, ['md', 'lg'])) {
       $this->breakpoint = $breakpoint;

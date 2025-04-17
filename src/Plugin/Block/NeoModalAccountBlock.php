@@ -9,7 +9,6 @@ use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\neo\NeoLinkitTrait;
 use Drupal\user\Access\RegisterAccessCheck;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -63,7 +62,7 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
     AccountInterface $current_user,
     FormBuilderInterface $form_builder,
     RegisterAccessCheck $register_access_check,
-    MenuLinkTreeInterface $menu_link_tree
+    MenuLinkTreeInterface $menu_link_tree,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager);
     $this->currentUser = $current_user;

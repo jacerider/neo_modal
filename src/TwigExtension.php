@@ -4,7 +4,6 @@ namespace Drupal\neo_modal;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
-use Twig\TwigFunction;
 
 /**
  * Defines Twig extensions.
@@ -33,7 +32,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * Render the neo image style.
    */
-  public static function renderModal($build, mixed $trigger, array $options = [], string $preset = NULL, $attributes = []) {
+  public static function renderModal($build, mixed $trigger, array $options = [], ?string $preset = NULL, $attributes = []) {
     if (empty($build)) {
       return $build;
     }

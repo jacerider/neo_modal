@@ -24,7 +24,7 @@ final class NeoModalBlockController extends ControllerBase {
    * @return array
    *   A render array.
    */
-  public function __invoke(BlockInterface $block, string $arg = NULL): array {
+  public function __invoke(BlockInterface $block, ?string $arg = NULL): array {
     $build = [];
     $plugin = $block->getPlugin();
     if ($plugin instanceof NeoModalBlockInterface) {

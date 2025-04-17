@@ -27,7 +27,7 @@ class NeoModalAccountLoginForm extends UserLoginForm {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, BlockInterface $block = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?BlockInterface $block = NULL) {
     $form = parent::buildForm($form, $form_state);
     $form['#id'] = 'neo-modal-account-login';
     $form['#neo_style'] = 'clean';
