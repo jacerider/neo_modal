@@ -106,6 +106,7 @@ function neo_modal_ajax_render_alter(array &$data) {
   foreach ($data as $delta => $command) {
     if ($command['command'] == 'openDialog') {
       if (!empty($command['dialogOptions'])) {
+        $data[$delta]['settings'] = $data[$delta]['settings'] ?? [];
         if (!empty($command['dialogOptions']['title'])) {
           $data[$delta]['settings']['title'] = $command['dialogOptions']['title'];
           if (empty($command['dialogOptions']['neo']['icon'])) {

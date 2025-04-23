@@ -191,6 +191,7 @@ body.has-neo-modal--loader {
 
 .neo-modal--header-center {
   @apply flex w-full justify-center p-2;
+  min-width: 0;
 
   .neo-modal--header-content & {
     padding: var(--modal-content-header-padding);
@@ -242,13 +243,18 @@ body.has-neo-modal--loader {
 }
 
 .neo-modal--label {
-  @apply flex items-center justify-center;
+  @apply flex items-center justify-center overflow-hidden;
 
   &.has-icon .neo-modal--title {
     @apply text-left;
   }
 
+  * {
+    @apply whitespace-nowrap text-ellipsis overflow-hidden;
+  }
+
   h2 {
+
     // Global scope.
     .neo-modal--header-global & {
       @apply text-sm leading-none;

@@ -1,9 +1,10 @@
 neo_modal.api.block.view:
-  path: '/api/modal/block/{block}/{arg}'
+  path: '/api/modal/block/{block}/{arg1}/{arg2}'
   defaults:
     _title: 'View'
     _controller: '\Drupal\neo_modal\Controller\NeoModalBlockController'
-    arg: NULL
+    arg1: NULL
+    arg2: NULL
   requirements:
     _entity_access: 'block.view'
 

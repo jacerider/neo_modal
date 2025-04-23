@@ -89,6 +89,7 @@ class NeoModal {
     footerAnimateOutSpeed: 'fastest',
     footerAnimateOutDelay: null,
     title: '',
+    titleCallback: null,
     titleAnimateIn: 'fadeInDown',
     titleAnimateInSpeed: null,
     titleAnimateInDelay: 'fastest',
@@ -419,6 +420,13 @@ class NeoModal {
 
     this.eventSettings.trigger(this, builtOptions);
     return builtOptions;
+  }
+
+  public getOption(key:string):any {
+    if (this.options && typeof this.options[key as keyof neoModal.NeoModalOptions] !== 'undefined') {
+      return this.options[key as keyof neoModal.NeoModalOptions];
+    }
+    return null;
   }
 
   protected mergeOptions(options:neoModal.NeoModalOptions):neoModal.NeoModalOptions {
@@ -1717,9 +1725,20 @@ class NeoModal {
       const title = document.createElement('div');
       title.classList.add('neo-modal--title');
 
-      if (this.options.title) {
+      if (this.options.titleCallback) {
+        const callback = this.getFromWindow(this.options.titleCallback);
+        if (callback) {
+          this.title = document.createElement('h2');
+          const titleInner = document.createElement('span');
+          callback(this, titleInner);
+          this.title.appendChild(titleInner);
+        }
+      }
+      else if (this.options.title) {
         this.title = document.createElement('h2');
         this.title.innerHTML = '<span>' + this.options.title + '</span>';
+      }
+      if (this.title) {
         title.appendChild(this.title);
         label.classList.add('has-title');
       }
@@ -2127,6 +2146,36 @@ class NeoModal {
 
   // HELPERS
   // --------------------------------------------------------------------------
+
+  /**
+   * Retrieves a value from the window object using a string path
+   * @param path A dot-separated path like "document.body" or "localStorage.getItem"
+   * @returns The value at the specified path or undefined if not found
+   */
+  protected getFromWindow<T = any>(path: string): T | undefined {
+    if (!path) {
+      return undefined;
+    }
+
+    // Split the path into segments
+    const pathSegments = path.split('.');
+
+    // Start with the window object
+    let current: any = window;
+
+    // Traverse the path
+    for (const segment of pathSegments) {
+      // If current becomes undefined/null or the property doesn't exist, return undefined
+      if (current === undefined || current === null || !(segment in current)) {
+        return undefined;
+      }
+
+      // Move to the next object in the path
+      current = current[segment];
+    }
+
+    return current as T;
+  }
 
   /**
    * Parse Youtube or Vimeo videos and get host & ID

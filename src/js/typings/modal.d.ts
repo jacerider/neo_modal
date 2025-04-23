@@ -96,6 +96,7 @@ declare namespace neoModal {
     footerColor:string;
     footerColorBg:string;
     title:string|null;
+    titleCallback:?string;
     titleAnimateIn:AnimationIn|boolean;
     titleAnimateInSpeed:AnimationSpeed|null;
     titleAnimateInDelay:AnimationDelay|null;

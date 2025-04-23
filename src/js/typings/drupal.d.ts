@@ -5,6 +5,7 @@ declare namespace drupal {
     export interface INeoModal {
       open(settings:neoModal.NeoModalOptions): neoModal;
       close(): void;
+      getTop(): neoModal?;
     }
 
   }

@@ -82,6 +82,9 @@ import { NeoModal } from './modal/modal';
     },
     close: () => {
       NeoModal.closeTop();
+    },
+    getTop: () => {
+      return NeoModal.getTop();
     }
   };
 

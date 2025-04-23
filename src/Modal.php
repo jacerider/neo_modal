@@ -7,6 +7,7 @@ namespace Drupal\neo_modal;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
+use Drupal\neo\Helpers\Str;
 use Drupal\neo_icon\IconRepositoryTrait;
 use Drupal\neo_settings\SettingsTrait;
 
@@ -505,7 +506,7 @@ class Modal {
     if (!empty($options)) {
       $class = new \ReflectionClass($this);
       foreach ($options as $key => $option) {
-        $method = 'set' . ucfirst($key);
+        $method = 'set' . ucfirst(Str::camel($key));
         if (method_exists($this, $method)) {
           $param = (string) $class->getMethod($method)->getParameters()[0]->getType();
           $option = match ($param) {
@@ -514,9 +515,6 @@ class Modal {
             'bool' => (bool) $option,
             default => $option,
           };
-          if ((string) $param === 'bool') {
-            $option = (bool) $option;
-          }
           $this->$method($option);
         }
       }
@@ -2099,7 +2097,12 @@ class Modal {
   }
 
   /**
+   * Set the breakpoint.
    *
+   * @param string $breakpoint
+   *   The breakpoint. Can be 'md' or 'lg'.
+   *
+   * @return $this
    */
   public function setBreakpoint(string $breakpoint):self {
     if (in_array($breakpoint, ['md', 'lg'])) {
@@ -2113,6 +2116,8 @@ class Modal {
    *
    * @param string|array $build
    *   The renderable array.
+   * @param array $triggerAttributes
+   *   The trigger attributes.
    */
   protected function buildTrigger($build, array $triggerAttributes = []) {
     if (is_string($build) || $build instanceof MarkupInterface) {
@@ -2209,6 +2214,8 @@ class Modal {
    *
    * @param string|array $build
    *   The renderable array.
+   * @param array $attributes
+   *   The attributes.
    */
   public function applyTo(mixed &$build, array $attributes = []):void {
     $build = $this->buildTrigger($build, $attributes);
