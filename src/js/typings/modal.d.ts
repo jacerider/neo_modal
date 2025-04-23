@@ -192,6 +192,21 @@ declare namespace neoModal {
     neoModalOptions:NeoModalOptions;
   }
 
+  interface NeoModalStatic {
+    new (options:NeoModalOptions):NeoModal;
+    static setDefaultOptions(options:any):void;
+    static closeTop():void;
+    static getTop():NeoModal|null;
+    open ():void;
+    close ():void;
+    size():void;
+    refreshContent():void;
+    getModal():HTMLElement|null;
+    getContent():HTMLElement|null;
+    getOption(option:string):any;
+    event(eventName:string):any|null;
+  }
+
   type Placement =
     | 'center'
     | 'top'
@@ -368,3 +383,7 @@ declare namespace neoModal {
 }
 
 declare var NeoModal: neoModal.NeoModalStatic;
+
+interface Window {
+  NeoModal: NeoModal;
+}

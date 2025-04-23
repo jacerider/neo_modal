@@ -707,7 +707,7 @@ class NeoModal {
     }
   }
 
-  public watch():void {
+  protected watch():void {
     this.size();
   }
 
@@ -745,7 +745,7 @@ class NeoModal {
   protected focused:boolean = false;
   protected focusing:boolean = false;
   protected focusTimeout:ReturnType<typeof setTimeout>|null = null;
-  public focusWatch():void {
+  protected focusWatch():void {
     if (this.focused) {
       this.focusOut();
     }
@@ -755,7 +755,7 @@ class NeoModal {
     }, 3000);
   }
 
-  public focusIn():void {
+  protected focusIn():void {
     if (this.focusing) {
       return;
     }
@@ -946,7 +946,7 @@ class NeoModal {
    *
    * This may be called multiple times, but will only build the stack once.
    */
-  public buildStack():void {
+  protected buildStack():void {
     this.buildWrapper();
     const backdropInsert = this.buildBackdrop();
     if (this.wrapper) {
