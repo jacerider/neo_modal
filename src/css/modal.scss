@@ -23,6 +23,10 @@ body.has-neo-modal--loader {
   }
 }
 
+.neo-modal-disable-position {
+  position: static !important;
+}
+
 .neo-modal {
   @apply fixed;
   z-index: var(--modal-z-index, 40);
@@ -250,10 +254,11 @@ body.has-neo-modal--loader {
   }
 
   * {
-    @apply whitespace-nowrap text-ellipsis overflow-hidden;
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
   }
 
   h2 {
+    @apply m-0 p-0;
 
     // Global scope.
     .neo-modal--header-global & {

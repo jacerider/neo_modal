@@ -112,6 +112,7 @@ const u = class u {
     s(this, "modal", null);
     s(this, "backdrop", null);
     s(this, "groupTriggers", null);
+    s(this, "parentsFixedSticky", null);
     s(this, "container", null);
     s(this, "content", null);
     s(this, "contentBlock", null);
@@ -750,7 +751,9 @@ const u = class u {
   }
   doOpen() {
     var e, i;
-    this.eventOpen.trigger(this), this.watchInterval = setInterval(this.watch.bind(this), 200), (e = this.modal) == null || e.style.setProperty("visibility", ""), (i = this.modal) == null || i.style.setProperty("pointer-events", ""), this.transitionBodyIn();
+    this.eventOpen.trigger(this), this.watchInterval = setInterval(this.watch.bind(this), 200), (e = this.modal) == null || e.style.setProperty("visibility", ""), (i = this.modal) == null || i.style.setProperty("pointer-events", ""), this.parentsFixedSticky = this.getFixedOrStickyParents(this.modal), this.getFixedOrStickyParents(this.modal).forEach((o) => {
+      o.classList.add("neo-modal-disable-position");
+    }), this.transitionBodyIn();
     const t = document.querySelectorAll(".neo-modal:not(.neo-modal--closing)");
     this.depth = t.length;
     for (let o = 0; o < t.length; o++) {
@@ -812,12 +815,14 @@ const u = class u {
     });
   }
   finishClose() {
-    var t, e;
+    var t, e, i;
     if (this.contentPlaceholder) {
-      const i = (t = this.contentInner) == null ? void 0 : t.querySelector(".neo-modal-template");
-      i && ((e = this.contentPlaceholder.parentNode) == null || e.replaceChild(i, this.contentPlaceholder));
+      const o = (t = this.contentInner) == null ? void 0 : t.querySelector(".neo-modal-template");
+      o && ((e = this.contentPlaceholder.parentNode) == null || e.replaceChild(o, this.contentPlaceholder));
     }
-    this.remove(), this.removeWrapper(), this.popper && this.popper.destroy(), this.originalOptions && (this.options = this.originalOptions, this.originalOptions = null), this.options.navKeyboard && (document.body.removeEventListener("keydown", this.onKeyboardDown), document.body.removeEventListener("keyup", this.onKeyboardUp)), this.wrapper = null, document.body.removeEventListener("mousemove", this.focusWatch), this.eventAfterClose.trigger(this);
+    (i = this.parentsFixedSticky) == null || i.forEach((o) => {
+      o.classList.remove("neo-modal-disable-position");
+    }), this.remove(), this.removeWrapper(), this.popper && this.popper.destroy(), this.originalOptions && (this.options = this.originalOptions, this.originalOptions = null), this.options.navKeyboard && (document.body.removeEventListener("keydown", this.onKeyboardDown), document.body.removeEventListener("keyup", this.onKeyboardUp)), this.wrapper = null, document.body.removeEventListener("mousemove", this.focusWatch), this.eventAfterClose.trigger(this);
   }
   globalInit() {
     document.body.classList.add("has-neo-modal"), this.options.bodyLock && (typeof bodyScrollLock < "u" ? bodyScrollLock.lock() : document.body.classList.add("neo-modal--body-lock"));
@@ -850,6 +855,22 @@ const u = class u {
         return;
       i = i[o];
     }
+    return i;
+  }
+  getFixedOrStickyParents(t) {
+    const e = [];
+    let i = t.parentElement;
+    for (; i; ) {
+      const n = window.getComputedStyle(i).getPropertyValue("position");
+      (n === "fixed" || n === "sticky") && e.push(i), i = i.parentElement;
+    }
+    return e;
+  }
+  getParentsWithClass(t, e) {
+    const i = [];
+    let o = t.parentElement;
+    for (; o; )
+      o.classList.contains(e) && i.push(o), o = o.parentElement;
     return i;
   }
   /**

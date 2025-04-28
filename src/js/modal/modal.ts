@@ -286,6 +286,7 @@ class NeoModal {
   protected modal:neoModal.NeoModalElement|null = null;
   protected backdrop:HTMLElement|null = null;
   protected groupTriggers:NodeListOf<HTMLElement>|null = null;
+  protected parentsFixedSticky:HTMLElement[]|null = null;
   protected container:HTMLElement|null = null;
   protected content:HTMLElement|null = null;
   protected contentBlock:HTMLElement|null = null;
@@ -1886,6 +1887,12 @@ class NeoModal {
     this.modal?.style.setProperty('visibility', '');
     this.modal?.style.setProperty('pointer-events', '');
 
+    // Clear a path so modal is not blocked by fixed/sticky parents.
+    this.parentsFixedSticky = this.getFixedOrStickyParents(this.modal as HTMLElement);
+    this.getFixedOrStickyParents(this.modal as HTMLElement).forEach((element) => {
+      element.classList.add('neo-modal-disable-position');
+    });
+
     this.transitionBodyIn();
 
     // Nest other modals.
@@ -2089,8 +2096,17 @@ class NeoModal {
         this.contentPlaceholder.parentNode?.replaceChild(content, this.contentPlaceholder);
       }
     }
+
+    // Restore any fixed/sticky parents that were disabled.
+    this.parentsFixedSticky?.forEach((element) => {
+      element.classList.remove('neo-modal-disable-position');
+    });
+
     this.remove();
     this.removeWrapper();
+
+    // this.modal?.asdf
+
     if (this.popper) {
       this.popper.destroy();
     }
@@ -2175,6 +2191,39 @@ class NeoModal {
     }
 
     return current as T;
+  }
+
+  protected getFixedOrStickyParents(element: HTMLElement): HTMLElement[] {
+    const fixedOrStickyParents: HTMLElement[] = [];
+    let currentElement: HTMLElement | null = element.parentElement;
+
+    while (currentElement) {
+      const computedStyle = window.getComputedStyle(currentElement);
+      const position = computedStyle.getPropertyValue('position');
+
+      if (position === 'fixed' || position === 'sticky') {
+        fixedOrStickyParents.push(currentElement);
+      }
+
+      currentElement = currentElement.parentElement;
+    }
+
+    return fixedOrStickyParents;
+  }
+
+  protected getParentsWithClass(element: HTMLElement, className: string): HTMLElement[] {
+    const parentsWithClass: HTMLElement[] = [];
+    let currentElement: HTMLElement | null = element.parentElement;
+
+    while (currentElement) {
+      if (currentElement.classList.contains(className)) {
+        parentsWithClass.push(currentElement);
+      }
+
+      currentElement = currentElement.parentElement;
+    }
+
+    return parentsWithClass;
   }
 
   /**
