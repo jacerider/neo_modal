@@ -18,8 +18,19 @@ use Drupal\Core\Render\Attribute\RenderElement;
  * Usage example:
  * @code
  * $form['author'] = [
- *   '#type' => 'neo_modal',
- *   '#title' => $this->t('Author'),
+ *   '#type' => 'neo_modal_confirm',
+ *   '#title' => $this->icon('Delete this thing', 'trash'),
+ *   '#description' => $this->t('Are you sure you want to delete this thing?.'),
+ *   '#confirm_text' => $this->t('Delete'),
+ *   '#submit' => [
+ *     '::deleteSubmit',
+ *   ],
+ *   '#attributes' => [
+ *     'class' => ['btn'],
+ *   ],
+ *   '#wrapper_attributes' => [
+ *     'class' => ['mt-4'],
+ *   ],
  * ];
  *
  * $form['author']['name'] = [
@@ -62,6 +73,7 @@ class NeoModalConfirm extends NeoModal {
           '#type' => 'submit',
           '#value' => $element['#confirm_text'],
           '#submit' => $element['#submit'],
+          '#limit_validation_errors' => [],
           '#attributes' => [
             'class' => ['btn btn-primary'],
           ],
