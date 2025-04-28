@@ -23,7 +23,13 @@ use Drupal\neo_modal\Modal;
  * @code
  * $form['author'] = [
  *   '#type' => 'neo_modal',
- *   '#title' => $this->t('Author'),
+ *   '#title' => $this->t('Open Modal'),
+ *   '#close' => $this->t('Cancel'), // Include if you want a close button.
+ *   '#modal' => [
+ *     'scope' => TRUE, // Optional if you want to use front/back scope.
+ *     'title' => $this->t('Modal Title'),
+ *    ],
+ *    '#modal_preset' => 'shelf_right',
  * ];
  *
  * $form['author']['name'] = [
@@ -42,7 +48,6 @@ class NeoModal extends RenderElementBase {
     $class = static::class;
     return [
       '#title' => '',
-      '#title_attributes' => [],
       '#close' => '',
       '#modal' => [],
       '#modal_preset' => NULL,
@@ -57,6 +62,7 @@ class NeoModal extends RenderElementBase {
         [$class, 'preRenderModal'],
       ],
       '#theme_wrappers' => ['neo_modal'],
+      '#wrapper_attributes' => [],
       '#value' => NULL,
     ];
   }
@@ -117,12 +123,15 @@ class NeoModal extends RenderElementBase {
       ];
     }
 
+    $attributes = $element['#title_attributes'] ?? $element['#attributes'];
+    $element['#attributes'] = $element['#wrapper_attributes'] ?? [];
+
     $options = $element['#modal'] ?: $element['#options'] ?? [];
     $preset = $element['#modal_preset'] ?: $options['preset'] ?? NULL;
     unset($options['preset']);
 
     $modal = new Modal($content, $options, $preset);
-    $modal->mergeTriggerAttributes($element['#title_attributes']);
+    $modal->mergeTriggerAttributes($attributes);
     if (!empty($element['#parents'])) {
       $modal->setSmartActions();
       $modal->applyToForm($element['#title'], $content);
