@@ -127,6 +127,9 @@ class NeoModal extends RenderElementBase {
     $element['#attributes'] = $element['#wrapper_attributes'] ?? [];
 
     $options = $element['#modal'] ?: $element['#options'] ?? [];
+    $options += [
+      'title' => $element['#title'],
+    ];
     $preset = $element['#modal_preset'] ?: $options['preset'] ?? NULL;
     unset($options['preset']);
 
