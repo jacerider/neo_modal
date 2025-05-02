@@ -688,7 +688,7 @@ const u = class u {
         const a = document.createElement("button");
         n.classList.forEach((l) => {
           l.startsWith("btn") && a.classList.add(l);
-        }), a.classList.length || (a.classList.add("btn"), n.classList.contains("button--primary") && a.classList.add("btn-primary")), a.classList.add("neo-modal--btn"), a.innerHTML = n.getAttribute("value") || n.innerText, a.addEventListener("click", (l) => {
+        }), a.classList.length || (a.classList.add("btn"), n.classList.contains("button--primary") && a.classList.add("btn-primary")), a.classList.add("neo-modal--btn"), a.innerHTML = n.innerHTML || n.getAttribute("value") || "Click Me", a.addEventListener("click", (l) => {
           l.preventDefault(), l.stopPropagation(), n.dispatchEvent(new Event("mousedown")), n.click(), n.dispatchEvent(new Event("mouseup"));
         }), e.appendChild(a);
       }), t.appendChild(e));
