@@ -1695,7 +1695,7 @@ class NeoModal {
             }
           }
           clone.classList.add('neo-modal--btn');
-          clone.innerHTML = button.getAttribute('value') || button.innerText;
+          clone.innerHTML = button.innerHTML || button.getAttribute('value') || 'Click Me';
           clone.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
