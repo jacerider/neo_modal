@@ -323,8 +323,13 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
     if (($isAnon && $this->configuration['menu_account_anon']) || $this->configuration['menu_account_auth']) {
       // Load the menu tree for the main menu.
       $parameters = new MenuTreeParameters();
-      $parameters->setMaxDepth(1);
+      $parameters->onlyEnabledLinks()->setMaxDepth(1);
       $tree = $this->menuLinkTree->load('account', $parameters);
+      $manipulators = [
+        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+        ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+      ];
+      $tree = $this->menuLinkTree->transform($tree, $manipulators);
       $build['#menu_account'] = $this->menuLinkTree->build($tree);
       unset($build['#menu_account']['#items']['user.logout']);
     }
@@ -332,8 +337,13 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
     if (($isAnon && $this->configuration['menu_tools_anon']) || $this->configuration['menu_tools_auth']) {
       // Load the menu tree for the main menu.
       $parameters = new MenuTreeParameters();
-      $parameters->setMaxDepth(1);
+      $parameters->onlyEnabledLinks()->setMaxDepth(1);
       $tree = $this->menuLinkTree->load('tools', $parameters);
+      $manipulators = [
+        ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+        ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+      ];
+      $tree = $this->menuLinkTree->transform($tree, $manipulators);
       $build['#menu_tools'] = $this->menuLinkTree->build($tree);
       unset($build['#menu_tools']['#items']['user.logout']);
     }
