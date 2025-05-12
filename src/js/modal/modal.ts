@@ -1923,7 +1923,7 @@ class NeoModal {
       }
       if (this.options.headerAnimate) {
         if (this.title) {
-          this.animateIn(this.title, 'title');
+          this.animateIn(this.title.parentElement || this.title, 'title');
         }
         if (this.subtitle) {
           this.animateIn(this.subtitle, 'subtitle');
@@ -2056,7 +2056,7 @@ class NeoModal {
         }
         if (this.options.headerAnimate) {
           if (this.title) {
-            this.animateOut(this.title, 'title');
+            this.animateOut(this.title.parentElement || this.title, 'title');
           }
           if (this.subtitle) {
             this.animateOut(this.subtitle, 'title');
