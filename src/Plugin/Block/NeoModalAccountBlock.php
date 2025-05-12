@@ -352,7 +352,7 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
       $build['#title'] = $this->t('Your Account');
 
       if ($this->configuration['link_anon_text'] && $this->configuration['link_anon_url']) {
-        $build['#link'] = [
+        $build['#secondary_link'] = [
           '#type' => !empty($this->configuration['link_anon_modal']) ? 'neo_modal_link' : 'link',
           '#title' => $this->configuration['link_anon_text'],
           '#url' => Url::fromUserInput($this->configuration['link_anon_url']),
@@ -363,7 +363,7 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
 
       switch ($this->configuration['login_display']) {
         case 'link':
-          $build['#login'] = [
+          $build['#primary_link'] = [
             '#type' => 'neo_modal_link',
             '#title' => $this->icon($this->configuration['login_text'], 'sign-in'),
             '#url' => Url::fromRoute('neo_modal.api.account.login', [
@@ -375,7 +375,7 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
           break;
 
         case 'form':
-          $build['#login'] = $this->formBuilder->getForm('\Drupal\neo_modal\Form\NeoModalAccountLoginForm', $this->configuration['modal'], $this->configuration['modal_preset']);
+          $build['#form'] = $this->formBuilder->getForm('\Drupal\neo_modal\Form\NeoModalAccountLoginForm', $this->configuration['modal'], $this->configuration['modal_preset']);
           break;
       }
 
@@ -403,9 +403,9 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
       $build['#title'] = $this->t('Your Account');
 
       if ($this->configuration['link_auth_text'] && $this->configuration['link_auth_url']) {
-        $build['#link'] = [
+        $build['#primary_link'] = [
           '#type' => !empty($this->configuration['link_auth_modal']) ? 'neo_modal_link' : 'link',
-          '#title' => $this->configuration['link_auth_text'],
+          '#title' => $this->adminIcon($this->configuration['link_auth_text']),
           '#url' => Url::fromUserInput($this->configuration['link_auth_url']),
           '#modal' => ['nest' => TRUE, 'smartActions' => TRUE] + $this->configuration['modal'],
           '#modal_preset' => $this->configuration['modal_preset'],
@@ -420,7 +420,7 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
         $build['#user'] = $this->entityTypeManager->getViewBuilder('user')->view($user, 'compact');
       }
 
-      $build['#logout'] = [
+      $build['#logout_link'] = [
         '#type' => 'link',
         '#title' => $this->icon('Log out', 'sign-out'),
         '#url' => Url::fromRoute('user.logout'),

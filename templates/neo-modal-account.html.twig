@@ -6,11 +6,14 @@
     {% if user %}
       <div>{{ user }}</div>
     {% endif %}
-    {% if login %}
-      <div>{{ login|neo_class('btn btn-primary w-full') }}</div>
+    {% if primary_link %}
+      <div>{{ primary_link|neo_class('btn btn-primary w-full') }}</div>
     {% endif %}
-    {% if link %}
-      <div>{{ link|neo_class('btn btn-outline w-full') }}</div>
+    {% if secondary_link %}
+      <div>{{ secondary_link|neo_class('btn btn-outline w-full') }}</div>
+    {% endif %}
+    {% if form %}
+      <div>{{ form }}</div>
     {% endif %}
     {% if menu_account %}
       <div>{{ menu_account|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
@@ -27,11 +30,9 @@
       <div>{{ register|neo_class('btn btn-primary w-full') }}</div>
     </div>
   {% endif %}
-  {% if logout %}
+  {% if logout_link %}
     <div class="p-6 mt-auto">
-      {% if logout %}
-        <div>{{ logout|neo_class('btn btn-primary w-full') }}</div>
-      {% endif %}
+      {{ logout_link|neo_class('btn btn-primary-outline w-full') }}
     </div>
   {% endif %}
 </div>
