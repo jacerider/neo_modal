@@ -764,7 +764,7 @@ const u = class u {
       const o = t[t.length - 2];
       o.neoModal && o.neoModal.focusIn();
     }
-    this.header && (this.options.headerInContent ? (this.headerStartOut || this.headerEndOut) && (this.headerStartOut && this.animateIn(this.headerStartOut, "header"), this.headerEndOut && this.animateIn(this.headerEndOut, "header")) : this.animateIn(this.header, "header"), this.options.headerAnimate && (this.title && this.animateIn(this.title, "title"), this.subtitle && this.animateIn(this.subtitle, "subtitle"), this.icon && this.animateIn(this.icon, "icon"), this.closeButton && this.animateIn(this.closeButton, "closeButton"))), this.prev && this.animateIn(this.prev, "navPrev"), this.next && this.animateIn(this.next, "navNext"), this.footer && this.animateIn(this.footer, "footer"), this.contentBlock ? this.animateIn(this.contentBlock, "content", () => {
+    this.header && (this.options.headerInContent ? (this.headerStartOut || this.headerEndOut) && (this.headerStartOut && this.animateIn(this.headerStartOut, "header"), this.headerEndOut && this.animateIn(this.headerEndOut, "header")) : this.animateIn(this.header, "header"), this.options.headerAnimate && (this.title && this.animateIn(this.title.parentElement || this.title, "title"), this.subtitle && this.animateIn(this.subtitle, "subtitle"), this.icon && this.animateIn(this.icon, "icon"), this.closeButton && this.animateIn(this.closeButton, "closeButton"))), this.prev && this.animateIn(this.prev, "navPrev"), this.next && this.animateIn(this.next, "navNext"), this.footer && this.animateIn(this.footer, "footer"), this.contentBlock ? this.animateIn(this.contentBlock, "content", () => {
       this.finishOpen();
     }) : this.finishOpen();
   }
@@ -809,7 +809,7 @@ const u = class u {
         const i = e[e.length - 2];
         i.neoModal && (i.neoModal.focusOut(), i.neoModal.buildStack());
       }
-      this.backdrop && this.depth === 1 && window.getComputedStyle(this.backdrop).display !== "none" && this.animateOut(this.backdrop, "backdrop"), this.header && (this.options.headerInContent || this.animateOut(this.header, "header"), this.options.headerAnimate && (this.title && this.animateOut(this.title, "title"), this.subtitle && this.animateOut(this.subtitle, "title"), this.icon && this.animateOut(this.icon, "icon"), this.closeButton && this.animateOut(this.closeButton, "closeButton"))), this.prev && this.animateOut(this.prev, "navPrev"), this.next && this.animateOut(this.next, "navNext"), this.footer && this.animateOut(this.footer, "footer"), this.contentBlock ? this.animateOut(this.contentBlock, "content", () => {
+      this.backdrop && this.depth === 1 && window.getComputedStyle(this.backdrop).display !== "none" && this.animateOut(this.backdrop, "backdrop"), this.header && (this.options.headerInContent || this.animateOut(this.header, "header"), this.options.headerAnimate && (this.title && this.animateOut(this.title.parentElement || this.title, "title"), this.subtitle && this.animateOut(this.subtitle, "title"), this.icon && this.animateOut(this.icon, "icon"), this.closeButton && this.animateOut(this.closeButton, "closeButton"))), this.prev && this.animateOut(this.prev, "navPrev"), this.next && this.animateOut(this.next, "navNext"), this.footer && this.animateOut(this.footer, "footer"), this.contentBlock ? this.animateOut(this.contentBlock, "content", () => {
         t();
       }) : t();
     });
