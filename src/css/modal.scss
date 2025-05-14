@@ -296,7 +296,7 @@ body.has-neo-modal--loader {
   }
 
   .neo-modal--icon {
-    @apply flex items-center justify-center mr-2 flex-none;
+    @apply mr-2 flex flex-none items-center justify-center;
 
     i {
       @apply opacity-60;
@@ -487,10 +487,6 @@ body.has-neo-modal--loader {
 .neo-modal--actions {
   @apply flex gap-4 p-4;
 
-  .neo-modal--btn {
-    @apply m-0 block whitespace-nowrap;
-  }
-
   &[data-neo-size='xs'] {
     @apply gap-1 px-4 py-1;
   }
@@ -498,6 +494,14 @@ body.has-neo-modal--loader {
   &[data-neo-size='sm'] {
     @apply gap-2 px-4 py-2;
   }
+}
+
+.neo-modal--btn {
+  @apply m-0 block whitespace-nowrap;
+}
+
+.neo-modal--hide {
+  display: none !important;
 }
 
 .neo-modal--content--container {

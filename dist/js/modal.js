@@ -267,11 +267,14 @@ const u = class u {
    * Build modal.
    */
   buildModal() {
-    this.buildHeader(), this.buildFooter(), this.modal && this.modal.querySelectorAll("[data-neo-modal-close]").forEach((t) => {
-      t.addEventListener("click", (e) => {
+    this.buildHeader(), this.buildFooter(), this.bindClose(), this.setAttributes(), this.size();
+  }
+  bindClose() {
+    this.modal && this.modal.querySelectorAll("[data-neo-modal-close]:not(.neo-modal--processed)").forEach((t) => {
+      t.classList.add("neo-modal--processed"), t.addEventListener("click", (e) => {
         this.close(), e.preventDefault(), e.stopPropagation();
       });
-    }), this.setAttributes(), this.size();
+    });
   }
   buildTooltips() {
     this.modal && this.modal.querySelectorAll(".neo-modal--tooltip:not(.neo-modal--tooltip-processed)").forEach((t) => {
@@ -485,7 +488,7 @@ const u = class u {
   }
   refreshContent() {
     var t;
-    this.contentBlock && ((t = this.contentBlock.querySelector(".neo-modal--content-footer")) == null || t.remove()), this.buildContentFooter();
+    this.contentBlock && ((t = this.contentBlock.querySelector(".neo-modal--content-footer")) == null || t.remove()), this.bindClose(), this.buildContentFooter();
   }
   bindContentEvents() {
     this.contentInner && this.canZoom && (this.contentInner.classList.add("neo-modal--zoom"), this.contentInner.addEventListener("wheel", (t) => {
@@ -676,19 +679,17 @@ const u = class u {
           const l = a.dataset.neoSize || null;
           l && (e.dataset.neoSize = l);
         }
-        n.style.display = "none", n.querySelectorAll("input, button, a").forEach((l) => {
-          i.push(l);
+        n.classList.add("neo-modal--hide"), n.querySelectorAll("input, button, a").forEach((l) => {
+          l.classList.contains("btn-ignore") || i.push(l);
         });
       } else
         this.contentInner.querySelectorAll("form > input[type=submit], form > button, .neo-modal--btn").forEach((n) => {
-          i.push(n);
+          n.classList.contains("btn-ignore") || i.push(n);
         });
       i.length && (i.forEach((n) => {
-        n.style.display = "none";
+        n.classList.add("neo-modal--hide");
         const a = document.createElement("button");
-        n.classList.forEach((l) => {
-          l.startsWith("btn") && a.classList.add(l);
-        }), a.classList.length || (a.classList.add("btn"), n.classList.contains("button--primary") && a.classList.add("btn-primary")), a.classList.add("neo-modal--btn"), a.innerHTML = n.innerHTML || n.getAttribute("value") || "Click Me", a.addEventListener("click", (l) => {
+        a.classList.add("neo-modal--btn"), n.style.display === "none" && (a.style.display = "none"), this.transferClassesWithPrefixes(n, a, ["btn", "ml-"]), a.classList.length || (a.classList.add("btn"), n.classList.contains("button--primary") && a.classList.add("btn-primary")), a.innerHTML = n.innerHTML || n.getAttribute("value") || "Click Me", a.addEventListener("click", (l) => {
           l.preventDefault(), l.stopPropagation(), n.dispatchEvent(new Event("mousedown")), n.click(), n.dispatchEvent(new Event("mouseup"));
         }), e.appendChild(a);
       }), t.appendChild(e));
@@ -856,6 +857,19 @@ const u = class u {
       i = i[o];
     }
     return i;
+  }
+  /**
+   * Transfers classes from one element to another based on specified prefixes
+   * @param sourceElement The element to transfer classes from
+   * @param targetElement The element to transfer classes to
+   * @param prefixes An array of prefixes to filter the classes
+   */
+  transferClassesWithPrefixes(t, e, i) {
+    Array.from(t.classList).filter(
+      (a) => i.some((l) => a.startsWith(l))
+    ).forEach((a) => {
+      e.classList.add(a);
+    });
   }
   getFixedOrStickyParents(t) {
     const e = [];

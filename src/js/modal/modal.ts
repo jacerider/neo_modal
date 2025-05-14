@@ -533,8 +533,15 @@ class NeoModal {
   protected buildModal():void {
     this.buildHeader();
     this.buildFooter();
+    this.bindClose();
+    this.setAttributes();
+    this.size();
+  }
+
+  protected bindClose() {
     if (this.modal) {
-      this.modal.querySelectorAll('[data-neo-modal-close]').forEach((el) => {
+      this.modal.querySelectorAll('[data-neo-modal-close]:not(.neo-modal--processed)').forEach((el) => {
+        el.classList.add('neo-modal--processed');
         el.addEventListener('click', e => {
           this.close();
           e.preventDefault();
@@ -542,8 +549,6 @@ class NeoModal {
         });
       });
     }
-    this.setAttributes();
-    this.size();
   }
 
   protected buildTooltips():void {
@@ -1214,6 +1219,7 @@ class NeoModal {
     if (this.contentBlock) {
       this.contentBlock.querySelector('.neo-modal--content-footer')?.remove();
     }
+    this.bindClose();
     this.buildContentFooter();
   }
 
@@ -1669,32 +1675,36 @@ class NeoModal {
             actions.dataset['neoSize'] = neoSize;
           }
         }
-        lastFormAction.style.display = 'none';
+        lastFormAction.classList.add('neo-modal--hide');
         lastFormAction.querySelectorAll('input, button, a').forEach((button) => {
-          buttons.push(button as HTMLElement);
+          if (!button.classList.contains('btn-ignore')) {
+            buttons.push(button as HTMLElement);
+          }
         });
       }
       else {
         this.contentInner.querySelectorAll('form > input[type=submit], form > button, .neo-modal--btn').forEach((button) => {
-          buttons.push(button as HTMLElement);
+          if (!button.classList.contains('btn-ignore')) {
+            buttons.push(button as HTMLElement);
+          }
         });
       }
       if (buttons.length) {
         buttons.forEach((button) => {
-          button.style.display = 'none';
+          button.classList.add('neo-modal--hide');
           const clone = document.createElement('button');
-          button.classList.forEach(className => {
-            if (className.startsWith('btn')) {
-              clone.classList.add(className);
-            }
-          });
+          clone.classList.add('neo-modal--btn');
+          if (button.style.display === 'none') {
+            clone.style.display = 'none';
+          }
+          // Support button and margin classes is defined.
+          this.transferClassesWithPrefixes(button, clone, ['btn', 'ml-']);
           if (!clone.classList.length) {
             clone.classList.add('btn');
             if (button.classList.contains('button--primary')) {
               clone.classList.add('btn-primary');
             }
           }
-          clone.classList.add('neo-modal--btn');
           clone.innerHTML = button.innerHTML || button.getAttribute('value') || 'Click Me';
           clone.addEventListener('click', (e) => {
             e.preventDefault();
@@ -2191,6 +2201,28 @@ class NeoModal {
     }
 
     return current as T;
+  }
+
+  /**
+   * Transfers classes from one element to another based on specified prefixes
+   * @param sourceElement The element to transfer classes from
+   * @param targetElement The element to transfer classes to
+   * @param prefixes An array of prefixes to filter the classes
+   */
+  protected transferClassesWithPrefixes(
+    sourceElement: HTMLElement,
+    targetElement: HTMLElement,
+    prefixes: string[]
+  ): void {
+    const sourceClasses = Array.from(sourceElement.classList);
+
+    const classesToTransfer = sourceClasses.filter(className =>
+      prefixes.some(prefix => className.startsWith(prefix))
+    );
+
+    classesToTransfer.forEach(className => {
+      targetElement.classList.add(className);
+    });
   }
 
   protected getFixedOrStickyParents(element: HTMLElement): HTMLElement[] {
