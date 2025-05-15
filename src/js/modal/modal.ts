@@ -1864,6 +1864,32 @@ class NeoModal {
     }
   }
 
+  protected scrollLock():void {
+    if (this.options.bodyLock) {
+      if (typeof bodyScrollLock !== 'undefined') {
+        if (this.contentInner) {
+          bodyScrollLock.lock(this.contentInner);
+        }
+      }
+      else {
+        document.body.classList.add('neo-modal--body-lock');
+      }
+    }
+  }
+
+  protected scrollUnlock():void {
+    if (this.options.bodyLock) {
+      if (typeof bodyScrollLock !== 'undefined') {
+        if (this.contentInner) {
+          bodyScrollLock.unlock(this.contentInner);
+        }
+      }
+      else {
+        document.body.classList.remove('neo-modal--body-lock');
+      }
+    }
+  }
+
   protected toggle():void {
     if (this.isOpen) {
       this.close();
@@ -1904,6 +1930,7 @@ class NeoModal {
     });
 
     this.transitionBodyIn();
+    this.scrollLock();
 
     // Nest other modals.
     const modals = document.querySelectorAll<HTMLElement>('.neo-modal:not(.neo-modal--closing)');
@@ -2112,6 +2139,7 @@ class NeoModal {
       element.classList.remove('neo-modal-disable-position');
     });
 
+    this.scrollUnlock();
     this.remove();
     this.removeWrapper();
 
@@ -2138,26 +2166,10 @@ class NeoModal {
 
   protected globalInit():void {
     document.body.classList.add('has-neo-modal');
-    if (this.options.bodyLock) {
-      if (typeof bodyScrollLock !== 'undefined') {
-        bodyScrollLock.lock();
-      }
-      else {
-        document.body.classList.add('neo-modal--body-lock');
-      }
-    }
   }
 
   protected globalDestroy():void {
     document.body.classList.remove('has-neo-modal');
-    if (this.options.bodyLock) {
-      if (typeof bodyScrollLock !== 'undefined') {
-        bodyScrollLock.unlock();
-      }
-      else {
-        document.body.classList.remove('neo-modal--body-lock');
-      }
-    }
   }
 
   // GENERIC GETTERS
