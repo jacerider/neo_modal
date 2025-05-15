@@ -1,9 +1,6 @@
-var g = Object.defineProperty;
-var v = (d, t, e) => t in d ? g(d, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : d[t] = e;
-var s = (d, t, e) => v(d, typeof t != "symbol" ? t + "" : t, e);
-class c {
+class h {
   constructor() {
-    s(this, "handlers", []);
+    this.handlers = [];
   }
   on(t) {
     this.handlers.push(t);
@@ -18,14 +15,12 @@ class c {
     return this;
   }
 }
-const u = class u {
+const p = class p {
   /**
    * Construct.
    */
   constructor(t) {
-    s(this, "options");
-    s(this, "originalOptions", null);
-    s(this, "eventMap", /* @__PURE__ */ new Map([
+    this.originalOptions = null, this.eventMap = /* @__PURE__ */ new Map([
       ["onSettings", () => this.eventSettings.expose()],
       ["onContentLoaded", () => this.eventContentLoaded.expose()],
       ["onBeforeOpen", () => this.eventBeforeOpen.expose()],
@@ -40,9 +35,7 @@ const u = class u {
       ["onBeforePrev", () => this.eventBeforePrev.expose()],
       ["onPrev", () => this.eventPrev.expose()],
       ["onAfterPrev", () => this.eventAfterPrev.expose()]
-    ]));
-    // Options that support declaration via [data-neo-modal-*].
-    s(this, "optionsAsAttributes", [
+    ]), this.optionsAsAttributes = [
       "appendTo",
       "appendToClosest",
       "wrapperClasses",
@@ -90,8 +83,7 @@ const u = class u {
       "contentAnimateOut",
       "contentAnimateOutSpeed",
       "contentAnimateOutDelay"
-    ]);
-    s(this, "optionsAsMerge", [
+    ], this.optionsAsMerge = [
       "title",
       "subtitle",
       "icon",
@@ -100,78 +92,10 @@ const u = class u {
       "iframe",
       "content",
       "trigger"
-    ]);
-    // Options that, when boolean, should be set to default.
-    s(this, "optionsFromBoolToDefault", [
+    ], this.optionsFromBoolToDefault = [
       "icon"
-    ]);
-    s(this, "loader", null);
-    s(this, "loading", !1);
-    s(this, "trigger", null);
-    s(this, "wrapper", null);
-    s(this, "modal", null);
-    s(this, "backdrop", null);
-    s(this, "groupTriggers", null);
-    s(this, "parentsFixedSticky", null);
-    s(this, "container", null);
-    s(this, "content", null);
-    s(this, "contentBlock", null);
-    s(this, "contentWrapper", null);
-    s(this, "contentInner", null);
-    s(this, "contentPlaceholder", null);
-    s(this, "header", null);
-    s(this, "headerStartOut", null);
-    s(this, "headerEndOut", null);
-    s(this, "footer", null);
-    s(this, "footerContent", null);
-    s(this, "title", null);
-    s(this, "subtitle", null);
-    s(this, "icon", null);
-    s(this, "closeButton", null);
-    s(this, "next", null);
-    s(this, "prev", null);
-    s(this, "shareUrl", "");
-    s(this, "downloadUrl", "");
-    s(this, "copyUrl", "");
-    s(this, "depth", 0);
-    s(this, "isOpen", !1);
-    s(this, "isBuilt", !1);
-    s(this, "canZoom", !1);
-    s(this, "canClickContent", !0);
-    s(this, "throttle", null);
-    s(this, "watchInterval", null);
-    s(this, "popper", null);
-    s(this, "eventSettings", new c());
-    s(this, "eventBeforeOpen", new c());
-    s(this, "eventOpen", new c());
-    s(this, "eventAfterOpen", new c());
-    s(this, "eventBeforeClose", new c());
-    s(this, "eventClose", new c());
-    s(this, "eventAfterClose", new c());
-    s(this, "eventBeforeNext", new c());
-    s(this, "eventNext", new c());
-    s(this, "eventAfterNext", new c());
-    s(this, "eventBeforePrev", new c());
-    s(this, "eventPrev", new c());
-    s(this, "eventAfterPrev", new c());
-    s(this, "eventContentLoaded", new c());
-    s(this, "observer", null);
-    s(this, "focused", !1);
-    s(this, "focusing", !1);
-    s(this, "focusTimeout", null);
-    s(this, "currentZoom", 1);
-    s(this, "minZoom", 1);
-    s(this, "maxZoom", 3);
-    s(this, "stepSize", 1);
-    s(this, "zooming", !1);
-    s(this, "dragStartX", 0);
-    s(this, "dragStartY", 0);
-    s(this, "dragEndX", 0);
-    s(this, "dragEndY", 0);
-    s(this, "dragThreshold", 50);
-    s(this, "dragging", !1);
-    s(this, "loaderTimeout", null);
-    for (let e in u.colorDefaults)
+    ], this.loader = null, this.loading = !1, this.trigger = null, this.wrapper = null, this.modal = null, this.backdrop = null, this.groupTriggers = null, this.parentsFixedSticky = null, this.container = null, this.content = null, this.contentBlock = null, this.contentWrapper = null, this.contentInner = null, this.contentPlaceholder = null, this.header = null, this.headerStartOut = null, this.headerEndOut = null, this.footer = null, this.footerContent = null, this.title = null, this.subtitle = null, this.icon = null, this.closeButton = null, this.next = null, this.prev = null, this.shareUrl = "", this.downloadUrl = "", this.copyUrl = "", this.depth = 0, this.isOpen = !1, this.isBuilt = !1, this.canZoom = !1, this.canClickContent = !0, this.throttle = null, this.watchInterval = null, this.popper = null, this.eventSettings = new h(), this.eventBeforeOpen = new h(), this.eventOpen = new h(), this.eventAfterOpen = new h(), this.eventBeforeClose = new h(), this.eventClose = new h(), this.eventAfterClose = new h(), this.eventBeforeNext = new h(), this.eventNext = new h(), this.eventAfterNext = new h(), this.eventBeforePrev = new h(), this.eventPrev = new h(), this.eventAfterPrev = new h(), this.eventContentLoaded = new h(), this.observer = null, this.focused = !1, this.focusing = !1, this.focusTimeout = null, this.currentZoom = 1, this.minZoom = 1, this.maxZoom = 3, this.stepSize = 1, this.zooming = !1, this.dragStartX = 0, this.dragStartY = 0, this.dragEndX = 0, this.dragEndY = 0, this.dragThreshold = 50, this.dragging = !1, this.loaderTimeout = null;
+    for (let e in p.colorDefaults)
       this.optionsAsAttributes.push(e);
     this.options = this.buildOptions(t), this.options.trigger instanceof HTMLElement && (this.options.trigger.neoModalOptions = this.options), this.buildTrigger();
   }
@@ -198,24 +122,24 @@ const u = class u {
     return null;
   }
   buildOptions(t) {
-    t = Object.assign({}, u.defaults, t);
+    t = Object.assign({}, p.defaults, t);
     const e = {};
     if (this.optionsFromBoolToDefault.forEach((o) => {
-      const n = t[o];
-      typeof n == "boolean" && n === !0 && (e[o] = n);
+      const s = t[o];
+      typeof s == "boolean" && s === !0 && (e[o] = s);
     }), t.trigger instanceof HTMLElement) {
       const o = t.trigger;
-      this.optionsAsAttributes.forEach((n) => {
-        const a = "data-neo-modal-" + n;
-        if (o.hasAttribute(a)) {
-          let l = o.getAttribute(a);
-          typeof l == "string" && (l === "true" && (l = !0), l === "false" && (l = !1)), e[n] = l;
+      this.optionsAsAttributes.forEach((s) => {
+        const n = "data-neo-modal-" + s;
+        if (o.hasAttribute(n)) {
+          let a = o.getAttribute(n);
+          typeof a == "string" && (a === "true" && (a = !0), a === "false" && (a = !1)), e[s] = a;
         }
       });
     }
     const i = Object.assign({}, t, e);
-    return this.eventMap.forEach((o, n) => {
-      typeof i[n] == "function" && o().on(i[n]);
+    return this.eventMap.forEach((o, s) => {
+      typeof i[s] == "function" && o().on(i[s]);
     }), this.eventSettings.trigger(this, i), i;
   }
   getOption(t) {
@@ -242,8 +166,8 @@ const u = class u {
         t();
       else if (this.wrapper) {
         this.isBuilt = !0, this.modal = document.createElement("div"), this.modal.classList.add("neo-modal"), this.options.modalClasses && this.options.modalClasses.split(" ").forEach((o) => {
-          var n;
-          (n = this.modal) == null || n.classList.add(o);
+          var s;
+          (s = this.modal) == null || s.classList.add(o);
         }), this.options.colorScheme && ((e = this.modal) == null || e.classList.add(this.options.colorScheme)), this.modal.neoModal = this, this.modal.setAttribute("role", "dialog"), this.modal.setAttribute("aria-modal", "true"), this.modal.style.setProperty("visibility", "hidden"), this.modal.style.setProperty("pointer-events", "none"), this.wrapper.appendChild(this.modal);
         const i = this.buildContainer();
         this.modal.appendChild(i), this.buildContent(i).then(() => {
@@ -293,7 +217,7 @@ const u = class u {
   setAttributes() {
     if (this.modal) {
       this.options.contentScroll ? this.modal.classList.add("neo-modal--content-scroll") : this.modal.classList.add("neo-modal--global-scroll");
-      for (let t in u.colorDefaults)
+      for (let t in p.colorDefaults)
         if (this.options[t]) {
           const e = this.options[t], i = t.replace(/[A-Z]/g, (o) => "-" + o.toLowerCase()).replace("color-bg", "bg");
           this.modal.style.setProperty("--modal-" + i, e);
@@ -367,8 +291,8 @@ const u = class u {
       let e = this.currentZoom + t * this.stepSize;
       if (e < this.minZoom || e > this.maxZoom)
         return;
-      const o = "(" + "neo-modal--zoom-" + "(\\s|(-)?(\\w*)(\\s)?)).*?", n = new RegExp(o, "g");
-      this.contentInner.className = this.contentInner.className.replace(n, ""), this.contentInner.classList.add("neo-modal--zoom-" + this.currentZoom + "to" + e), this.currentZoom = e;
+      const o = "(" + "neo-modal--zoom-" + "(\\s|(-)?(\\w*)(\\s)?)).*?", s = new RegExp(o, "g");
+      this.contentInner.className = this.contentInner.className.replace(s, ""), this.contentInner.classList.add("neo-modal--zoom-" + this.currentZoom + "to" + e), this.currentZoom = e;
     }
   }
   getGroupTriggers() {
@@ -378,8 +302,8 @@ const u = class u {
     const e = this.getGroupTriggers();
     if (e && e.length > 1) {
       let i = null;
-      return e.forEach((o, n) => {
-        o === this.options.trigger && (t === "next" && (n < e.length - 1 ? i = e[n + 1] : i = e[0]), t === "prev" && (n > 0 ? i = e[n - 1] : i = e[e.length - 1]));
+      return e.forEach((o, s) => {
+        o === this.options.trigger && (t === "next" && (s < e.length - 1 ? i = e[s + 1] : i = e[0]), t === "prev" && (s > 0 ? i = e[s - 1] : i = e[e.length - 1]));
       }), i;
     }
     return null;
@@ -390,8 +314,8 @@ const u = class u {
       const i = this.getToTrigger(t);
       i && (this.showLoader(), t === "prev" && this.eventBeforePrev.trigger(this), t === "next" && this.eventBeforeNext.trigger(this), !this.focused && this.header && !this.options.headerInContent && this.animateOut(this.header, "header", null, "default"), !this.focused && this.footer && this.animateOut(this.footer, "footer", null, "default"), this.animateOut(this.contentBlock, t, () => {
         t === "prev" && this.eventPrev.trigger(this), t === "next" && this.eventNext.trigger(this), this.rebuild(i.neoModalOptions).then(() => {
-          var o, n;
-          this.contentBlock && (t === "prev" && this.eventAfterPrev.trigger(this), t === "next" && this.eventAfterNext.trigger(this), this.header && !this.options.headerInContent && (this.focused ? this.header.style.display = "none" : this.animateIn(this.header, "header")), this.footer && (this.focused ? this.footer.style.display = "none" : this.animateIn(this.footer, "footer")), (o = this.modal) == null || o.style.setProperty("visibility", ""), (n = this.container) == null || n.style.setProperty("visibility", ""), this.animateIn(this.contentBlock, t), t === "prev" && this.eventPrev.trigger(this), t === "next" && this.eventNext.trigger(this));
+          var o, s;
+          this.contentBlock && (t === "prev" && this.eventAfterPrev.trigger(this), t === "next" && this.eventAfterNext.trigger(this), this.header && !this.options.headerInContent && (this.focused ? this.header.style.display = "none" : this.animateIn(this.header, "header")), this.footer && (this.focused ? this.footer.style.display = "none" : this.animateIn(this.footer, "footer")), (o = this.modal) == null || o.style.setProperty("visibility", ""), (s = this.container) == null || s.style.setProperty("visibility", ""), this.animateIn(this.contentBlock, t), t === "prev" && this.eventPrev.trigger(this), t === "next" && this.eventNext.trigger(this));
         });
       }));
     }
@@ -448,10 +372,10 @@ const u = class u {
     var e, i;
     if (this.options.group) {
       const o = this.getGroupTriggers();
-      o && o.length > 1 && (this.prev = document.createElement("div"), this.prev.classList.add("neo-modal--nav"), this.prev.classList.add("neo-modal--prev"), this.prev.innerHTML = `<a class="neo-modal--tooltip" data-tippy-theme="modal" data-tippy-content="Prev" data-tippy-placement="right" data-tippy-delay="[500, 0]"><span>${this.options.navPrevLabel}</span></a>`, (e = this.prev.querySelector("a")) == null || e.addEventListener("click", (n) => {
-        n.preventDefault(), this.navigate("prev");
-      }), t.appendChild(this.prev), this.next = document.createElement("div"), this.next.classList.add("neo-modal--nav"), this.next.classList.add("neo-modal--next"), this.next.innerHTML = `<a class="neo-modal--tooltip" data-tippy-theme="modal" data-tippy-content="Next" data-tippy-placement="left" data-tippy-delay="[500, 0]"><span>${this.options.navNextLabel}</span></a>`, (i = this.next.querySelector("a")) == null || i.addEventListener("click", (n) => {
-        n.preventDefault(), this.navigate("next");
+      o && o.length > 1 && (this.prev = document.createElement("div"), this.prev.classList.add("neo-modal--nav"), this.prev.classList.add("neo-modal--prev"), this.prev.innerHTML = `<a class="neo-modal--tooltip" data-tippy-theme="modal" data-tippy-content="Prev" data-tippy-placement="right" data-tippy-delay="[500, 0]"><span>${this.options.navPrevLabel}</span></a>`, (e = this.prev.querySelector("a")) == null || e.addEventListener("click", (s) => {
+        s.preventDefault(), this.navigate("prev");
+      }), t.appendChild(this.prev), this.next = document.createElement("div"), this.next.classList.add("neo-modal--nav"), this.next.classList.add("neo-modal--next"), this.next.innerHTML = `<a class="neo-modal--tooltip" data-tippy-theme="modal" data-tippy-content="Next" data-tippy-placement="left" data-tippy-delay="[500, 0]"><span>${this.options.navNextLabel}</span></a>`, (i = this.next.querySelector("a")) == null || i.addEventListener("click", (s) => {
+        s.preventDefault(), this.navigate("next");
       }), t.appendChild(this.next), this.buildDrag());
     }
     return null;
@@ -472,10 +396,10 @@ const u = class u {
   onDrag(t) {
     if (this.dragging && this.contentWrapper) {
       t.type === "touchmove" ? (t = t, this.dragEndX = t.touches[0].pageX, this.dragEndY = t.touches[0].pageY) : (t = t, this.dragEndX = t.pageX, this.dragEndY = t.pageY);
-      const e = this.dragEndX - this.dragStartX, i = this.dragEndY - this.dragStartY, o = Math.abs(e), n = Math.abs(i);
-      if (o > n && o <= 180) {
-        const a = Math.min(1, (1 - o / 180) * 1.5);
-        t.preventDefault(), this.contentWrapper.style.transform = "translateX(" + e + "px)", this.contentWrapper.style.opacity = a + "";
+      const e = this.dragEndX - this.dragStartX, i = this.dragEndY - this.dragStartY, o = Math.abs(e), s = Math.abs(i);
+      if (o > s && o <= 180) {
+        const n = Math.min(1, (1 - o / 180) * 1.5);
+        t.preventDefault(), this.contentWrapper.style.transform = "translateX(" + e + "px)", this.contentWrapper.style.opacity = n + "";
       }
     }
   }
@@ -519,17 +443,17 @@ const u = class u {
       if (o)
         switch (o.tagName) {
           case "IMAGE":
-            const n = o;
-            return n.onload = () => {
+            const s = o;
+            return s.onload = () => {
               t(e);
-            }, this.shareUrl = n.src, this.downloadUrl = n.src, this.copyUrl = n.src, this.canZoom = this.options.fit, e;
+            }, this.shareUrl = s.src, this.downloadUrl = s.src, this.copyUrl = s.src, this.canZoom = this.options.fit, e;
           case "PICTURE":
-            const a = o.querySelector("img");
-            if (a)
-              return a.onload = () => {
-                this.shareUrl = a.currentSrc, this.downloadUrl = a.currentSrc, this.copyUrl = a.currentSrc, this.canZoom = this.options.fit, t(e);
-              }, this.options.group && a.addEventListener("dragstart", function(l) {
-                l.preventDefault();
+            const n = o.querySelector("img");
+            if (n)
+              return n.onload = () => {
+                this.shareUrl = n.currentSrc, this.downloadUrl = n.currentSrc, this.copyUrl = n.currentSrc, this.canZoom = this.options.fit, t(e);
+              }, this.options.group && n.addEventListener("dragstart", function(a) {
+                a.preventDefault();
               }), e;
             break;
         }
@@ -540,8 +464,8 @@ const u = class u {
     const e = this.options.image || "", i = document.createElement("div"), o = document.createElement("img");
     return this.canZoom = this.options.fit, o.onload = () => {
       t(i);
-    }, this.options.group && o.addEventListener("dragstart", function(n) {
-      n.preventDefault();
+    }, this.options.group && o.addEventListener("dragstart", function(s) {
+      s.preventDefault();
     }), o.src = e, i.appendChild(o), this.shareUrl = e, this.downloadUrl = e, this.copyUrl = e, i;
   }
   getContentVideo(t) {
@@ -551,19 +475,19 @@ const u = class u {
       if (i) {
         const o = document.createElement("div");
         o.classList.add("neo-modal--video"), o.classList.add("neo-modal--ratio"), o.classList.add("neo-modal--ratio-" + this.options.videoRatio), o.classList.add("bg-black"), this.canClickContent = !1;
-        let n;
+        let s;
         if (i.type == "vimeo" || i.type == "youtube") {
-          let l;
-          n = this.options.videoAutoplay ? "?rel=0&autoplay=1" : "?rel=0";
-          let h = n + this.getUrlParameter(this.options.video);
-          i.type == "vimeo" ? l = "https://player.vimeo.com/video/" : i.type == "youtube" && (l = "https://www.youtube-nocookie.com/embed/");
-          const r = document.createElement("iframe");
-          return r.onload = () => {
+          let a;
+          s = this.options.videoAutoplay ? "?rel=0&autoplay=1" : "?rel=0";
+          let d = s + this.getUrlParameter(this.options.video);
+          i.type == "vimeo" ? a = "https://player.vimeo.com/video/" : i.type == "youtube" && (a = "https://www.youtube-nocookie.com/embed/");
+          const l = document.createElement("iframe");
+          return l.onload = () => {
             t(e);
-          }, r.classList.add("neo-modal--iframe"), r.setAttribute("webkitallowfullscreen", ""), r.setAttribute("mozallowfullscreen", ""), r.setAttribute("allowfullscreen", ""), r.setAttribute("allow", "autoplay"), r.setAttribute("frameborder", "0"), r.setAttribute("src", l + i.id + h), o.appendChild(r), e.appendChild(o), ["auto"].includes(this.options.width) && this.content && (this.content.style.width = "calc(100% - 6rem)"), this.shareUrl = this.options.video, this.downloadUrl = this.options.video, this.copyUrl = this.options.video, e;
+          }, l.classList.add("neo-modal--iframe"), l.setAttribute("webkitallowfullscreen", ""), l.setAttribute("mozallowfullscreen", ""), l.setAttribute("allowfullscreen", ""), l.setAttribute("allow", "autoplay"), l.setAttribute("frameborder", "0"), l.setAttribute("src", a + i.id + d), o.appendChild(l), e.appendChild(o), ["auto"].includes(this.options.width) && this.content && (this.content.style.width = "calc(100% - 6rem)"), this.shareUrl = this.options.video, this.downloadUrl = this.options.video, this.copyUrl = this.options.video, e;
         }
-        const a = document.createElement("video");
-        a.setAttribute("src", this.options.video), a.innerText = "Your browser does not support the video tag.", this.options.videoAutoplay && a.setAttribute("autoplay", ""), o.appendChild(a), e.appendChild(o);
+        const n = document.createElement("video");
+        n.setAttribute("src", this.options.video), n.innerText = "Your browser does not support the video tag.", this.options.videoAutoplay && n.setAttribute("autoplay", ""), o.appendChild(n), e.appendChild(o);
       } else
         e.innerText = "Video not found.";
     }
@@ -589,17 +513,17 @@ const u = class u {
       i.classList.add("neo-modal--header-center");
       const o = document.createElement("div");
       o.classList.add("neo-modal--header-end"), this.headerStartOut = document.createElement("div"), this.headerStartOut.classList.add("neo-modal--header-start-out"), this.headerStartOut.classList.add("neo-modal--header-out"), this.headerEndOut = document.createElement("div"), this.headerEndOut.classList.add("neo-modal--header-end-out"), this.headerEndOut.classList.add("neo-modal--header-out");
-      const n = this.buildLabel();
-      n && i.appendChild(n), this.buildCloseButton(), this.closeButton && (this.options.closeButton === "start" ? e.appendChild(this.closeButton) : this.options.closeButton === "start-out" ? this.headerStartOut.appendChild(this.closeButton) : this.options.closeButton === "end" ? o.appendChild(this.closeButton) : this.options.closeButton === "end-out" && this.headerEndOut.appendChild(this.closeButton));
-      const a = this.buildNumeration();
-      a && (this.options.numerationPlacement === "start" ? e.appendChild(a) : this.options.numerationPlacement === "end" && o.prepend(a));
-      const l = e.childNodes.length > 0, h = i.childNodes.length > 0, r = o.childNodes.length > 0;
-      if (l && t.appendChild(e), h && t.appendChild(i), r && t.appendChild(o), this.headerStartOut.childNodes.length > 0 ? t.appendChild(this.headerStartOut) : this.headerStartOut = null, this.headerEndOut.childNodes.length > 0 ? t.appendChild(this.headerEndOut) : this.headerEndOut = null, t.childNodes.length > 0)
-        return this.header = t, this.options.headerInContent ? this.contentBlock && this.contentBlock.prepend(this.header) : this.modal && (this.modal.appendChild(this.header), h && (l || r) && setTimeout(() => {
-          if (l && r) {
-            const p = Math.max(e.offsetWidth, o.offsetWidth);
-            e.style.minWidth = p + "px", o.style.minWidth = p + "px";
-          } else l ? i.style.marginRight = e.offsetWidth + "px" : i.style.marginLeft = o.offsetWidth + "px";
+      const s = this.buildLabel();
+      s && i.appendChild(s), this.buildCloseButton(), this.closeButton && (this.options.closeButton === "start" ? e.appendChild(this.closeButton) : this.options.closeButton === "start-out" ? this.headerStartOut.appendChild(this.closeButton) : this.options.closeButton === "end" ? o.appendChild(this.closeButton) : this.options.closeButton === "end-out" && this.headerEndOut.appendChild(this.closeButton));
+      const n = this.buildNumeration();
+      n && (this.options.numerationPlacement === "start" ? e.appendChild(n) : this.options.numerationPlacement === "end" && o.prepend(n));
+      const a = e.childNodes.length > 0, d = i.childNodes.length > 0, l = o.childNodes.length > 0;
+      if (a && t.appendChild(e), d && t.appendChild(i), l && t.appendChild(o), this.headerStartOut.childNodes.length > 0 ? t.appendChild(this.headerStartOut) : this.headerStartOut = null, this.headerEndOut.childNodes.length > 0 ? t.appendChild(this.headerEndOut) : this.headerEndOut = null, t.childNodes.length > 0)
+        return this.header = t, this.options.headerInContent ? this.contentBlock && this.contentBlock.prepend(this.header) : this.modal && (this.modal.appendChild(this.header), d && (a || l) && setTimeout(() => {
+          if (a && l) {
+            const c = Math.max(e.offsetWidth, o.offsetWidth);
+            e.style.minWidth = c + "px", o.style.minWidth = c + "px";
+          } else a ? i.style.marginRight = e.offsetWidth + "px" : i.style.marginLeft = o.offsetWidth + "px";
         }, 100)), this.header;
     }
     return null;
@@ -626,22 +550,22 @@ const u = class u {
         const i = e.querySelector(".neo-modal--share");
         i == null || i.addEventListener("click", (o) => {
           o.preventDefault();
-          const n = {
+          const s = {
             title: this.options.title || "",
             text: this.options.subtitle || "",
             url: this.shareUrl
           };
-          navigator.share(n);
+          navigator.share(s);
         });
       }
       if (this.options.downloadLink && this.downloadUrl && e.insertAdjacentHTML("beforeend", '<a class="neo-modal--tooltip neo-modal--download" data-tippy-theme="modal" data-tippy-content="Download" data-tippy-delay="[200, 0]" target="_blank" href="' + this.downloadUrl + '" download>' + this.options.svgOpen + this.options.svgIconDownload + this.options.svgClose + "</a>"), this.options.copyLink && this.copyUrl) {
         const i = "Copy";
         e.insertAdjacentHTML("beforeend", '<a class="neo-modal--tooltip neo-modal--copy" data-tippy-theme="modal" data-tippy-content="' + i + '" data-tippy-delay="[200, 0]">' + this.options.svgOpen + this.options.svgIconLink + this.options.svgClose + "</a>");
         const o = e.querySelector(".neo-modal--copy");
-        o == null || o.addEventListener("click", (n) => {
-          n.preventDefault();
-          const a = this.copyUrl.substring(0, 1) === "/" ? window.location.origin + this.copyUrl : this.copyUrl;
-          navigator.clipboard.writeText(a).then(() => {
+        o == null || o.addEventListener("click", (s) => {
+          s.preventDefault();
+          const n = this.copyUrl.substring(0, 1) === "/" ? window.location.origin + this.copyUrl : this.copyUrl;
+          navigator.clipboard.writeText(n).then(() => {
             o.hasOwnProperty("_tippy") && (o._tippy.setContent("Copied"), o._tippy.show(), setTimeout(() => {
               o._tippy.hide(), setTimeout(() => {
                 o._tippy.setContent(i);
@@ -662,10 +586,10 @@ const u = class u {
       const e = document.createElement("div");
       e.classList.add("neo-modal--actions");
       for (const [i, o] of Object.entries(this.options.buttons)) {
-        const n = document.createElement("button");
-        n.classList.add("neo-modal--btn"), n.classList.add("btn"), n.innerHTML = i, n.addEventListener("click", (a) => {
-          a.preventDefault(), a.stopPropagation(), o();
-        }), e.appendChild(n);
+        const s = document.createElement("button");
+        s.classList.add("neo-modal--btn"), s.classList.add("btn"), s.innerHTML = i, s.addEventListener("click", (n) => {
+          n.preventDefault(), n.stopPropagation(), o();
+        }), e.appendChild(s);
       }
       t.appendChild(e);
     }
@@ -674,24 +598,24 @@ const u = class u {
       e.classList.add("neo-modal--actions");
       const i = [], o = this.contentInner.querySelectorAll(".form-actions");
       if (o.length > 0) {
-        const n = o[o.length - 1], a = n.closest("form");
-        if (a) {
-          const l = a.dataset.neoSize || null;
-          l && (e.dataset.neoSize = l);
+        const s = o[o.length - 1], n = s.closest("form");
+        if (n) {
+          const a = n.dataset.neoSize || null;
+          a && (e.dataset.neoSize = a);
         }
-        n.classList.add("neo-modal--hide"), n.querySelectorAll("input, button, a").forEach((l) => {
-          l.classList.contains("btn-ignore") || i.push(l);
+        s.classList.add("neo-modal--hide"), s.querySelectorAll("input, button, a").forEach((a) => {
+          a.classList.contains("btn-ignore") || i.push(a);
         });
       } else
-        this.contentInner.querySelectorAll("form > input[type=submit], form > button, .neo-modal--btn").forEach((n) => {
-          n.classList.contains("btn-ignore") || i.push(n);
+        this.contentInner.querySelectorAll("form > input[type=submit], form > button, .neo-modal--btn").forEach((s) => {
+          s.classList.contains("btn-ignore") || i.push(s);
         });
-      i.length && (i.forEach((n) => {
-        n.classList.add("neo-modal--hide");
-        const a = document.createElement("button");
-        a.classList.add("neo-modal--btn"), n.style.display === "none" && (a.style.display = "none"), this.transferClassesWithPrefixes(n, a, ["btn", "ml-"]), a.classList.length || (a.classList.add("btn"), n.classList.contains("button--primary") && a.classList.add("btn-primary")), a.innerHTML = n.innerHTML || n.getAttribute("value") || "Click Me", a.addEventListener("click", (l) => {
-          l.preventDefault(), l.stopPropagation(), n.dispatchEvent(new Event("mousedown")), n.click(), n.dispatchEvent(new Event("mouseup"));
-        }), e.appendChild(a);
+      i.length && (i.forEach((s) => {
+        s.classList.add("neo-modal--hide");
+        const n = document.createElement("button");
+        n.classList.add("neo-modal--btn"), s.style.display === "none" && (n.style.display = "none"), this.transferClassesWithPrefixes(s, n, ["btn", "ml-"]), n.classList.length || (n.classList.add("btn"), s.classList.contains("button--primary") && n.classList.add("btn-primary")), n.innerHTML = s.innerHTML || s.getAttribute("value") || "Click Me", n.addEventListener("click", (a) => {
+          a.preventDefault(), a.stopPropagation(), s.dispatchEvent(new Event("mousedown")), s.click(), s.dispatchEvent(new Event("mouseup"));
+        }), e.appendChild(n);
       }), t.appendChild(e));
     }
     return t.childNodes.length > 0 && this.contentBlock && (this.contentBlock.append(t), this.footerContent = t), null;
@@ -744,7 +668,7 @@ const u = class u {
     this.isOpen ? this.close() : this.open();
   }
   open() {
-    this.options.nest || u.closeTop(), this.options.trigger || (this.trigger = document.activeElement), this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), this.buildStack(), this.build().then(() => {
+    this.options.nest || p.closeTop(), this.options.trigger || (this.trigger = document.activeElement), this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), this.buildStack(), this.build().then(() => {
       setTimeout(() => {
         this.doOpen();
       });
@@ -758,8 +682,8 @@ const u = class u {
     const t = document.querySelectorAll(".neo-modal:not(.neo-modal--closing)");
     this.depth = t.length;
     for (let o = 0; o < t.length; o++) {
-      const n = t.length - (o + 1);
-      n === 0 ? t[o].removeAttribute("data-neo-modal--depth") : t[o].setAttribute("data-neo-modal--depth", n + "");
+      const s = t.length - (o + 1);
+      s === 0 ? t[o].removeAttribute("data-neo-modal--depth") : t[o].setAttribute("data-neo-modal--depth", s + "");
     }
     if (t.length > 1) {
       const o = t[t.length - 2];
@@ -770,21 +694,21 @@ const u = class u {
     }) : this.finishOpen();
   }
   finishOpen() {
-    var o, n, a;
+    var o, s, n;
     this.options.navKeyboard && (document.body.addEventListener("keydown", this.onKeyboardDown.bind(this)), document.body.addEventListener("keyup", this.onKeyboardUp.bind(this))), this.options.fit && (document.body.addEventListener("mousemove", this.focusWatch.bind(this), !1), this.focusWatch());
     const t = "a[href], details, [tabindex]", i = (this.options.inputFocus === !0 ? (o = this.contentInner) == null ? void 0 : o.querySelector(
       "input:not([type=hidden]):not([type=checkbox]), textarea, select, button"
-    ) : null) || ((n = this.modal) == null ? void 0 : n.querySelector(
+    ) : null) || ((s = this.modal) == null ? void 0 : s.querySelector(
       t
-    )) || ((a = this.contentInner) == null ? void 0 : a.querySelector(
+    )) || ((n = this.contentInner) == null ? void 0 : n.querySelector(
       t
     ));
     if (i ? (i.focus(), i instanceof HTMLInputElement && i.select()) : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this), this.contentInner) {
-      const l = (h, r) => {
-        for (const p of h)
-          p.type === "childList" && this.refreshContent();
+      const a = (d, l) => {
+        for (const c of d)
+          c.type === "childList" && this.refreshContent();
       };
-      this.observer = new MutationObserver(l), this.observer.observe(this.contentInner, {
+      this.observer = new MutationObserver(a), this.observer.observe(this.contentInner, {
         childList: !0,
         // Watch for addition/removal of child nodes
         subtree: !0
@@ -866,17 +790,17 @@ const u = class u {
    */
   transferClassesWithPrefixes(t, e, i) {
     Array.from(t.classList).filter(
-      (a) => i.some((l) => a.startsWith(l))
-    ).forEach((a) => {
-      e.classList.add(a);
+      (n) => i.some((a) => n.startsWith(a))
+    ).forEach((n) => {
+      e.classList.add(n);
     });
   }
   getFixedOrStickyParents(t) {
     const e = [];
     let i = t.parentElement;
     for (; i; ) {
-      const n = window.getComputedStyle(i).getPropertyValue("position");
-      (n === "fixed" || n === "sticky") && e.push(i), i = i.parentElement;
+      const s = window.getComputedStyle(i).getPropertyValue("position");
+      (s === "fixed" || s === "sticky") && e.push(i), i = i.parentElement;
     }
     return e;
   }
@@ -891,12 +815,12 @@ const u = class u {
    * Parse Youtube or Vimeo videos and get host & ID
    */
   parseVideo(t) {
-    let e = "", i = "", o, n = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
-    if (o = t.match(n), o && o[7])
+    let e = "", i = "", o, s = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
+    if (o = t.match(s), o && o[7])
       e = "youtube", i = o[7];
     else {
-      let a = /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/;
-      o = t.match(a), o && o[5] && (e = "vimeo", i = o[5]);
+      let n = /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/;
+      o = t.match(n), o && o[5] && (e = "vimeo", i = o[5]);
     }
     return e && i ? {
       type: e,
@@ -909,9 +833,9 @@ const u = class u {
   getUrlParameter(t) {
     let e = "", o = decodeURIComponent(t).split("?");
     if (o[1] !== void 0) {
-      let n = o[1].split("&"), a, l;
-      for (l = 0; l < n.length; l++)
-        a = n[l].split("="), e = e + "&" + a[0] + "=" + a[1];
+      let s = o[1].split("&"), n, a;
+      for (a = 0; a < s.length; a++)
+        n = s[a].split("="), e = e + "&" + n[0] + "=" + n[1];
     }
     return encodeURI(e);
   }
@@ -941,13 +865,13 @@ const u = class u {
     const t = [];
     return this.options.bodyTransitionScale && t.push("neo-modal--body-scale"), this.options.bodyTransitionBlur && t.push("neo-modal--body-blur"), t;
   }
-  animate(t, e, i, o, n) {
-    const a = i.charAt(0).toUpperCase() + i.slice(1), l = e + "Animate" + a;
-    if (typeof this.options[l] == "string") {
-      const h = this.options[l], r = e + "Animate" + a + "Speed", p = e + "Animate" + a + "Delay", f = () => {
-        t.removeEventListener("animationend", f), t.removeEventListener("animationcancel", f), t.classList.remove("neo-animate--animated"), t.classList.remove("neo-animate--" + h), typeof this.options[r] == "string" && t.classList.remove("neo-animate--" + this.options[r]), typeof this.options[p] == "string" && t.classList.remove("neo-animate--delay-" + this.options[p]), i === "out" && (t.style.display = "none"), o && o();
+  animate(t, e, i, o, s) {
+    const n = i.charAt(0).toUpperCase() + i.slice(1), a = e + "Animate" + n;
+    if (typeof this.options[a] == "string") {
+      const d = this.options[a], l = e + "Animate" + n + "Speed", c = e + "Animate" + n + "Delay", m = () => {
+        t.removeEventListener("animationend", m), t.removeEventListener("animationcancel", m), t.classList.remove("neo-animate--animated"), t.classList.remove("neo-animate--" + d), typeof this.options[l] == "string" && t.classList.remove("neo-animate--" + this.options[l]), typeof this.options[c] == "string" && t.classList.remove("neo-animate--delay-" + this.options[c]), i === "out" && (t.style.display = "none"), o && o();
       };
-      t.addEventListener("animationend", f), t.addEventListener("animationcancel", f), t.style.display = "", t.classList.add("neo-animate--" + h), (n || typeof this.options[r] == "string") && t.classList.add("neo-animate--" + (n || this.options[r])), typeof this.options[p] == "string" && t.classList.add("neo-animate--delay-" + this.options[p]), t.classList.add("neo-animate--animated");
+      t.addEventListener("animationend", m), t.addEventListener("animationcancel", m), t.style.display = "", t.classList.add("neo-animate--" + d), (s || typeof this.options[l] == "string") && t.classList.add("neo-animate--" + (s || this.options[l])), typeof this.options[c] == "string" && t.classList.add("neo-animate--delay-" + this.options[c]), t.classList.add("neo-animate--animated");
     } else o && o();
   }
   animateIn(t, e, i, o) {
@@ -964,7 +888,7 @@ const u = class u {
     return Math.ceil(t.offsetHeight + i);
   }
 };
-s(u, "colorDefaults", {
+p.colorDefaults = {
   contentColor: "",
   contentColorBg: "",
   contentFooterColor: "",
@@ -978,7 +902,7 @@ s(u, "colorDefaults", {
   backdropColorBg: "",
   navColor: "",
   navColorBg: ""
-}), s(u, "defaults", Object.assign({}, {
+}, p.defaults = Object.assign({}, {
   appendTo: null,
   appendToClosest: null,
   wrapperClasses: null,
@@ -1129,62 +1053,59 @@ s(u, "colorDefaults", {
   onPrev: null,
   onAfterPrev: null,
   onContentLoaded: null
-}, u.colorDefaults));
-let m = u;
-window.NeoModal = m;
-(function(d, t, e) {
+}, p.colorDefaults);
+let u = p;
+window.NeoModal = u;
+(function(r, t, e) {
   class i extends Event {
-    constructor(l, h, r = null) {
-      super(`dialog:${l}`, { bubbles: !0 });
-      s(this, "dialog");
-      s(this, "settings");
-      this.dialog = h, this.settings = r;
+    constructor(n, a, d = null) {
+      super(`dialog:${n}`, { bubbles: !0 }), this.dialog = a, this.settings = d;
     }
   }
   const o = {
     iconClasses: "neo-icon neo-icon-font",
-    onContentLoaded: (n) => {
-      const a = n.getContent();
-      a && d.attachBehaviors(a, t);
+    onContentLoaded: (s) => {
+      const n = s.getContent();
+      n && r.attachBehaviors(n, t);
     },
-    onAfterClose: (n) => {
-      const a = n.getContent();
-      a && d.detachBehaviors(a, t);
+    onAfterClose: (s) => {
+      const n = s.getContent();
+      n && r.detachBehaviors(n, t);
     }
   };
-  typeof t.neoModal < "u" && typeof t.neoModal.defaults < "u" && Object.assign(o, t.neoModal.defaults), m.setDefaultOptions(o), d.behaviors.neoModal = {
-    attach: (n) => {
-      e("neo.modal", ".use-neo-modal", n).forEach((a) => {
-        const l = {};
-        l.trigger = a, l.content = (h) => {
-          let r = h.nextElementSibling;
-          return r && r.tagName === "TEMPLATE" ? r.innerHTML : r && r.classList.contains("neo-modal-template") ? r : (r = h.querySelector(".neo-modal-template"), r && r.tagName === "TEMPLATE" ? r.innerHTML : "");
-        }, new m(l);
+  typeof t.neoModal < "u" && typeof t.neoModal.defaults < "u" && Object.assign(o, t.neoModal.defaults), u.setDefaultOptions(o), r.behaviors.neoModal = {
+    attach: (s) => {
+      e("neo.modal", ".use-neo-modal", s).forEach((n) => {
+        const a = {};
+        a.trigger = n, a.content = (d) => {
+          let l = d.nextElementSibling;
+          return l && l.tagName === "TEMPLATE" ? l.innerHTML : l && l.classList.contains("neo-modal-template") ? l : (l = d.querySelector(".neo-modal-template"), l && l.tagName === "TEMPLATE" ? l.innerHTML : "");
+        }, new u(a);
       });
     }
-  }, d.neoModal = {
-    open: (n) => {
-      const a = new m(n);
-      a.event("onBeforeOpen").on(() => {
-        window.dispatchEvent(new i("beforecreate", a, t));
-      }), a.event("onOpen").on(() => {
-        window.dispatchEvent(new i("aftercreate", a, t));
-      }), a.event("onClose").on(() => {
-        window.dispatchEvent(new i("beforeclose", a, t));
-      }), a.event("onAfterClose").on(() => {
-        window.dispatchEvent(new i("afterclose", a, t));
-      }), a.open();
+  }, r.neoModal = {
+    open: (s) => {
+      const n = new u(s);
+      n.event("onBeforeOpen").on(() => {
+        window.dispatchEvent(new i("beforecreate", n, t));
+      }), n.event("onOpen").on(() => {
+        window.dispatchEvent(new i("aftercreate", n, t));
+      }), n.event("onClose").on(() => {
+        window.dispatchEvent(new i("beforeclose", n, t));
+      }), n.event("onAfterClose").on(() => {
+        window.dispatchEvent(new i("afterclose", n, t));
+      }), n.open();
     },
     close: () => {
-      m.closeTop();
+      u.closeTop();
     },
-    getTop: () => m.getTop()
-  }, d.behaviors.dialog = {}, d.behaviors.dialog.prepareDialogButtons = () => {
+    getTop: () => u.getTop()
+  }, r.behaviors.dialog = {}, r.behaviors.dialog.prepareDialogButtons = () => {
   };
 })(Drupal, drupalSettings, once);
-typeof jQuery == "function" && typeof jQuery.fn.dialog > "u" && (jQuery.fn.dialog = function(d) {
-  return Drupal.neoModal ? typeof d == "string" ? (d === "destroy" && Drupal.neoModal.close(), this) : this.each(function() {
-    Drupal.neoModal && Drupal.neoModal && (d.headerInContent = !0, d.dialogClass && (d.modalClasses = d.dialogClass), typeof d.closeOnEscape < "u" && d.closeOnEscape === !1 && (d.closeButton = !1, d.closeOnEscape = !1, d.backdropClose = !1), d.content = jQuery(this)[0].outerHTML, Drupal.neoModal.open(d));
+typeof jQuery == "function" && typeof jQuery.fn.dialog > "u" && (jQuery.fn.dialog = function(r) {
+  return Drupal.neoModal ? typeof r == "string" ? (r === "destroy" && Drupal.neoModal.close(), this) : this.each(function() {
+    Drupal.neoModal && Drupal.neoModal && (r.headerInContent = !0, r.dialogClass && (r.modalClasses = r.dialogClass), typeof r.closeOnEscape < "u" && r.closeOnEscape === !1 && (r.closeButton = !1, r.closeOnEscape = !1, r.backdropClose = !1), r.content = jQuery(this)[0].outerHTML, Drupal.neoModal.open(r));
   }) : this;
 });
 //# sourceMappingURL=modal.js.map
