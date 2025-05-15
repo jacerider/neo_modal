@@ -664,6 +664,12 @@ const p = class p {
       (t = this.loader) == null || t.remove(), this.loader = null;
     })));
   }
+  scrollLock() {
+    this.options.bodyLock && (typeof bodyScrollLock < "u" ? this.contentInner && bodyScrollLock.lock(this.contentInner) : document.body.classList.add("neo-modal--body-lock"));
+  }
+  scrollUnlock() {
+    this.options.bodyLock && (typeof bodyScrollLock < "u" ? this.contentInner && bodyScrollLock.unlock(this.contentInner) : document.body.classList.remove("neo-modal--body-lock"));
+  }
   toggle() {
     this.isOpen ? this.close() : this.open();
   }
@@ -678,7 +684,7 @@ const p = class p {
     var e, i;
     this.eventOpen.trigger(this), this.watchInterval = setInterval(this.watch.bind(this), 200), (e = this.modal) == null || e.style.setProperty("visibility", ""), (i = this.modal) == null || i.style.setProperty("pointer-events", ""), this.parentsFixedSticky = this.getFixedOrStickyParents(this.modal), this.getFixedOrStickyParents(this.modal).forEach((o) => {
       o.classList.add("neo-modal-disable-position");
-    }), this.transitionBodyIn();
+    }), this.transitionBodyIn(), this.scrollLock();
     const t = document.querySelectorAll(".neo-modal:not(.neo-modal--closing)");
     this.depth = t.length;
     for (let o = 0; o < t.length; o++) {
@@ -747,13 +753,13 @@ const p = class p {
     }
     (i = this.parentsFixedSticky) == null || i.forEach((o) => {
       o.classList.remove("neo-modal-disable-position");
-    }), this.remove(), this.removeWrapper(), this.popper && this.popper.destroy(), this.originalOptions && (this.options = this.originalOptions, this.originalOptions = null), this.options.navKeyboard && (document.body.removeEventListener("keydown", this.onKeyboardDown), document.body.removeEventListener("keyup", this.onKeyboardUp)), this.wrapper = null, document.body.removeEventListener("mousemove", this.focusWatch), this.eventAfterClose.trigger(this);
+    }), this.scrollUnlock(), this.remove(), this.removeWrapper(), this.popper && this.popper.destroy(), this.originalOptions && (this.options = this.originalOptions, this.originalOptions = null), this.options.navKeyboard && (document.body.removeEventListener("keydown", this.onKeyboardDown), document.body.removeEventListener("keyup", this.onKeyboardUp)), this.wrapper = null, document.body.removeEventListener("mousemove", this.focusWatch), this.eventAfterClose.trigger(this);
   }
   globalInit() {
-    document.body.classList.add("has-neo-modal"), this.options.bodyLock && (typeof bodyScrollLock < "u" ? bodyScrollLock.lock() : document.body.classList.add("neo-modal--body-lock"));
+    document.body.classList.add("has-neo-modal");
   }
   globalDestroy() {
-    document.body.classList.remove("has-neo-modal"), this.options.bodyLock && (typeof bodyScrollLock < "u" ? bodyScrollLock.unlock() : document.body.classList.remove("neo-modal--body-lock"));
+    document.body.classList.remove("has-neo-modal");
   }
   // GENERIC GETTERS
   // --------------------------------------------------------------------------
