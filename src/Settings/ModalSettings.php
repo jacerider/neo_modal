@@ -78,6 +78,7 @@ class ModalSettings extends SettingsBase {
         '#attributes' => [
           'class' => [
             'btn',
+            'btn-primary',
             'w-full',
             'text-center',
           ],
@@ -108,7 +109,7 @@ class ModalSettings extends SettingsBase {
     $modal->applyTo($level2['nested']);
     $modal = new Modal($level2);
     $modal->setTitle('Level 2');
-    $modal->setColorScheme('secondary-solid-dark');
+    $modal->setColorScheme('secondary-dark');
     // $modal->setBackdrop(FALSE);
     $modal->applyTo($level1['nested']);
     $modal = new Modal($level1);

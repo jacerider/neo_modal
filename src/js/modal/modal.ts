@@ -222,6 +222,7 @@ class NeoModal {
     'wrapperClasses',
     'modalClasses',
     'colorScheme',
+    'colorSchemeInherit',
     'width',
     'height',
     'zIndex',
@@ -313,7 +314,7 @@ class NeoModal {
   protected canZoom:boolean = false;
   protected canClickContent:boolean = true;
   protected throttle:ReturnType<typeof setTimeout>|null = null;
-  protected watchInterval:ReturnType<typeof setInterval>|null = null;
+  // protected watchInterval:ReturnType<typeof setInterval>|null = null;
   protected popper:Popper.instance|null = null;
   private eventSettings = new Signal<NeoModal, neoModal.NeoModalOptions>();
   private eventBeforeOpen = new Signal<NeoModal, void>();
@@ -713,9 +714,9 @@ class NeoModal {
     }
   }
 
-  protected watch():void {
-    this.size();
-  }
+  // protected watch():void {
+  //   this.size();
+  // }
 
   protected onKeyboardDown(event:KeyboardEvent):void {
     if (this.options.fit && !this.focused) {
@@ -1258,6 +1259,7 @@ class NeoModal {
 
       if (this.contentInner) {
         this.contentInner.classList.add('neo-modal--content');
+        console.log(this.options.colorScheme, this.options.colorSchemeInherit);
         if (!this.options.colorSchemeInherit) {
           this.contentInner.classList.add('scheme--reset');
         }
@@ -1919,7 +1921,7 @@ class NeoModal {
 
   protected doOpen():void {
     this.eventOpen.trigger(this);
-    this.watchInterval = setInterval(this.watch.bind(this), 200);
+    // this.watchInterval = setInterval(this.watch.bind(this), 200);
     this.modal?.style.setProperty('visibility', '');
     this.modal?.style.setProperty('pointer-events', '');
 
@@ -2012,7 +2014,7 @@ class NeoModal {
     ) || this.contentInner?.querySelector<HTMLElement>(
       focusableElements
     );
-    if (focusableElement) {
+    if (focusableElement && focusableElement !== document.body) {
       focusableElement.focus();
       if (focusableElement instanceof HTMLInputElement) {
         focusableElement.select();
@@ -2033,6 +2035,7 @@ class NeoModal {
             this.refreshContent();
           }
         }
+        this.size();
       };
       this.observer = new MutationObserver(callback);
       this.observer.observe(this.contentInner, {
@@ -2049,16 +2052,14 @@ class NeoModal {
     if (this.observer) {
       this.observer.disconnect();
     }
-    clearInterval(this.watchInterval as ReturnType<typeof setInterval>);
+    // clearInterval(this.watchInterval as ReturnType<typeof setInterval>);
     this.doClose().then(() => {
       this.finishClose();
     });
 
-    if (this.options.trigger) {
-      this.options.trigger.focus();
-    }
-    else if (this.trigger) {
-      this.trigger.focus();
+    const trigger = this.options.trigger || this.trigger;
+    if (trigger && trigger !== document.body) {
+      trigger.focus();
     }
   }
 

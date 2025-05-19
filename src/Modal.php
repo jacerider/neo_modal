@@ -69,6 +69,13 @@ class Modal {
   protected string|null $colorScheme = NULL;
 
   /**
+   * If true, the color scheme will be inherited from the parent element.
+   *
+   * @var bool|null
+   */
+  protected bool|null $colorSchemeInherit = NULL;
+
+  /**
    * The width of the modal.
    *
    * @var string|null
@@ -824,16 +831,17 @@ class Modal {
    *
    * @param string $colorScheme
    *   The color scheme of the modal.
+   * @param bool $inherit
+   *   If TRUE, the color scheme will be inherited from the parent element.
    *
    * @return $this
    */
-  public function setColorScheme(string $colorScheme):self {
-    if ($colorScheme) {
-      if (substr($colorScheme, 0, 7) !== 'scheme-') {
-        $colorScheme = 'scheme-' . $colorScheme;
-      }
-      $this->colorScheme = str_replace('_', '-', $colorScheme);
+  public function setColorScheme(string $colorScheme, bool $inherit = TRUE):self {
+    if (substr($colorScheme, 0, 7) !== 'scheme-') {
+      $colorScheme = 'scheme-' . $colorScheme;
     }
+    $this->colorScheme = str_replace('_', '-', $colorScheme);
+    $this->colorSchemeInherit = $inherit;
     return $this;
   }
 
@@ -1991,6 +1999,7 @@ class Modal {
     }
     // Boolean options.
     foreach ([
+      'colorSchemeInherit' => FALSE,
       'backdrop' => TRUE,
       'footer' => TRUE,
       'drag' => TRUE,

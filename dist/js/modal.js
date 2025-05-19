@@ -41,6 +41,7 @@ const p = class p {
       "wrapperClasses",
       "modalClasses",
       "colorScheme",
+      "colorSchemeInherit",
       "width",
       "height",
       "zIndex",
@@ -94,7 +95,7 @@ const p = class p {
       "trigger"
     ], this.optionsFromBoolToDefault = [
       "icon"
-    ], this.loader = null, this.loading = !1, this.trigger = null, this.wrapper = null, this.modal = null, this.backdrop = null, this.groupTriggers = null, this.parentsFixedSticky = null, this.container = null, this.content = null, this.contentBlock = null, this.contentWrapper = null, this.contentInner = null, this.contentPlaceholder = null, this.header = null, this.headerStartOut = null, this.headerEndOut = null, this.footer = null, this.footerContent = null, this.title = null, this.subtitle = null, this.icon = null, this.closeButton = null, this.next = null, this.prev = null, this.shareUrl = "", this.downloadUrl = "", this.copyUrl = "", this.depth = 0, this.isOpen = !1, this.isBuilt = !1, this.canZoom = !1, this.canClickContent = !0, this.throttle = null, this.watchInterval = null, this.popper = null, this.eventSettings = new h(), this.eventBeforeOpen = new h(), this.eventOpen = new h(), this.eventAfterOpen = new h(), this.eventBeforeClose = new h(), this.eventClose = new h(), this.eventAfterClose = new h(), this.eventBeforeNext = new h(), this.eventNext = new h(), this.eventAfterNext = new h(), this.eventBeforePrev = new h(), this.eventPrev = new h(), this.eventAfterPrev = new h(), this.eventContentLoaded = new h(), this.observer = null, this.focused = !1, this.focusing = !1, this.focusTimeout = null, this.currentZoom = 1, this.minZoom = 1, this.maxZoom = 3, this.stepSize = 1, this.zooming = !1, this.dragStartX = 0, this.dragStartY = 0, this.dragEndX = 0, this.dragEndY = 0, this.dragThreshold = 50, this.dragging = !1, this.loaderTimeout = null;
+    ], this.loader = null, this.loading = !1, this.trigger = null, this.wrapper = null, this.modal = null, this.backdrop = null, this.groupTriggers = null, this.parentsFixedSticky = null, this.container = null, this.content = null, this.contentBlock = null, this.contentWrapper = null, this.contentInner = null, this.contentPlaceholder = null, this.header = null, this.headerStartOut = null, this.headerEndOut = null, this.footer = null, this.footerContent = null, this.title = null, this.subtitle = null, this.icon = null, this.closeButton = null, this.next = null, this.prev = null, this.shareUrl = "", this.downloadUrl = "", this.copyUrl = "", this.depth = 0, this.isOpen = !1, this.isBuilt = !1, this.canZoom = !1, this.canClickContent = !0, this.throttle = null, this.popper = null, this.eventSettings = new h(), this.eventBeforeOpen = new h(), this.eventOpen = new h(), this.eventAfterOpen = new h(), this.eventBeforeClose = new h(), this.eventClose = new h(), this.eventAfterClose = new h(), this.eventBeforeNext = new h(), this.eventNext = new h(), this.eventAfterNext = new h(), this.eventBeforePrev = new h(), this.eventPrev = new h(), this.eventAfterPrev = new h(), this.eventContentLoaded = new h(), this.observer = null, this.focused = !1, this.focusing = !1, this.focusTimeout = null, this.currentZoom = 1, this.minZoom = 1, this.maxZoom = 3, this.stepSize = 1, this.zooming = !1, this.dragStartX = 0, this.dragStartY = 0, this.dragEndX = 0, this.dragEndY = 0, this.dragThreshold = 50, this.dragging = !1, this.loaderTimeout = null;
     for (let e in p.colorDefaults)
       this.optionsAsAttributes.push(e);
     this.options = this.buildOptions(t), this.options.trigger instanceof HTMLElement && (this.options.trigger.neoModalOptions = this.options), this.buildTrigger();
@@ -253,9 +254,9 @@ const p = class p {
       }
     }
   }
-  watch() {
-    this.size();
-  }
+  // protected watch():void {
+  //   this.size();
+  // }
   onKeyboardDown(t) {
     this.options.fit && !this.focused && this.focusWatch(), this.options.closeOnEscape === !0 && t.key === "Escape" && document.querySelector(".neo-modal:last-child") === this.modal && this.close(), this.throttle || (t.key === "ArrowRight" && this.navigate("next"), t.key === "ArrowLeft" && this.navigate("prev"), this.throttle = setTimeout(() => {
       this.throttle = null;
@@ -426,7 +427,7 @@ const p = class p {
   }
   buildContentByType(t) {
     return new Promise((e) => {
-      this.contentWrapper = document.createElement("div"), this.contentWrapper.classList.add("neo-modal--content-wrapper"), this.options.image ? this.contentInner = this.getContentImage(e) : this.options.video ? this.contentInner = this.getContentVideo(e) : this.options.iframe ? this.contentInner = this.getContentIframe(e) : this.contentInner = this.getContentDefault(e), this.contentInner ? (this.contentInner.classList.add("neo-modal--content"), this.options.colorSchemeInherit || this.contentInner.classList.add("scheme--reset"), this.contentWrapper.appendChild(this.contentInner), t.appendChild(this.contentWrapper)) : t.appendChild(this.contentWrapper);
+      this.contentWrapper = document.createElement("div"), this.contentWrapper.classList.add("neo-modal--content-wrapper"), this.options.image ? this.contentInner = this.getContentImage(e) : this.options.video ? this.contentInner = this.getContentVideo(e) : this.options.iframe ? this.contentInner = this.getContentIframe(e) : this.contentInner = this.getContentDefault(e), this.contentInner ? (this.contentInner.classList.add("neo-modal--content"), console.log(this.options.colorScheme, this.options.colorSchemeInherit), this.options.colorSchemeInherit || this.contentInner.classList.add("scheme--reset"), this.contentWrapper.appendChild(this.contentInner), t.appendChild(this.contentWrapper)) : t.appendChild(this.contentWrapper);
     });
   }
   getContentDefault(t) {
@@ -682,7 +683,7 @@ const p = class p {
   }
   doOpen() {
     var e, i;
-    this.eventOpen.trigger(this), this.watchInterval = setInterval(this.watch.bind(this), 200), (e = this.modal) == null || e.style.setProperty("visibility", ""), (i = this.modal) == null || i.style.setProperty("pointer-events", ""), this.parentsFixedSticky = this.getFixedOrStickyParents(this.modal), this.getFixedOrStickyParents(this.modal).forEach((o) => {
+    this.eventOpen.trigger(this), (e = this.modal) == null || e.style.setProperty("visibility", ""), (i = this.modal) == null || i.style.setProperty("pointer-events", ""), this.parentsFixedSticky = this.getFixedOrStickyParents(this.modal), this.getFixedOrStickyParents(this.modal).forEach((o) => {
       o.classList.add("neo-modal-disable-position");
     }), this.transitionBodyIn(), this.scrollLock();
     const t = document.querySelectorAll(".neo-modal:not(.neo-modal--closing)");
@@ -709,10 +710,11 @@ const p = class p {
     )) || ((n = this.contentInner) == null ? void 0 : n.querySelector(
       t
     ));
-    if (i ? (i.focus(), i instanceof HTMLInputElement && i.select()) : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this), this.contentInner) {
+    if (i && i !== document.body ? (i.focus(), i instanceof HTMLInputElement && i.select()) : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this), this.contentInner) {
       const a = (d, l) => {
         for (const c of d)
           c.type === "childList" && this.refreshContent();
+        this.size();
       };
       this.observer = new MutationObserver(a), this.observer.observe(this.contentInner, {
         childList: !0,
@@ -723,10 +725,12 @@ const p = class p {
     }
   }
   close() {
-    var t;
-    this.isOpen = !1, (t = this.modal) == null || t.classList.add("neo-modal--closing"), this.eventBeforeClose.trigger(this), this.observer && this.observer.disconnect(), clearInterval(this.watchInterval), this.doClose().then(() => {
+    var e;
+    this.isOpen = !1, (e = this.modal) == null || e.classList.add("neo-modal--closing"), this.eventBeforeClose.trigger(this), this.observer && this.observer.disconnect(), this.doClose().then(() => {
       this.finishClose();
-    }), this.options.trigger ? this.options.trigger.focus() : this.trigger && this.trigger.focus();
+    });
+    const t = this.options.trigger || this.trigger;
+    t && t !== document.body && t.focus();
   }
   doClose() {
     return new Promise((t) => {
