@@ -2052,7 +2052,7 @@ class Modal {
    */
   public function getModalAttributes():Attribute {
     $attributes = [];
-    $attributes['class'][] = 'neo-modal-template';
+    $attributes['class'][] = 'neo-modal--template';
     if ($this->breakpoint) {
       $attributes['class'][] = match($this->breakpoint) {
         'md' => 'md:!block',
@@ -2245,7 +2245,12 @@ class Modal {
    *   The content renderable array.
    */
   public function applyToForm(mixed &$trigger, array &$content):void {
-    $this->setAppendToClosest('form');
+    // Currently we copy the modal content back into the form on close or beofre
+    // modal butto submit. This may cause issues when non-simple form elements.
+    // Uncommenting the following line will keep the modal content within the
+    // form and can be turned back on if issues arise. However, keeping it
+    // commented makes things a bit more clean and predictable.
+    // $this->setAppendToClosest('form');.
     $trigger = $this->buildTrigger($trigger);
     $content = $this->buildContent($content, 'div');
   }
