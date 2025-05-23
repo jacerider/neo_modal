@@ -15,7 +15,7 @@ class h {
     return this;
   }
 }
-const p = class p {
+const c = class c {
   /**
    * Construct.
    */
@@ -96,7 +96,7 @@ const p = class p {
     ], this.optionsFromBoolToDefault = [
       "icon"
     ], this.loader = null, this.loading = !1, this.trigger = null, this.wrapper = null, this.modal = null, this.backdrop = null, this.groupTriggers = null, this.parentsFixedSticky = null, this.container = null, this.content = null, this.contentBlock = null, this.contentWrapper = null, this.contentInner = null, this.contentPlaceholder = null, this.header = null, this.headerStartOut = null, this.headerEndOut = null, this.footer = null, this.footerContent = null, this.title = null, this.subtitle = null, this.icon = null, this.closeButton = null, this.next = null, this.prev = null, this.shareUrl = "", this.downloadUrl = "", this.copyUrl = "", this.depth = 0, this.isOpen = !1, this.isBuilt = !1, this.canZoom = !1, this.canClickContent = !0, this.throttle = null, this.popper = null, this.eventSettings = new h(), this.eventBeforeOpen = new h(), this.eventOpen = new h(), this.eventAfterOpen = new h(), this.eventBeforeClose = new h(), this.eventClose = new h(), this.eventAfterClose = new h(), this.eventBeforeNext = new h(), this.eventNext = new h(), this.eventAfterNext = new h(), this.eventBeforePrev = new h(), this.eventPrev = new h(), this.eventAfterPrev = new h(), this.eventContentLoaded = new h(), this.observer = null, this.focused = !1, this.focusing = !1, this.focusTimeout = null, this.currentZoom = 1, this.minZoom = 1, this.maxZoom = 3, this.stepSize = 1, this.zooming = !1, this.dragStartX = 0, this.dragStartY = 0, this.dragEndX = 0, this.dragEndY = 0, this.dragThreshold = 50, this.dragging = !1, this.loaderTimeout = null;
-    for (let e in p.colorDefaults)
+    for (let e in c.colorDefaults)
       this.optionsAsAttributes.push(e);
     this.options = this.buildOptions(t), this.options.trigger instanceof HTMLElement && (this.options.trigger.neoModalOptions = this.options), this.buildTrigger();
   }
@@ -123,7 +123,7 @@ const p = class p {
     return null;
   }
   buildOptions(t) {
-    t = Object.assign({}, p.defaults, t);
+    t = Object.assign({}, c.defaults, t);
     const e = {};
     if (this.optionsFromBoolToDefault.forEach((o) => {
       const s = t[o];
@@ -195,11 +195,15 @@ const p = class p {
     this.buildHeader(), this.buildFooter(), this.bindClose(), this.setAttributes(), this.size();
   }
   bindClose() {
-    this.modal && this.modal.querySelectorAll("[data-neo-modal-close]:not(.neo-modal--processed)").forEach((t) => {
-      t.classList.add("neo-modal--processed"), t.addEventListener("click", (e) => {
-        this.close(), e.preventDefault(), e.stopPropagation();
+    this.modal && (this.modal.querySelectorAll("[data-neo-modal-close-submit]:not(.neo-modal--processed)").forEach((t) => {
+      t.classList.add("neo-modal--processed"), t.addEventListener("mouseup", (e) => {
+        this.options.nest ? c.closeTop() : this.close();
       });
-    });
+    }), this.modal.querySelectorAll("[data-neo-modal-close]:not(.neo-modal--processed)").forEach((t) => {
+      t.classList.add("neo-modal--processed"), t.addEventListener("click", (e) => {
+        e.preventDefault(), this.options.nest ? c.closeTop() : this.close();
+      });
+    }));
   }
   buildTooltips() {
     this.modal && this.modal.querySelectorAll(".neo-modal--tooltip:not(.neo-modal--tooltip-processed)").forEach((t) => {
@@ -218,7 +222,7 @@ const p = class p {
   setAttributes() {
     if (this.modal) {
       this.options.contentScroll ? this.modal.classList.add("neo-modal--content-scroll") : this.modal.classList.add("neo-modal--global-scroll");
-      for (let t in p.colorDefaults)
+      for (let t in c.colorDefaults)
         if (this.options[t]) {
           const e = this.options[t], i = t.replace(/[A-Z]/g, (o) => "-" + o.toLowerCase()).replace("color-bg", "bg");
           this.modal.style.setProperty("--modal-" + i, e);
@@ -427,7 +431,7 @@ const p = class p {
   }
   buildContentByType(t) {
     return new Promise((e) => {
-      this.contentWrapper = document.createElement("div"), this.contentWrapper.classList.add("neo-modal--content-wrapper"), this.options.image ? this.contentInner = this.getContentImage(e) : this.options.video ? this.contentInner = this.getContentVideo(e) : this.options.iframe ? this.contentInner = this.getContentIframe(e) : this.contentInner = this.getContentDefault(e), this.contentInner ? (this.contentInner.classList.add("neo-modal--content"), console.log(this.options.colorScheme, this.options.colorSchemeInherit), this.options.colorSchemeInherit || this.contentInner.classList.add("scheme--reset"), this.contentWrapper.appendChild(this.contentInner), t.appendChild(this.contentWrapper)) : t.appendChild(this.contentWrapper);
+      this.contentWrapper = document.createElement("div"), this.contentWrapper.classList.add("neo-modal--content-wrapper"), this.options.image ? this.contentInner = this.getContentImage(e) : this.options.video ? this.contentInner = this.getContentVideo(e) : this.options.iframe ? this.contentInner = this.getContentIframe(e) : this.contentInner = this.getContentDefault(e), this.contentInner ? (this.contentInner.classList.add("neo-modal--content"), this.options.colorSchemeInherit || this.contentInner.classList.add("scheme--reset"), this.contentWrapper.appendChild(this.contentInner), t.appendChild(this.contentWrapper)) : t.appendChild(this.contentWrapper);
     });
   }
   getContentDefault(t) {
@@ -522,8 +526,8 @@ const p = class p {
       if (a && t.appendChild(e), d && t.appendChild(i), l && t.appendChild(o), this.headerStartOut.childNodes.length > 0 ? t.appendChild(this.headerStartOut) : this.headerStartOut = null, this.headerEndOut.childNodes.length > 0 ? t.appendChild(this.headerEndOut) : this.headerEndOut = null, t.childNodes.length > 0)
         return this.header = t, this.options.headerInContent ? this.contentBlock && this.contentBlock.prepend(this.header) : this.modal && (this.modal.appendChild(this.header), d && (a || l) && setTimeout(() => {
           if (a && l) {
-            const c = Math.max(e.offsetWidth, o.offsetWidth);
-            e.style.minWidth = c + "px", o.style.minWidth = c + "px";
+            const p = Math.max(e.offsetWidth, o.offsetWidth);
+            e.style.minWidth = p + "px", o.style.minWidth = p + "px";
           } else a ? i.style.marginRight = e.offsetWidth + "px" : i.style.marginLeft = o.offsetWidth + "px";
         }, 100)), this.header;
     }
@@ -615,7 +619,7 @@ const p = class p {
         s.classList.add("neo-modal--hide");
         const n = document.createElement("button");
         n.classList.add("neo-modal--btn"), s.style.display === "none" && (n.style.display = "none"), this.transferClassesWithPrefixes(s, n, ["btn", "ml-"]), n.classList.length || (n.classList.add("btn"), s.classList.contains("button--primary") && n.classList.add("btn-primary")), n.innerHTML = s.innerHTML || s.getAttribute("value") || "Click Me", n.addEventListener("click", (a) => {
-          a.preventDefault(), a.stopPropagation(), s.dispatchEvent(new Event("mousedown")), s.click(), s.dispatchEvent(new Event("mouseup"));
+          this.restoreContentToPlaceholder(), a.preventDefault(), a.stopPropagation(), s.dispatchEvent(new Event("mousedown")), s.click(), s.dispatchEvent(new Event("mouseup"));
         }), e.appendChild(n);
       }), t.appendChild(e));
     }
@@ -675,7 +679,7 @@ const p = class p {
     this.isOpen ? this.close() : this.open();
   }
   open() {
-    this.options.nest || p.closeTop(), this.options.trigger || (this.trigger = document.activeElement), this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), this.buildStack(), this.build().then(() => {
+    this.options.nest || c.closeTop(), this.options.trigger || (this.trigger = document.activeElement), this.isOpen = !0, this.originalOptions = Object.assign({}, this.options), this.eventBeforeOpen.trigger(this), this.buildStack(), this.build().then(() => {
       setTimeout(() => {
         this.doOpen();
       });
@@ -712,8 +716,8 @@ const p = class p {
     ));
     if (i && i !== document.body ? (i.focus(), i instanceof HTMLInputElement && i.select()) : this.options.trigger && this.options.trigger.blur(), this.buildTooltips(), this.eventAfterOpen.trigger(this), this.contentInner) {
       const a = (d, l) => {
-        for (const c of d)
-          c.type === "childList" && this.refreshContent();
+        for (const p of d)
+          p.type === "childList" && this.refreshContent();
         this.size();
       };
       this.observer = new MutationObserver(a), this.observer.observe(this.contentInner, {
@@ -750,14 +754,17 @@ const p = class p {
     });
   }
   finishClose() {
-    var t, e, i;
-    if (this.contentPlaceholder) {
-      const o = (t = this.contentInner) == null ? void 0 : t.querySelector(".neo-modal-template");
-      o && ((e = this.contentPlaceholder.parentNode) == null || e.replaceChild(o, this.contentPlaceholder));
-    }
-    (i = this.parentsFixedSticky) == null || i.forEach((o) => {
-      o.classList.remove("neo-modal-disable-position");
+    var t;
+    this.restoreContentToPlaceholder(), (t = this.parentsFixedSticky) == null || t.forEach((e) => {
+      e.classList.remove("neo-modal-disable-position");
     }), this.scrollUnlock(), this.remove(), this.removeWrapper(), this.popper && this.popper.destroy(), this.originalOptions && (this.options = this.originalOptions, this.originalOptions = null), this.options.navKeyboard && (document.body.removeEventListener("keydown", this.onKeyboardDown), document.body.removeEventListener("keyup", this.onKeyboardUp)), this.wrapper = null, document.body.removeEventListener("mousemove", this.focusWatch), this.eventAfterClose.trigger(this);
+  }
+  restoreContentToPlaceholder() {
+    var t, e;
+    if (this.contentPlaceholder) {
+      const i = (t = this.contentInner) == null ? void 0 : t.querySelector(".neo-modal--template");
+      i && ((e = this.contentPlaceholder.parentNode) == null || e.replaceChild(i, this.contentPlaceholder), this.contentPlaceholder = null);
+    }
   }
   globalInit() {
     document.body.classList.add("has-neo-modal");
@@ -878,10 +885,10 @@ const p = class p {
   animate(t, e, i, o, s) {
     const n = i.charAt(0).toUpperCase() + i.slice(1), a = e + "Animate" + n;
     if (typeof this.options[a] == "string") {
-      const d = this.options[a], l = e + "Animate" + n + "Speed", c = e + "Animate" + n + "Delay", m = () => {
-        t.removeEventListener("animationend", m), t.removeEventListener("animationcancel", m), t.classList.remove("neo-animate--animated"), t.classList.remove("neo-animate--" + d), typeof this.options[l] == "string" && t.classList.remove("neo-animate--" + this.options[l]), typeof this.options[c] == "string" && t.classList.remove("neo-animate--delay-" + this.options[c]), i === "out" && (t.style.display = "none"), o && o();
+      const d = this.options[a], l = e + "Animate" + n + "Speed", p = e + "Animate" + n + "Delay", m = () => {
+        t.removeEventListener("animationend", m), t.removeEventListener("animationcancel", m), t.classList.remove("neo-animate--animated"), t.classList.remove("neo-animate--" + d), typeof this.options[l] == "string" && t.classList.remove("neo-animate--" + this.options[l]), typeof this.options[p] == "string" && t.classList.remove("neo-animate--delay-" + this.options[p]), i === "out" && (t.style.display = "none"), o && o();
       };
-      t.addEventListener("animationend", m), t.addEventListener("animationcancel", m), t.style.display = "", t.classList.add("neo-animate--" + d), (s || typeof this.options[l] == "string") && t.classList.add("neo-animate--" + (s || this.options[l])), typeof this.options[c] == "string" && t.classList.add("neo-animate--delay-" + this.options[c]), t.classList.add("neo-animate--animated");
+      t.addEventListener("animationend", m), t.addEventListener("animationcancel", m), t.style.display = "", t.classList.add("neo-animate--" + d), (s || typeof this.options[l] == "string") && t.classList.add("neo-animate--" + (s || this.options[l])), typeof this.options[p] == "string" && t.classList.add("neo-animate--delay-" + this.options[p]), t.classList.add("neo-animate--animated");
     } else o && o();
   }
   animateIn(t, e, i, o) {
@@ -898,7 +905,7 @@ const p = class p {
     return Math.ceil(t.offsetHeight + i);
   }
 };
-p.colorDefaults = {
+c.colorDefaults = {
   contentColor: "",
   contentColorBg: "",
   contentFooterColor: "",
@@ -912,7 +919,7 @@ p.colorDefaults = {
   backdropColorBg: "",
   navColor: "",
   navColorBg: ""
-}, p.defaults = Object.assign({}, {
+}, c.defaults = Object.assign({}, {
   appendTo: null,
   appendToClosest: null,
   wrapperClasses: null,
@@ -1063,8 +1070,8 @@ p.colorDefaults = {
   onPrev: null,
   onAfterPrev: null,
   onContentLoaded: null
-}, p.colorDefaults);
-let u = p;
+}, c.colorDefaults);
+let u = c;
 window.NeoModal = u;
 (function(r, t, e) {
   class i extends Event {
@@ -1089,7 +1096,7 @@ window.NeoModal = u;
         const a = {};
         a.trigger = n, a.content = (d) => {
           let l = d.nextElementSibling;
-          return l && l.tagName === "TEMPLATE" ? l.innerHTML : l && l.classList.contains("neo-modal-template") ? l : (l = d.querySelector(".neo-modal-template"), l && l.tagName === "TEMPLATE" ? l.innerHTML : "");
+          return l && l.tagName === "TEMPLATE" ? l.innerHTML : l && l.classList.contains("neo-modal--template") ? l : (l = d.querySelector(".neo-modal--template"), l && l.tagName === "TEMPLATE" ? l.innerHTML : "");
         }, new u(a);
       });
     }
