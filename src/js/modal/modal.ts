@@ -541,12 +541,28 @@ class NeoModal {
 
   protected bindClose() {
     if (this.modal) {
+      this.modal.querySelectorAll('[data-neo-modal-close-submit]:not(.neo-modal--processed)').forEach((el) => {
+        el.classList.add('neo-modal--processed');
+        el.addEventListener('mouseup', _e => {
+          if (this.options.nest) {
+            NeoModal.closeTop();
+          }
+          else {
+            this.close();
+          }
+        });
+      });
       this.modal.querySelectorAll('[data-neo-modal-close]:not(.neo-modal--processed)').forEach((el) => {
         el.classList.add('neo-modal--processed');
         el.addEventListener('click', e => {
-          this.close();
           e.preventDefault();
-          e.stopPropagation();
+          // e.stopPropagation();
+          if (this.options.nest) {
+            NeoModal.closeTop();
+          }
+          else {
+            this.close();
+          }
         });
       });
     }
@@ -1259,7 +1275,6 @@ class NeoModal {
 
       if (this.contentInner) {
         this.contentInner.classList.add('neo-modal--content');
-        console.log(this.options.colorScheme, this.options.colorSchemeInherit);
         if (!this.options.colorSchemeInherit) {
           this.contentInner.classList.add('scheme--reset');
         }
@@ -1709,6 +1724,10 @@ class NeoModal {
           }
           clone.innerHTML = button.innerHTML || button.getAttribute('value') || 'Click Me';
           clone.addEventListener('click', (e) => {
+            // We restore any placeholder content here so that if this is a
+            // modal that has a form that has a modal... we move the changed
+            // html back into the form before submit.
+            this.restoreContentToPlaceholder();
             e.preventDefault();
             e.stopPropagation();
             button.dispatchEvent(new Event('mousedown'));
@@ -2128,12 +2147,8 @@ class NeoModal {
   }
 
   protected finishClose():void {
-    if (this.contentPlaceholder) {
-      const content = this.contentInner?.querySelector('.neo-modal-template');
-      if (content) {
-        this.contentPlaceholder.parentNode?.replaceChild(content, this.contentPlaceholder);
-      }
-    }
+    // Restore content into placeholder.
+    this.restoreContentToPlaceholder();
 
     // Restore any fixed/sticky parents that were disabled.
     this.parentsFixedSticky?.forEach((element) => {
@@ -2163,6 +2178,16 @@ class NeoModal {
     this.wrapper = null;
     document.body.removeEventListener('mousemove', this.focusWatch);
     this.eventAfterClose.trigger(this);
+  }
+
+  protected restoreContentToPlaceholder(): void {
+    if (this.contentPlaceholder) {
+      const content = this.contentInner?.querySelector('.neo-modal--template');
+      if (content) {
+        this.contentPlaceholder.parentNode?.replaceChild(content, this.contentPlaceholder);
+        this.contentPlaceholder = null;
+      }
+    }
   }
 
   protected globalInit():void {
