@@ -20,6 +20,8 @@ modal-ajax:
   js:
     src/js/modal-ajax.ts: {}
   dependencies:
+    - core/drupal
+    - core/drupal.ajax
     - neo_modal/modal
 
 links:
