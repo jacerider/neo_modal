@@ -15,12 +15,16 @@ body.has-neo-modal--loader {
   @apply overflow-hidden;
 }
 
-.neo-modal-template {
+.neo-modal--template {
   @apply hidden;
 
-  .neo-modal & {
+  .neo-modal--content > & {
     @apply block;
   }
+}
+
+.neo-modal--hide {
+  display: none !important;
 }
 
 .neo-modal-disable-position {
@@ -498,10 +502,6 @@ body.has-neo-modal--loader {
 
 .neo-modal--btn {
   @apply m-0 block whitespace-nowrap;
-}
-
-.neo-modal--hide {
-  display: none !important;
 }
 
 .neo-modal--content--container {
