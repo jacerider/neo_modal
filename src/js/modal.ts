@@ -48,10 +48,10 @@ import { NeoModal } from './modal/modal';
           if (template && template.tagName === 'TEMPLATE') {
             return template.innerHTML;
           }
-          if (template && template.classList.contains('neo-modal-template')) {
+          if (template && template.classList.contains('neo-modal--template')) {
             return template;
           }
-          template = ref.querySelector('.neo-modal-template');
+          template = ref.querySelector('.neo-modal--template');
           if (template && template.tagName === 'TEMPLATE') {
             return template.innerHTML;
           }
