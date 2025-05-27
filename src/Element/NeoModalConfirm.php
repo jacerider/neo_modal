@@ -55,6 +55,7 @@ class NeoModalConfirm extends NeoModal {
       '#modal_title' => t('Confirm'),
       '#modal_preset' => 'shelf_top',
       '#modal' => [
+        'scope' => TRUE,
         'smartActions' => TRUE,
       ],
     ] + parent::getInfo();
@@ -112,6 +113,7 @@ class NeoModalConfirm extends NeoModal {
         '#type' => 'markup',
         '#markup' => $element['#description'],
       ];
+      $element['#description'] = NULL;
     }
     return parent::preRenderModal($element);
   }
