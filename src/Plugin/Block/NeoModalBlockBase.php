@@ -9,7 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\neo\NeoLinkitTrait;
-use Drupal\neo_icon\IconTranslationTrait;
+use Drupal\neo_icon\IconTrait;
 use Drupal\neo_modal\Modal;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInterface, ContainerFactoryPluginInterface {
 
-  use IconTranslationTrait;
+  use IconTrait;
   use NeoLinkitTrait;
 
   /**
