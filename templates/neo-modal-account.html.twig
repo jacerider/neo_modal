@@ -1,29 +1,29 @@
 <div{{ attributes.addClass('account-modal flex flex-col h-full') }}>
   <div class="flex flex-col gap-4 p-6">
     {% if message %}
-      <div>{{ message }}</div>
+      <div class="account-modal--welcome">{{ message }}</div>
     {% endif %}
     {% if user %}
-      <div>{{ user }}</div>
+      <div class="account-modal--user">{{ user }}</div>
     {% endif %}
     {% if primary_link %}
-      <div>{{ primary_link|neo_class('btn btn-primary w-full') }}</div>
+      <div class="account-modal--primary-link">{{ primary_link|neo_class('btn btn-primary w-full') }}</div>
     {% endif %}
     {% if secondary_link %}
-      <div>{{ secondary_link|neo_class('btn btn-outline w-full') }}</div>
+      <div class="account-modal--secondary-link">{{ secondary_link|neo_class('btn btn-outline w-full') }}</div>
     {% endif %}
     {% if form %}
-      <div>{{ form }}</div>
+      <div class="account-modal--form">{{ form }}</div>
     {% endif %}
     {% if menu_account %}
-      <div>{{ menu_account|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
+      <div class="account-modal--menu-account">{{ menu_account|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
     {% endif %}
     {% if menu_tools %}
-      <div class="pt-2">{{ menu_tools|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
+      <div class="account-modal--menu-tools pt-2">{{ menu_tools|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
     {% endif %}
   </div>
   {% if register %}
-    <div class="bg-base-500 text-base-content-500 scheme-primary-solid p-6 text-center mt-auto">
+    <div class="account-modal--register bg-base-500 text-base-content-500 scheme-primary-solid p-6 text-center mt-auto">
       {% if register_title %}
         <h3 class="text-xl mb-6">{{ register_title }}</h3>
       {% endif %}
@@ -31,7 +31,7 @@
     </div>
   {% endif %}
   {% if logout_link %}
-    <div class="p-6 mt-auto">
+    <div class="account-modal--logout-link p-6 mt-auto">
       {{ logout_link|neo_class('btn btn-primary-outline w-full') }}
     </div>
   {% endif %}
