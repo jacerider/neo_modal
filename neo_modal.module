@@ -119,6 +119,12 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
  */
 function neo_modal_ajax_render_alter(array &$data) {
   foreach ($data as $delta => $command) {
+    if ($command['command'] == 'ajaxRedirect') {
+      if (!empty($command['data']['dialog']['neo'])) {
+        $modal = new Modal(NULL, $command['data']['dialog']['neo'], $command['data']['dialog']['neo']['preset'] ?? 'dialog');
+        $data[$delta]['data']['dialog']['neo'] = $modal->getValues();
+      }
+    }
     if ($command['command'] == 'openDialog') {
       if (!empty($command['dialogOptions'])) {
         $data[$delta]['settings'] = $data[$delta]['settings'] ?? [];
