@@ -1,0 +1,387 @@
+neo_modal.settings:
+  type: neo_modal
+  mapping:
+    _core:
+      # This only exists for merging configuration; it's not required.
+      requiredKey: false
+      type: _core_config_info
+
+neo_settings.settings.neo_modal:
+  type: neo_modal
+
+neo_modal:
+  type: mapping
+  label: Neo Modal Settings
+  mapping:
+    scope:
+      type: boolean
+      label: Scope
+    scheme:
+      type: string
+      label: Scheme
+    modalClasses:
+      type: string
+      label: Modal Classes
+    appendTo:
+      type: string
+      label: Append To
+    appendToClosest:
+      type: string
+      label: Append To Closest
+    width:
+      type: string
+      label: Width
+    height:
+      type: string
+      label: Height
+    zIndex:
+      type: string
+      label: Z-Index
+    displaceTop:
+      type: string
+      label: Displace Top
+    displaceRight:
+      type: string
+      label: Displace Right
+    displaceBottom:
+      type: string
+      label: Displace Bottom
+    displaceLeft:
+      type: string
+      label: Displace Left
+    group:
+      type: string
+      label: Group
+    smartActions:
+      type: boolean
+      label: Smart Actions
+    numeration:
+      type: boolean
+      label: Numeration
+    fit:
+      type: boolean
+      label: Fit
+    nest:
+      type: boolean
+      label: Nest
+    drag:
+      type: boolean
+      label: Drag
+    inputFocus:
+      type: boolean
+      label: Input Focus
+    bodyLock:
+      type: boolean
+      label: Body Lock
+    header:
+      type: boolean
+      label: Header
+    headerAnimate:
+      type: boolean
+      label: Header Animate
+    headerInContent:
+      type: boolean
+      label: Header in Content
+    footer:
+      type: boolean
+      label: Footer
+    downloadLink:
+      type: boolean
+      label: Download Link
+    shareLink:
+      type: boolean
+      label: Share Link
+    copyLink:
+      type: boolean
+      label: Copy Link
+    closeButton:
+      type: string
+      label: Close Button
+    contentScroll:
+      type: boolean
+      label: Content Scroll
+    contentPadding:
+      type: string
+      label: Content Padding
+    title:
+      type: string
+      label: Title
+    titleCallback:
+      type: string
+      label: Title Callback
+    subtitle:
+      type: string
+      label: Subtitle
+    icon:
+      type: string
+      label: Icon
+    placement:
+      type: string
+      label: Placement
+    attach:
+      type: string
+      label: Attach
+    attachPlacement:
+      type: string
+      label: Attach Placement
+    loader:
+      type: boolean
+      label: Loader
+    bodyTransitionScale:
+      type: boolean
+      label: Body Transition Scale
+    bodyTransitionBlur:
+      type: boolean
+      label: Body Transition Blur
+    colorScheme:
+      type: string
+      label: Color Scheme
+    contentColor:
+      type: string
+      label: Content Color
+    contentColorBg:
+      type: string
+      label: Content Color BG
+    contentFooterColor:
+      type: string
+      label: Content Footer Color
+    contentFooterColorBg:
+      type: string
+      label: Content Footer Color BG
+    headerColor:
+      type: string
+      label: Header Color
+    headerColorBg:
+      type: string
+      label: Header Color BG
+    footerColor:
+      type: string
+      label: Footer Color
+    footerColorBg:
+      type: string
+      label: Footer Color BG
+    backdropColorBg:
+      type: string
+      label: Backdrop Color BG
+    navColor:
+      type: string
+      label: Nav Color
+    navColorBg:
+      type: string
+      label: Nav Color BG
+    loaderColor:
+      type: string
+      label: Nav Color
+    loaderColorBg:
+      type: string
+      label: Nav Color BG
+    contentAnimateIn:
+      type: string
+      label: Content Animate In
+    contentAnimateInSpeed:
+      type: string
+      label: Content Animate In Speed
+    contentAnimateInDelay:
+      type: string
+      label: Content Animate In Delay
+    contentAnimateOut:
+      type: string
+      label: Content Animate Out
+    contentAnimateOutSpeed:
+      type: string
+      label: Content Animate Out Speed
+    contentAnimateOutDelay:
+      type: string
+      label: Content Animate Out Delay
+    headerAnimateIn:
+      type: string
+      label: Header Animate In
+    headerAnimateInSpeed:
+      type: string
+      label: Header Animate In Speed
+    headerAnimateInDelay:
+      type: string
+      label: Header Animate In Delay
+    headerAnimateOut:
+      type: string
+      label: Header Animate Out
+    headerAnimateOutSpeed:
+      type: string
+      label: Header Animate Out Speed
+    headerAnimateOutDelay:
+      type: string
+      label: Header Animate Out Delay
+    footerAnimateIn:
+      type: string
+      label: Footer Animate In
+    footerAnimateInSpeed:
+      type: string
+      label: Footer Animate In Speed
+    footerAnimateInDelay:
+      type: string
+      label: Footer Animate In Delay
+    footerAnimateOut:
+      type: string
+      label: Footer Animate Out
+    footerAnimateOutSpeed:
+      type: string
+      label: Footer Animate Out Speed
+    footerAnimateOutDelay:
+      type: string
+      label: Footer Animate Out Delay
+    titleAnimateIn:
+      type: string
+      label: Title Animate In
+    titleAnimateInSpeed:
+      type: string
+      label: Title Animate In Speed
+    titleAnimateInDelay:
+      type: string
+      label: Title Animate In Delay
+    titleAnimateOut:
+      type: string
+      label: Title Animate Out
+    titleAnimateOutSpeed:
+      type: string
+      label: Title Animate Out Speed
+    titleAnimateOutDelay:
+      type: string
+      label: Title Animate Out Delay
+    subtitleAnimateIn:
+      type: string
+      label: Subtitle Animate In
+    subtitleAnimateInSpeed:
+      type: string
+      label: Subtitle Animate In Speed
+    subtitleAnimateInDelay:
+      type: string
+      label: Subtitle Animate In Delay
+    subtitleAnimateOut:
+      type: string
+      label: Subtitle Animate Out
+    subtitleAnimateOutSpeed:
+      type: string
+      label: Subtitle Animate Out Speed
+    subtitleAnimateOutDelay:
+      type: string
+      label: Subtitle Animate Out Delay
+    iconAnimateIn:
+      type: string
+      label: Icon Animate In
+    iconAnimateInSpeed:
+      type: string
+      label: Icon Animate In Speed
+    iconAnimateInDelay:
+      type: string
+      label: Icon Animate In Delay
+    iconAnimateOut:
+      type: string
+      label: Icon Animate Out
+    iconAnimateOutSpeed:
+      type: string
+      label: Icon Animate Out Speed
+    iconAnimateOutDelay:
+      type: string
+      label: Icon Animate Out Delay
+    closeButtonAnimateIn:
+      type: string
+      label: Close Button Animate In
+    closeButtonAnimateInSpeed:
+      type: string
+      label: Close Button Animate In Speed
+    closeButtonAnimateInDelay:
+      type: string
+      label: Close Button Animate In Delay
+    closeButtonAnimateOut:
+      type: string
+      label: Close Button Animate Out
+    closeButtonAnimateOutSpeed:
+      type: string
+      label: Close Button Animate Out Speed
+    closeButtonAnimateOutDelay:
+      type: string
+      label: Close Button Animate Out Delay
+    navPrevAnimateIn:
+      type: string
+      label: Nav Prev Animate In
+    navPrevAnimateInSpeed:
+      type: string
+      label: Nav Prev Animate In Speed
+    navPrevAnimateInDelay:
+      type: string
+      label: Nav Prev Animate In Delay
+    navPrevAnimateOut:
+      type: string
+      label: Nav Prev Animate Out
+    navPrevAnimateOutSpeed:
+      type: string
+      label: Nav Prev Animate Out Speed
+    navPrevAnimateOutDelay:
+      type: string
+      label: Nav Prev Animate Out Delay
+    navNextAnimateIn:
+      type: string
+      label: Nav Next Animate In
+    navNextAnimateInSpeed:
+      type: string
+      label: Nav Next Animate In Speed
+    navNextAnimateInDelay:
+      type: string
+      label: Nav Next Animate In Delay
+    navNextAnimateOut:
+      type: string
+      label: Nav Next Animate Out
+    navNextAnimateOutSpeed:
+      type: string
+      label: Nav Next Animate Out Speed
+    navNextAnimateOutDelay:
+      type: string
+      label: Nav Next Animate Out Delay
+    nextAnimateIn:
+      type: string
+      label: Next Animate In
+    nextAnimateInSpeed:
+      type: string
+      label: Next Animate In Speed
+    nextAnimateOut:
+      type: string
+      label: Next Animate Out
+    nextAnimateOutSpeed:
+      type: string
+      label: Next Animate Out Speed
+    prevAnimateIn:
+      type: string
+      label: Prev Animate In
+    prevAnimateInSpeed:
+      type: string
+      label: Prev Animate In Speed
+    prevAnimateOut:
+      type: string
+      label: Prev Animate Out
+    prevAnimateOutSpeed:
+      type: string
+      label: Prev Animate Out Speed
+    overlayAnimateIn:
+      type: string
+      label: Overlay Animate In
+    overlayAnimateInSpeed:
+      type: string
+      label: Overlay Animate In Speed
+    overlayAnimateOut:
+      type: string
+      label: Overlay Animate Out
+    overlayAnimateOutSpeed:
+      type: string
+      label: Overlay Animate Out Speed
+    loaderAnimateIn:
+      type: string
+      label: Loader Animate In
+    loaderAnimateInSpeed:
+      type: string
+      label: Loader Animate In Speed
+    loaderAnimateOut:
+      type: string
+      label: Loader Animate Out
+    loaderAnimateOutSpeed:
+      type: string
+      label: Loader Animate Out Speed

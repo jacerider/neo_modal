@@ -7,8 +7,8 @@ label: Media
 parent: null
 plugin: neo_modal
 settings:
-  numeration: 1
-  fit: 1
+  numeration: true
+  fit: true
   contentPadding: '0'
 weight: 0
 visibility: {  }

@@ -7,10 +7,10 @@ label: 'Shelf: Top'
 parent: ''
 plugin: neo_modal
 settings:
-  scope: 0
+  scope: false
   width: 1200px
-  headerInContent: 1
-  contentScroll: 1
+  headerInContent: true
+  contentScroll: true
   placement: top
   contentAnimateIn: fadeInDown
   contentAnimateOut: fadeOutUp

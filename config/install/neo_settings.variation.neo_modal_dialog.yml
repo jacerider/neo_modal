@@ -7,9 +7,9 @@ label: Dialog
 parent: ''
 plugin: neo_modal
 settings:
-  smartActions: 1
-  headerInContent: 1
-  contentScroll: 1
+  smartActions: true
+  headerInContent: true
+  contentScroll: true
 weight: 0
 visibility: {  }
 lock: true
