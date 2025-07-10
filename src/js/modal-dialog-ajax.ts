@@ -99,8 +99,16 @@ import { NeoModal } from "./modal/modal";
      * @param {object} response
      *   The Ajax response.
      */
-    Drupal.AjaxCommands.prototype.openModalDialogWithUrl = function (_ajax, _response, _status) {
-      console.log('Not yet supported in Neo Modal.', 'openModalDialogWithUrl');
+    Drupal.AjaxCommands.prototype.openModalDialogWithUrl = function (_ajax, response, _status) {
+      const dialogOptions = response.dialogOptions || {};
+      const elementSettings = {
+        progress: { type: 'throbber' },
+        dialogType: 'modal',
+        dialog: dialogOptions,
+        url: response.url,
+        httpMethod: 'GET',
+      };
+      Drupal.ajax(elementSettings).execute();
     } as drupal.Core.IAjaxCommand;
   }
 
