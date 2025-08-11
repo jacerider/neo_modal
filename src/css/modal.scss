@@ -67,7 +67,7 @@ body.has-neo-modal--loader {
 
 .neo-modal--spinner {
   @apply relative box-border block h-10 w-10;
-  color: var(--modal-loader-color, rgb(var(--color-base-content-950)));
+  color: var(--modal-loader-color, rgb(var(--color-base-950-content)));
   div {
     @apply absolute box-border rounded-full border-2 border-current opacity-100;
     animation: neoModalSpin 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
@@ -97,7 +97,7 @@ body.has-neo-modal--loader {
 
     span {
       @apply block border-2 border-t-0 -indent-96;
-      border-color: var(--modal-nav-color, rgb(var(--color-base-content-950)));
+      border-color: var(--modal-nav-color, rgb(var(--color-base-950-content)));
       border-bottom-color: transparent;
       border-left-color: transparent;
     }
@@ -167,7 +167,7 @@ body.has-neo-modal--loader {
 .neo-modal--header {
   @apply relative flex items-center justify-center shadow-lg;
   background: var(--modal-header-bg, rgb(var(--color-base-950)));
-  color: var(--modal-header-color, rgb(var(--color-base-content-950)));
+  color: var(--modal-header-color, rgb(var(--color-base-950-content)));
 
   // When in global scope.
   .neo-modal--header-global & {
@@ -364,12 +364,12 @@ body.has-neo-modal--loader {
 
   .neo-modal--header-global & {
     @apply px-2 text-2xl first:pl-0 last:pr-0;
-    color: var(--modal-header-color, rgb(var(--color-base-content-950)));
+    color: var(--modal-header-color, rgb(var(--color-base-950-content)));
   }
 
   .neo-modal--header-content & {
     @apply text-3xl;
-    color: var(--modal-header-color, rgb(var(--color-base-content-950)));
+    color: var(--modal-header-color, rgb(var(--color-base-950-content)));
   }
 
   .neo-modal--header-content .neo-modal--header-start-out &,
@@ -390,7 +390,7 @@ body.has-neo-modal--loader {
 
   a {
     @apply block cursor-pointer opacity-80 transition-opacity hover:opacity-100;
-    color: var(--modal-footer-color, rgb(var(--color-base-content-950)));
+    color: var(--modal-footer-color, rgb(var(--color-base-950-content)));
   }
 }
 
@@ -564,7 +564,7 @@ body.has-neo-modal--loader {
 .neo-modal--content-wrapper {
   @apply relative flex h-full flex-col;
   background: var(--modal-content-bg, rgb(var(--color-base-0)));
-  color: var(--modal-content-color, rgb(var(--color-base-content-0)));
+  color: var(--modal-content-color, rgb(var(--color-base-0-content)));
 
   .neo-modal--content-scroll & {
     @apply basis-full overflow-hidden;
@@ -738,7 +738,7 @@ body.has-neo-modal--loader {
 
 .neo-modal--trigger-overlay {
   @apply absolute left-0 top-0 flex h-full w-full items-center justify-center;
-  color: var(--modal-trigger-overlay-color, rgb(var(--color-base-content-950)));
+  color: var(--modal-trigger-overlay-color, rgb(var(--color-base-950-content)));
 
   &::before {
     @apply absolute left-0 top-0 h-full w-full opacity-0 transition-opacity duration-300;
@@ -787,7 +787,7 @@ body.has-neo-modal--loader {
   }
   .tippy-content {
     @apply text-xs;
-    color: var(--modal-tooltip-color, rgb(var(--color-base-content-950)));
+    color: var(--modal-tooltip-color, rgb(var(--color-base-950-content)));
   }
 }
 

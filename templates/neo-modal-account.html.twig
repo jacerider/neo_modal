@@ -16,14 +16,14 @@
       <div class="account-modal--form">{{ form }}</div>
     {% endif %}
     {% if menu_account %}
-      <div class="account-modal--menu-account">{{ menu_account|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
+      <div class="account-modal--menu-account">{{ menu_account|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-0-content hover:text-primary-500', 'items', 'url') }}</div>
     {% endif %}
     {% if menu_tools %}
-      <div class="account-modal--menu-tools pt-2">{{ menu_tools|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-content-0 hover:text-primary-500', 'items', 'url') }}</div>
+      <div class="account-modal--menu-tools pt-2">{{ menu_tools|neo_class('flex flex-col')|neo_property_class('border-b')|neo_property_class('block py-2 text-base-0-content hover:text-primary-500', 'items', 'url') }}</div>
     {% endif %}
   </div>
   {% if register %}
-    <div class="account-modal--register bg-base-500 text-base-content-500 scheme-primary-solid p-6 text-center mt-auto">
+    <div class="account-modal--register bg-base-500 text-base-500-content scheme-primary-solid p-6 text-center mt-auto">
       {% if register_title %}
         <h3 class="text-xl mb-6">{{ register_title }}</h3>
       {% endif %}
