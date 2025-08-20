@@ -163,13 +163,13 @@ body.has-neo-modal--loader {
   }
 }
 
-// Applies to a header no matter where it is.
+/* Applies to a header no matter where it is. */
 .neo-modal--header {
   @apply relative flex items-center justify-center shadow-lg;
   background: var(--modal-header-bg, rgb(var(--color-base-950)));
   color: var(--modal-header-color, rgb(var(--color-base-950-content)));
 
-  // When in global scope.
+  /* When in global scope. */
   .neo-modal--header-global & {
     @apply fixed z-20 text-center;
     top: var(--modal-displace-top, 0px);
@@ -182,7 +182,7 @@ body.has-neo-modal--loader {
     }
   }
 
-  // When in content scope.
+  /* When in content scope. */
   .neo-modal--header-content & {
     @apply shrink-0 grow-0;
   }
@@ -205,8 +205,8 @@ body.has-neo-modal--loader {
     @apply p-0;
 
     .neo-modal--label {
-      // Apply padding to label so that animations are not affected due to
-      // overflow hidden.
+      /* Apply padding to label so that animations are not affected due to
+      overflow hidden. */
       padding: var(--modal-content-header-padding);
     }
 
@@ -271,12 +271,12 @@ body.has-neo-modal--loader {
     h2 {
       @apply m-0 p-0;
 
-      // Global scope.
+      /* Global scope. */
       .neo-modal--header-global & {
         @apply text-sm leading-none;
       }
 
-      // Content scope.
+      /* Content scope. */
       .neo-modal--header-content & {
         @apply text-lg leading-none;
       }
@@ -287,12 +287,12 @@ body.has-neo-modal--loader {
         @apply font-light opacity-60;
       }
 
-      // Global scope.
+      /* Global scope. */
       .neo-modal--header-global & {
         @apply text-xs leading-none;
       }
 
-      // Content scope.
+      /* Content scope. */
       .neo-modal--header-content & {
         @apply text-xs leading-none;
       }
@@ -378,7 +378,7 @@ body.has-neo-modal--loader {
   }
 }
 
-// Footer.
+/* Footer. */
 .neo-modal--footer {
   @apply pointer-events-none fixed bottom-0 left-0 z-20 flex w-full items-center justify-center;
   bottom: calc(5px + var(--modal-displace-bottom, 0px));
@@ -603,7 +603,7 @@ body.has-neo-modal--loader {
   }
 
   .neo-modal--no-click & {
-    // When the modal is not clickable, we don't use a background color.
+    /* When the modal is not clickable, we don't use a background color. */
     @apply bg-transparent;
 
     &:before,
@@ -623,10 +623,6 @@ body.has-neo-modal--loader {
       background: none;
       box-shadow: none;
     }
-
-    // > .form--inner {
-    //   margin: 0;
-    // }
   }
 
   .neo-modal--content-scroll & {
@@ -672,7 +668,6 @@ body.has-neo-modal--loader {
     left: 0;
     width: 100%;
     height: 100%;
-    // padding: var(--modal-content-padding);
   }
 }
 
@@ -792,8 +787,6 @@ body.has-neo-modal--loader {
 }
 
 .neo-modal--zoom {
-  // overflow: hidden;
-
   img {
     animation-duration: var(--animate-duration);
     animation-timing-function: cubic-bezier(0.17, 0.67, 0.22, 1.22);
@@ -858,26 +851,31 @@ body.has-neo-modal--loader {
 
 @keyframes neoModalSpin {
   0% {
-    @apply left-4 top-4 h-2 w-2 opacity-0;
+    left: 1rem;
+    top: 1rem;
+    height: 8px;
+    width: 8px;
+    opacity: 0%;
   }
   4.9% {
-    @apply left-4 top-4 h-2 w-2 opacity-0;
+    left: 1rem;
+    top: 1rem;
+    height: 8px;
+    width: 8px;
+    opacity: 0%;
   }
   5% {
-    @apply left-4 top-4 h-2 w-2 opacity-100;
+    left: 1rem;
+    top: 1rem;
+    height: 8px;
+    width: 8px;
+    opacity: 100%;
   }
   100% {
-    @apply left-0 top-0 h-10 w-10 opacity-0;
+    left: 0px;
+    top: 0px;
+    height: 40px;
+    width: 40px;
+    opacity: 0%;
   }
 }
-
-// @keyframes neoModalSlideOutLeft {
-//   to {
-//     opacity: 0;
-//     transform: translate3d(-100%, 0, 0px);
-//     visibility: hidden;
-//   }
-// }
-// .neo-animate--slideOutLeft {
-//   animation-name: slideOutLeft;
-// }

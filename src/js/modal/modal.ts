@@ -2460,4 +2460,4 @@ class NeoModal {
 
 window.NeoModal = NeoModal;
 
-export {NeoModal};
+export default NeoModal;

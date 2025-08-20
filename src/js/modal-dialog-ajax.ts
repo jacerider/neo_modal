@@ -1,4 +1,4 @@
-import { NeoModal } from "./modal/modal";
+import NeoModal from "./modal/modal";
 
 (function (Drupal) {
 
@@ -113,5 +113,3 @@ import { NeoModal } from "./modal/modal";
   }
 
 })(Drupal);
-
-export {};

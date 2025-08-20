@@ -1,10 +1,10 @@
+import NeoModal from './modal/modal';
+
 declare global {
   interface JQuery {
     dialog(options?:any): JQuery;
   }
 }
-
-import { NeoModal } from './modal/modal';
 
 (function (Drupal, drupalSettings, once) {
 
@@ -125,5 +125,3 @@ if (typeof jQuery === 'function' && typeof jQuery.fn.dialog === 'undefined') {
     });
   };
 }
-
-export {};

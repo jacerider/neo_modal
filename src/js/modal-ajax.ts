@@ -22,5 +22,3 @@
   }
 
 })(Drupal, NeoModal);
-
-export {};

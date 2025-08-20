@@ -2,10 +2,12 @@ services:
   neo_modal.settings:
     parent: neo_settings.repository
     arguments: ['neo_modal']
+
   neo_modal.neo_build_event_subscriber:
     class: '\Drupal\neo_modal\EventSubscriber\NeoBuildEventSubscriber'
     tags:
       - { name: 'event_subscriber' }
+
   neo_modal.twig_extension:
     class: Drupal\neo_modal\TwigExtension
     tags:

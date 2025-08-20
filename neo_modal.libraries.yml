@@ -1,9 +1,9 @@
 modal:
   version: VERSION
-  neo: { group: contrib }
+  neo: true
   css:
     component:
-      src/css/modal.scss: { minified: true }
+      src/css/modal.css: { minified: true }
   js:
     src/js/modal.ts: {}
   dependencies:
@@ -16,7 +16,7 @@ modal:
 
 modal-ajax:
   version: VERSION
-  neo: { group: contrib }
+  neo: true
   js:
     src/js/modal-ajax.ts: {}
   dependencies:
@@ -26,7 +26,7 @@ modal-ajax:
 
 links:
   version: VERSION
-  neo: { group: contrib }
+  neo: true
   js:
     src/js/modal-link.ts: {}
   dependencies:
@@ -34,6 +34,6 @@ links:
 
 modal-dialog-ajax:
   version: VERSION
-  neo: { group: contrib }
+  neo: true
   js:
     src/js/modal-dialog-ajax.ts: {}
