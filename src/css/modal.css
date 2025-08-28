@@ -258,6 +258,7 @@ body.has-neo-modal--loader {
 
 .neo-modal--label {
   @apply flex items-center justify-center overflow-hidden;
+  line-height: 1.2;
 
   &.has-icon .neo-modal--title {
     @apply text-left;
