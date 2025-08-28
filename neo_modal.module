@@ -81,10 +81,11 @@ function neo_modal_module_implements_alter(&$implementations, $hook) {
  */
 function neo_modal_library_info_alter(&$libraries, $extension) {
   if ($extension == 'core') {
-    $path = '/' . \Drupal::service('extension.list.module')->getPath('neo') . '/dist';
+    $path = '/' . \Drupal::service('extension.list.module')->getPath('neo');
 
     $libraries['drupal.dialog']['css'] = [];
     $libraries['drupal.dialog']['js'] = [];
+
     // A library with no js or css will not be added to the page when
     // aggregation is enabled. So we add a js file that does nothing.
     $libraries['drupal.dialog']['js'][$path . '/js/na.js'] = ['minified' => TRUE];
