@@ -10,7 +10,6 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\neo\NeoLinkitTrait;
 use Drupal\neo_icon\IconTrait;
-use Drupal\neo_modal\Modal;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,6 +19,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
 
   use IconTrait;
   use NeoLinkitTrait;
+  use NeoModalBlockTrait;
 
   /**
    * The entity manager.
@@ -71,22 +71,8 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       'trigger_icon' => '',
       'trigger_url' => '',
       'trigger_icon_position' => 'before',
-      'modal_preset' => '',
       'modal_ajax' => FALSE,
-      'modal' => [],
-    ];
-  }
-
-  /**
-   * Forced modal configuration.
-   *
-   * The forced modal configuration is used to override the modal configuration.
-   *
-   * @return array
-   *   The forced modal configuration.
-   */
-  protected function modalForceConfiguration() {
-    return [];
+    ] + $this->neoModalDefaultConfiguration();
   }
 
   /**
@@ -95,7 +81,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
   public function blockForm($form, FormStateInterface $form_state) {
     $form['#id'] = 'block-settings';
     $form['#type'] = 'container';
-    $form['#process'][] = [$this, 'processModalSettings'];
+    $form['#process'][] = [$this, 'neoModalProcess'];
 
     $form['trigger_text'] = [
       '#type' => 'textfield',
@@ -155,32 +141,6 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
   }
 
   /**
-   * Process the modal settings.
-   */
-  public function processModalSettings(&$form, FormStateInterface $form_state, &$complete_form) {
-    $modalVariation = $form_state->getValue(array_merge($form['#parents'], ['modal_preset']), $this->configuration['modal_preset']);
-    $form['modal_preset'] = [
-      '#type' => 'neo_settings_variation',
-      '#title' => $this->t('Modal Preset'),
-      '#settings_repository_id' => 'neo_modal.settings',
-      '#default_value' => $modalVariation,
-      '#ajax' => [
-        'callback' => [__CLASS__, 'blockFormAjax'],
-        'wrapper' => 'block-settings',
-      ],
-    ];
-
-    $form['modal'] = [
-      '#type' => 'neo_settings',
-      '#title' => $this->t('Modal settings'),
-      '#settings_id' => 'neo_modal',
-      '#settings_variation' => $modalVariation,
-      '#default_value' => $this->configuration['modal'],
-    ];
-    return $form;
-  }
-
-  /**
    * Ajax callback for the block form.
    */
   public static function blockFormAjax($form, FormStateInterface $form_state) {
@@ -205,8 +165,9 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
     $this->configuration['trigger_url'] = $form_state->getValue(['trigger_url'], '');
     $this->configuration['trigger_icon_position'] = $form_state->getValue(['trigger_icon_position'], '');
     $this->configuration['modal_ajax'] = $form_state->getValue(['modal_ajax']);
-    $this->configuration['modal_preset'] = $form_state->getValue(['modal_preset']);
-    $this->configuration['modal'] = $form_state->getValue(['modal'], []);
+
+    // Submit modal settings.
+    $this->neoModalBlockSubmit($form, $form_state);
   }
 
   /**
@@ -238,16 +199,6 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       $modal->applyTo($build);
     }
     return $build;
-  }
-
-  /**
-   * Builds the modal object.
-   *
-   * @return \Drupal\neo_modal\Modal
-   *   The modal object.
-   */
-  protected function buildModal(): Modal {
-    return new Modal(NULL, $this->modalForceConfiguration() + $this->configuration['modal'], $this->configuration['modal_preset']);
   }
 
   /**
