@@ -115,7 +115,7 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
   /**
    * {@inheritdoc}
    */
-  protected function modalForceConfiguration() {
+  protected function neoModalForceConfiguration() {
     return [
       'contentPadding' => '0',
     ];
