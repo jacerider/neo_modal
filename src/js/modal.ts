@@ -16,6 +16,19 @@ declare global {
       this.dialog = dialog;
       this.settings = settings;
     }
+
+    // Add a method to dispatch with jQuery compatibility
+    dispatchOn(element: Element) {
+      // Use jQuery for backwards compatibility. Will be removed in Drupal 12.
+      if (typeof jQuery !== 'undefined') {
+        const eventType = this.type;
+        jQuery(element).trigger(eventType, [this.dialog, jQuery(element), this.settings]);
+      }
+      else {
+        // Dispatch native event
+        element.dispatchEvent(this);
+      }
+    }
   }
 
   const defaultOptions = {
@@ -67,16 +80,36 @@ declare global {
     open: (options:any) => {
       const modal = new NeoModal(options);
       modal.event('onBeforeOpen').on(() => {
-        window.dispatchEvent(new DrupalDialogEvent('beforecreate', modal, drupalSettings));
+        const modalElement = modal.getModal();
+        if (modalElement) {
+          const event = new DrupalDialogEvent('beforecreate', modal, drupalSettings);
+          event.dispatchOn(modalElement);
+          // modalElement.dispatchEvent(new DrupalDialogEvent('beforecreate', modal, drupalSettings));
+        }
       });
       modal.event('onOpen').on(() => {
-        window.dispatchEvent(new DrupalDialogEvent('aftercreate', modal, drupalSettings));
+        const modalElement = modal.getModal();
+        if (modalElement) {
+          const event = new DrupalDialogEvent('aftercreate', modal, drupalSettings);
+          event.dispatchOn(modalElement);
+          // modalElement.dispatchEvent(new DrupalDialogEvent('aftercreate', modal, drupalSettings));
+        }
       });
       modal.event('onClose').on(() => {
-        window.dispatchEvent(new DrupalDialogEvent('beforeclose', modal, drupalSettings));
+        const modalElement = modal.getModal();
+        if (modalElement) {
+          const event = new DrupalDialogEvent('beforeclose', modal, drupalSettings);
+          event.dispatchOn(modalElement);
+          // modalElement.dispatchEvent(new DrupalDialogEvent('beforeclose', modal, drupalSettings));
+        }
       });
       modal.event('onAfterClose').on(() => {
-        window.dispatchEvent(new DrupalDialogEvent('afterclose', modal, drupalSettings));
+        const modalElement = modal.getModal();
+        if (modalElement) {
+          const event = new DrupalDialogEvent('afterclose', modal, drupalSettings);
+          event.dispatchOn(modalElement);
+          // modalElement.dispatchEvent(new DrupalDialogEvent('afterclose', modal, drupalSettings));
+        }
       });
       modal.open();
     },
