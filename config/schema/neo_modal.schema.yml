@@ -385,3 +385,7 @@ neo_modal:
     loaderAnimateOutSpeed:
       type: string
       label: Loader Animate Out Speed
+    neo_settings_scope_front:
+      type: string
+    neo_settings_scope_back:
+      type: string
