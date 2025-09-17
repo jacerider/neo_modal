@@ -499,6 +499,10 @@ body.has-neo-modal--loader {
   &[data-neo-size='sm'] {
     @apply gap-2 px-4 py-2;
   }
+
+  .neo-modal--header-content & {
+    padding: var(--modal-content-header-padding);
+  }
 }
 
 .neo-modal--btn {
