@@ -463,6 +463,7 @@ class NeoModal {
         if (this.wrapper) {
           this.isBuilt = true;
           this.modal = document.createElement('div') as neoModal.NeoModalElement;
+          this.modal.setAttribute('id', 'neo-modal-' + Math.random().toString(36).slice(2, 11));
           this.modal.classList.add('neo-modal');
           if (this.options.modalClasses) {
             this.options.modalClasses.split(' ').forEach((className) => {
@@ -1929,9 +1930,9 @@ class NeoModal {
     }
     this.isOpen = true;
     this.originalOptions = Object.assign({}, this.options);
-    this.eventBeforeOpen.trigger(this);
     this.buildStack();
     this.build().then(() => {
+      this.eventBeforeOpen.trigger(this);
       setTimeout(() => {
         this.doOpen();
       });
@@ -2155,6 +2156,8 @@ class NeoModal {
       element.classList.remove('neo-modal-disable-position');
     });
 
+    this.eventAfterClose.trigger(this);
+
     this.scrollUnlock();
     this.remove();
     this.removeWrapper();
@@ -2177,7 +2180,6 @@ class NeoModal {
     }
     this.wrapper = null;
     document.body.removeEventListener('mousemove', this.focusWatch);
-    this.eventAfterClose.trigger(this);
   }
 
   protected restoreContentToPlaceholder(): void {
