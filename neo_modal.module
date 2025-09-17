@@ -83,6 +83,9 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
   if ($extension == 'core') {
     $path = '/' . \Drupal::service('extension.list.module')->getPath('neo');
 
+    // $libraries['drupal.dialog.off_canvas']['css'] = [];
+    // $libraries['drupal.dialog.off_canvas']['js'] = [];
+
     $libraries['drupal.dialog']['css'] = [];
     $libraries['drupal.dialog']['js'] = [];
 
@@ -99,6 +102,14 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
     $libraries['drupal.dialog.ajax']['dependencies'] = array_values(array_filter($libraries['drupal.dialog.ajax']['dependencies'], function ($value) {
       return $value !== 'core/jquery';
     }));
+  }
+  if ($extension == 'webform') {
+    // $libraries['webform.admin.off_canvas']['css'] = [];
+    // $libraries['webform.admin.off_canvas']['js'] = [];
+    // $libraries['webform.dialog']['css'] = [];
+    // $libraries['webform.dialog']['js'] = [];
+    // $libraries['drupal.dialog']['css'] = [];
+    // $libraries['drupal.dialog']['js'] = [];
   }
   if ($extension == 'focal_point') {
     // Focal point relies on core.dialog loading JQuery UI. But since we replace
@@ -148,11 +159,21 @@ function neo_modal_ajax_render_alter(array &$data) {
           $data[$delta]['settings']['placement'] = str_replace(' ', '-', str_replace('top', 'start', str_replace('bottom', 'end', $command['dialogOptions']['position']['my'])));
         }
         if (!empty($command['dialogOptions']['classes'])) {
+          // Media library support.
           if (in_array('media-library-widget-modal', $command['dialogOptions']['classes'])) {
             $data[$delta]['settings']['width'] = '100%';
             $data[$delta]['settings']['height'] = '100%';
             $data[$delta]['settings']['nest'] = TRUE;
           }
+          foreach ($command['dialogOptions']['classes'] as $class) {
+            // Webform support.
+            if (strstr($class, 'webform-off-canvas') || strstr($class, 'webform-ui-dialog')) {
+              $data[$delta]['settings']['width'] = '100%';
+              $data[$delta]['settings']['height'] = '100%';
+              $data[$delta]['settings']['nest'] = TRUE;
+            }
+          }
+          // Views UI support.
           if (in_array('views-ui-dialog js-views-ui-dialog', $command['dialogOptions']['classes'])) {
             $data[$delta]['settings']['width'] = '100%';
             $data[$delta]['settings']['height'] = '100%';
