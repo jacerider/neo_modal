@@ -19,14 +19,12 @@ declare global {
 
     // Add a method to dispatch with jQuery compatibility
     dispatchOn(element: Element) {
+      // Dispatch native event
+      element.dispatchEvent(this);
       // Use jQuery for backwards compatibility. Will be removed in Drupal 12.
       if (typeof jQuery !== 'undefined') {
         const eventType = this.type;
         jQuery(element).trigger(eventType, [this.dialog, jQuery(element), this.settings]);
-      }
-      else {
-        // Dispatch native event
-        element.dispatchEvent(this);
       }
     }
   }
