@@ -1724,6 +1724,11 @@ class NeoModal {
             }
           }
           clone.innerHTML = button.innerHTML || button.getAttribute('value') || 'Click Me';
+          clone.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            button.dispatchEvent(new Event('mousedown'));
+          });
           clone.addEventListener('click', (e) => {
             // We restore any placeholder content here so that if this is a
             // modal that has a form that has a modal... we move the changed
@@ -1731,8 +1736,11 @@ class NeoModal {
             this.restoreContentToPlaceholder();
             e.preventDefault();
             e.stopPropagation();
-            button.dispatchEvent(new Event('mousedown'));
             button.click();
+          });
+          clone.addEventListener('mouseup', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             button.dispatchEvent(new Event('mouseup'));
           });
           actions.appendChild(clone);
