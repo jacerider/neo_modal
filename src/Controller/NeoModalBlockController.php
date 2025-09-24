@@ -35,4 +35,26 @@ final class NeoModalBlockController extends ControllerBase {
     return $build;
   }
 
+  /**
+   * Title callback for the route.
+   *
+   * @param \Drupal\block\BlockInterface $block
+   *   The eXo toolbar item.
+   * @param string|null $arg1
+   *   An optional argument.
+   * @param string|null $arg2
+   *   An optional argument.
+   *
+   * @return string
+   *   The modal title.
+   */
+  public function getTitle(BlockInterface $block, ?string $arg1 = NULL, ?string $arg2 = NULL): string {
+    $title = '';
+    $plugin = $block->getPlugin();
+    if ($plugin instanceof NeoModalBlockInterface) {
+      $title = $plugin->getModalTitle($arg1, $arg2);
+    }
+    return $title;
+  }
+
 }
