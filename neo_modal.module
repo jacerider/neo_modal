@@ -104,6 +104,8 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
     }));
   }
   if ($extension == 'webform') {
+    $path = '/' . \Drupal::service('extension.list.module')->getPath('neo_modal');
+    $libraries['webform.ajax']['js'][$path . '/js/neo.webform.ajax.js'] = [];
     // $libraries['webform.admin.off_canvas']['css'] = [];
     // $libraries['webform.admin.off_canvas']['js'] = [];
     // $libraries['webform.dialog']['css'] = [];
