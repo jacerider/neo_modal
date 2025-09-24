@@ -269,17 +269,18 @@ body.has-neo-modal--loader {
   }
 
   .neo-modal--title {
+
     h2 {
       @apply m-0 p-0;
 
       /* Global scope. */
       .neo-modal--header-global & {
-        @apply text-sm leading-none;
+        @apply text-sm;
       }
 
       /* Content scope. */
       .neo-modal--header-content & {
-        @apply text-lg leading-none;
+        @apply text-lg;
       }
     }
 
@@ -290,12 +291,12 @@ body.has-neo-modal--loader {
 
       /* Global scope. */
       .neo-modal--header-global & {
-        @apply text-xs leading-none;
+        @apply text-xs;
       }
 
       /* Content scope. */
       .neo-modal--header-content & {
-        @apply text-xs leading-none;
+        @apply text-xs;
       }
     }
   }
@@ -490,7 +491,7 @@ body.has-neo-modal--loader {
 }
 
 .neo-modal--actions {
-  @apply flex gap-4 p-4;
+  @apply flex flex-col md:flex-row gap-4 p-4;
 
   &[data-neo-size='xs'] {
     @apply gap-1 px-4 py-1;
