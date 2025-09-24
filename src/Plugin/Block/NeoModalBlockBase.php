@@ -69,6 +69,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       ],
       'trigger_text' => '',
       'trigger_icon' => '',
+      'trigger_icon_only' => FALSE,
       'trigger_url' => '',
       'trigger_icon_position' => 'before',
       'modal_ajax' => FALSE,
@@ -83,6 +84,12 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
     $form['#type'] = 'container';
     $form['#process'][] = [$this, 'neoModalProcess'];
 
+    $form['modal_ajax'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Load modal content via AJAX'),
+      '#default_value' => $this->configuration['modal_ajax'],
+    ];
+
     $form['trigger_text'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Trigger Text'),
@@ -95,10 +102,16 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       '#default_value' => $this->configuration['trigger_icon'],
     ];
 
-    $form['trigger_url'] = [
-      '#title' => $this->t('Trigger URL Override (AJAX only)'),
-      '#description' => $this->t('The optional URL that will be used for users without javascript.'),
-    ] + $this->getLinkitElement($this->configuration['trigger_url']);
+    $form['trigger_icon_only'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Icon Only'),
+      '#default_value' => $this->configuration['trigger_icon_only'],
+      '#states' => [
+        'enabled' => [
+          ':input[name="settings[trigger_icon][value]"]' => ['filled' => TRUE],
+        ],
+      ],
+    ];
 
     $form['trigger_icon_position'] = [
       '#type' => 'select',
@@ -115,11 +128,15 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       ],
     ];
 
-    $form['modal_ajax'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Load modal content via AJAX'),
-      '#default_value' => $this->configuration['modal_ajax'],
-    ];
+    $form['trigger_url'] = [
+      '#title' => $this->t('Trigger URL Override (AJAX only)'),
+      '#description' => $this->t('The optional URL that will be used for users without javascript.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="settings[modal_ajax]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ] + $this->getLinkitElement($this->configuration['trigger_url']);
 
     $form['blocks'] = [
       '#type' => 'details',
@@ -162,6 +179,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
     }
     $this->configuration['trigger_text'] = $form_state->getValue(['trigger_text'], '');
     $this->configuration['trigger_icon'] = $form_state->getValue(['trigger_icon'], '');
+    $this->configuration['trigger_icon_only'] = (bool) $form_state->getValue(['trigger_icon_only'], FALSE);
     $this->configuration['trigger_url'] = $form_state->getValue(['trigger_url'], '');
     $this->configuration['trigger_icon_position'] = $form_state->getValue(['trigger_icon_position'], '');
     $this->configuration['modal_ajax'] = $form_state->getValue(['modal_ajax']);
@@ -182,7 +200,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
     $build = [
       '#type' => 'link',
       '#title' => $this->icon($this->configuration['trigger_text'], $this->configuration['trigger_icon'])
-        ->iconPosition($this->configuration['trigger_icon_position']),
+        ->iconPosition($this->configuration['trigger_icon_position'])->iconOnly($this->configuration['trigger_icon_only']),
       '#url' => $url,
     ];
     if ($blockId && $this->configuration['modal_ajax']) {
@@ -256,6 +274,13 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
       ];
     }
     return $build;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getModalTitle(): string {
+    return $this->configuration['modal']['title'] ?? '';
   }
 
   /**
