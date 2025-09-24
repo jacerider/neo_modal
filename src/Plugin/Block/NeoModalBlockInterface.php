@@ -17,4 +17,12 @@ interface NeoModalBlockInterface extends BlockPluginInterface {
    */
   public function buildModalContent(): array;
 
+  /**
+   * Gets the title for the modal.
+   *
+   * @return string
+   *   The modal title.
+   */
+  public function getModalTitle(): string;
+
 }
