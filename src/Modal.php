@@ -2137,6 +2137,7 @@ class Modal {
     if (empty($build['#type']) || in_array($build['#type'], [
       'markup',
       'plain_text',
+      'neo_icon',
     ]) || !empty($build['#markup'])) {
       $attributes = $build['#attributes'] ?? [];
       $attributes['href'] = '';
