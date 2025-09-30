@@ -321,7 +321,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
         [
           'action' => 'order',
           'relationship' => 'sibling',
-          'group' => 'menu-weight',
+          'group' => 'block-weight',
         ],
       ],
     ];
@@ -352,7 +352,7 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
         '#title' => t('Weight for @title', ['@title' => $label]),
         '#title_display' => 'invisible',
         '#default_value' => 0,
-        '#attributes' => ['class' => ['menu-weight']],
+        '#attributes' => ['class' => ['block-weight']],
       ];
       $count++;
     }
