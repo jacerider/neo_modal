@@ -3,6 +3,7 @@
 namespace Drupal\neo_modal;
 
 use Twig\Extension\AbstractExtension;
+use Twig\Markup;
 use Twig\TwigFilter;
 
 /**
@@ -35,6 +36,17 @@ class TwigExtension extends AbstractExtension {
   public static function renderModal($build, mixed $trigger, array $options = [], ?string $preset = NULL, $attributes = []) {
     if (empty($build)) {
       return $build;
+    }
+    if ($build instanceof Markup) {
+      $build = [
+        '#type' => 'inline_template',
+        '#template' => (string) $build,
+      ];
+    }
+    if ($trigger instanceof Markup) {
+      $trigger = [
+        '#markup' => (string) $trigger,
+      ];
     }
     $modal = new Modal($build, $options + [
       'scope' => TRUE,
