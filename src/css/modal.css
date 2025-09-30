@@ -491,7 +491,7 @@ body.has-neo-modal--loader {
 }
 
 .neo-modal--actions {
-  @apply flex flex-col md:flex-row gap-4 p-4;
+  @apply flex flex-col flex-wrap md:flex-row gap-4 p-4;
 
   &[data-neo-size='xs'] {
     @apply gap-1 px-4 py-1;
