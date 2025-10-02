@@ -2,6 +2,8 @@
 
 namespace Drupal\neo_modal;
 
+use Drupal\Core\Render\Markup as RenderMarkup;
+use Drupal\Core\Template\Attribute;
 use Twig\Extension\AbstractExtension;
 use Twig\Markup;
 use Twig\TwigFilter;
@@ -33,9 +35,12 @@ class TwigExtension extends AbstractExtension {
   /**
    * Render the neo image style.
    */
-  public static function renderModal($build, mixed $trigger, array $options = [], ?string $preset = NULL, $attributes = []) {
+  public static function renderModal($build, mixed $trigger, array $options = [], ?string $preset = NULL, $attributes = [], $trigger_attributes = []) {
     if (empty($build)) {
       return $build;
+    }
+    if (is_string($build)) {
+      $build = RenderMarkup::create($build);
     }
     if ($build instanceof Markup) {
       $build = [
@@ -51,6 +56,11 @@ class TwigExtension extends AbstractExtension {
     $modal = new Modal($build, $options + [
       'scope' => TRUE,
     ], $preset);
+
+    if ($trigger_attributes) {
+      $trigger_attributes = new Attribute($trigger_attributes);
+      $modal->getTriggerAttributes()->merge($trigger_attributes);
+    }
 
     $modal->applyTo($trigger, $attributes);
     return $trigger;
