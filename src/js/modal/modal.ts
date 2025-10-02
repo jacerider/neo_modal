@@ -1305,6 +1305,12 @@ class NeoModal {
         }
         else {
           element.innerHTML = content;
+          // Find and execute the script tag if it exists in the incoming content.
+          const script = element.querySelector('script');
+          if (script && script.textContent) {
+            eval(script.textContent);
+            script.remove(); // Optional: clean up
+          }
         }
       }
     }
