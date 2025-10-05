@@ -17,12 +17,13 @@ class ModalLocalAction extends LocalActionDefault {
    */
   public function getOptions(RouteMatchInterface $route_match) {
     $options = parent::getOptions($route_match);
+    $modalOptions = $this->pluginDefinition['modal'] ?? [
+      'width' => '700px',
+    ];
     $attributes = [
       'class' => ['use-ajax'],
       'data-dialog-type' => 'modal',
-      'data-dialog-options' => Json::encode($this->pluginDefinition['modal'] ?: [
-        'width' => '700px',
-      ]),
+      'data-dialog-options' => Json::encode($modalOptions),
     ];
     $options['attributes'] = $this->pluginDefinition['attributes'] ?? [];
     $options['attributes'] = NestedArray::mergeDeep($options['attributes'], $attributes);
