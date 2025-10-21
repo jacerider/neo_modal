@@ -1,13 +1,15 @@
-:root {
-  --modal-max-width: 100%;
-  --modal-padding-t: 0px;
-  --modal-content-padding: 1.5rem;
-  --modal-content-header-padding: 1rem 1.5rem;
-  --modal-displace-top: var(--drupal-displace-offset-top, 0px);
-  --modal-displace-right: var(--drupal-displace-offset-right, 0px);
-  --modal-displace-bottom: var(--drupal-displace-offset-bottom, 0px);
-  --modal-displace-left: var(--drupal-displace-offset-left, 0px);
-  --modal-z-index: 40;
+@layer base {
+  :root {
+    --modal-max-width: 100%;
+    --modal-padding-t: 0px;
+    --modal-content-padding: 1.5rem;
+    --modal-content-header-padding: 1rem 1.5rem;
+    --modal-displace-top: var(--drupal-displace-offset-top, 0px);
+    --modal-displace-right: var(--drupal-displace-offset-right, 0px);
+    --modal-displace-bottom: var(--drupal-displace-offset-bottom, 0px);
+    --modal-displace-left: var(--drupal-displace-offset-left, 0px);
+    --modal-z-index: 40;
+  }
 }
 
 body.neo-modal--body-lock,
