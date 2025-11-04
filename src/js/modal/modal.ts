@@ -557,7 +557,6 @@ class NeoModal {
         el.classList.add('neo-modal--processed');
         el.addEventListener('click', e => {
           e.preventDefault();
-          // e.stopPropagation();
           if (this.options.nest) {
             NeoModal.closeTop();
           }
