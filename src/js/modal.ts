@@ -19,17 +19,13 @@ declare global {
 
     // Add a method to dispatch with jQuery compatibility
     dispatchOn(element: Element) {
-      // Dispatch native event
-      // element.dispatchEvent(this);
       // Use jQuery for backwards compatibility. Will be removed in Drupal 12.
       if (typeof jQuery !== 'undefined') {
         const eventType = this.type;
         jQuery(element).trigger(eventType, [this.dialog, jQuery(element), this.settings]);
       }
-      else {
-        // Dispatch native event
-        element.dispatchEvent(this);
-      }
+      // Dispatch native event
+      element.dispatchEvent(this);
     }
   }
 
@@ -86,7 +82,6 @@ declare global {
         if (modalElement) {
           const event = new DrupalDialogEvent('beforecreate', modal, drupalSettings);
           event.dispatchOn(modalElement);
-          // modalElement.dispatchEvent(new DrupalDialogEvent('beforecreate', modal, drupalSettings));
         }
       });
       modal.event('onOpen').on(() => {
@@ -94,7 +89,6 @@ declare global {
         if (modalElement) {
           const event = new DrupalDialogEvent('aftercreate', modal, drupalSettings);
           event.dispatchOn(modalElement);
-          // modalElement.dispatchEvent(new DrupalDialogEvent('aftercreate', modal, drupalSettings));
         }
       });
       modal.event('onClose').on(() => {
@@ -102,7 +96,6 @@ declare global {
         if (modalElement) {
           const event = new DrupalDialogEvent('beforeclose', modal, drupalSettings);
           event.dispatchOn(modalElement);
-          // modalElement.dispatchEvent(new DrupalDialogEvent('beforeclose', modal, drupalSettings));
         }
       });
       modal.event('onAfterClose').on(() => {
@@ -110,7 +103,6 @@ declare global {
         if (modalElement) {
           const event = new DrupalDialogEvent('afterclose', modal, drupalSettings);
           event.dispatchOn(modalElement);
-          // modalElement.dispatchEvent(new DrupalDialogEvent('afterclose', modal, drupalSettings));
         }
       });
       modal.open();
