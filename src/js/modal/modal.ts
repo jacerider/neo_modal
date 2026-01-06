@@ -1837,7 +1837,6 @@ class NeoModal {
       if (this.options.closeButtonSvg) {
         inner.innerHTML = this.options.closeButtonSvg;
       }
-      // icon.classList.add(this.options.closeButton);
       this.closeButton.appendChild(inner);
     }
     return this.closeButton;
