@@ -42,6 +42,10 @@ body.has-neo-modal--loader {
   left: var(--modal-displace-left, 0px);
 }
 
+.neo-modal--content-scroll {
+  overflow: hidden;
+}
+
 .neo-modal--backdrop {
   @apply fixed h-full w-full;
   z-index: var(--modal-z-index, 40);
@@ -575,7 +579,7 @@ body.has-neo-modal--loader {
   color: var(--modal-content-color, rgb(var(--color-base-0-content)));
 
   .neo-modal--content-scroll & {
-    @apply basis-full overflow-hidden;
+    @apply basis-full overflow-hidden scrollbar-none;
   }
 
   &:before {
@@ -634,7 +638,7 @@ body.has-neo-modal--loader {
   }
 
   .neo-modal--content-scroll & {
-    @apply basis-full overflow-y-auto overflow-x-hidden;
+    @apply basis-full overflow-y-auto overflow-x-hidden scrollbar-none;
   }
 
   .neo-modal--draggable & {
