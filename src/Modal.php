@@ -356,6 +356,48 @@ class Modal {
   protected string|null $headerColorBg = NULL;
 
   /**
+   * The header animation in.
+   *
+   * @var string|null
+   */
+  protected string|null $headerAnimateIn = NULL;
+
+  /**
+   * The header animation in speed.
+   *
+   * @var string|null
+   */
+  protected string|null $headerAnimateInSpeed = NULL;
+
+  /**
+   * The header animation in delay.
+   *
+   * @var string|null
+   */
+  protected string|null $headerAnimateInDelay = NULL;
+
+  /**
+   * The header animation out.
+   *
+   * @var string|null
+   */
+  protected string|null $headerAnimateOut = NULL;
+
+  /**
+   * The header animation out speed.
+   *
+   * @var string|null
+   */
+  protected string|null $headerAnimateOutSpeed = NULL;
+
+  /**
+   * The header animation out delay.
+   *
+   * @var string|null
+   */
+  protected string|null $headerAnimateOutDelay = NULL;
+
+  /**
    * The footer color of the modal.
    *
    * @var string|null
@@ -1828,6 +1870,96 @@ class Modal {
   }
 
   /**
+   * Sets the header animation in.
+   *
+   * @param string $value
+   *   The animation value.
+   *
+   * @return $this
+   */
+  public function setHeaderAnimateIn(string $value):self {
+    if (isset(static::getAnimationsIn()[$value])) {
+      $this->headerAnimateIn = $value;
+    }
+    return $this;
+  }
+
+  /**
+   * Sets the header animation in speed.
+   *
+   * @param string $value
+   *   The speed value.
+   *
+   * @return $this
+   */
+  public function setHeaderAnimateInSpeed(string $value):self {
+    if (isset(static::getAnimationsSpeed()[$value])) {
+      $this->headerAnimateInSpeed = $value;
+    }
+    return $this;
+  }
+
+  /**
+   * Sets the content animation in delay.
+   *
+   * @param string $value
+   *   The delay value.
+   *
+   * @return $this
+   */
+  public function setHeaderAnimateInDelay(string $value):self {
+    if (isset(static::getAnimationsDelay()[$value])) {
+      $this->headerAnimateInDelay = $value;
+    }
+    return $this;
+  }
+
+  /**
+   * Sets the header animation out.
+   *
+   * @param string $value
+   *   The animation value.
+   *
+   * @return $this
+   */
+  public function setHeaderAnimateOut(string $value):self {
+    if (isset(static::getAnimationsOut()[$value])) {
+      $this->headerAnimateOut = $value;
+    }
+    return $this;
+  }
+
+  /**
+   * Sets the header animation out speed.
+   *
+   * @param string $value
+   *   The speed value.
+   *
+   * @return $this
+   */
+  public function setHeaderAnimateOutSpeed(string $value):self {
+    if (isset(static::getAnimationsSpeed()[$value])) {
+      $this->headerAnimateOutSpeed = $value;
+    }
+    return $this;
+  }
+
+  /**
+   * Sets the header animation out delay.
+   *
+   * @param string $value
+   *   The delay value.
+   *
+   * @return $this
+   */
+  public function setHeaderAnimateOutDelay(string $value):self {
+    if (isset(static::getAnimationsDelay()[$value])) {
+      $this->headerAnimateOutDelay = $value;
+    }
+    return $this;
+  }
+
+  /**
    * Set the footer color.
    *
    * @param string $color
@@ -1979,6 +2111,12 @@ class Modal {
       'contentFooterColorBg',
       'headerColor',
       'headerColorBg',
+      'headerAnimateIn',
+      'headerAnimateInSpeed',
+      'headerAnimateInDelay',
+      'headerAnimateOut',
+      'headerAnimateOutSpeed',
+      'headerAnimateOutDelay',
       'footerColor',
       'footerColorBg',
       'backdropColorBg',
