@@ -539,7 +539,7 @@ class ModalSettings extends SettingsBase {
           '#title' => $this->t('@label Background', [
             '@label' => $label,
           ]),
-          '#description' => $this->t('The content background color. If empty, the default css variable color will be used.'),
+          '#description' => $this->t('The background color. If empty, the default css variable color will be used.'),
           '#default_value' => $this->getValue($key . 'ColorBg'),
           '#format' => $hasBgOpacity ? 'rgba' : 'rgb',
           '#empty_option' => $this->t('Default'),
@@ -551,7 +551,7 @@ class ModalSettings extends SettingsBase {
           '#title' => $this->t('@label Color', [
             '@label' => $label,
           ]),
-          '#description' => $this->t('The content foreground color. If empty, the default css variable color will be used.'),
+          '#description' => $this->t('The foreground color. If empty, the default css variable color will be used.'),
           '#default_value' => $this->getValue($key . 'Color'),
           '#format' => $hasFgOpacity ? 'rgba' : 'rgb',
           '#empty_option' => $this->t('Default'),
@@ -704,9 +704,6 @@ class ModalSettings extends SettingsBase {
    */
   public static function ajaxModalOpen(array &$form, FormStateInterface $form_state) {
     $response = new AjaxResponse();
-    $build = [
-      '#markup' => '<p>Modal content</p>',
-    ];
     $response->addCommand(new NeoModalCommand(NULL, [
       'image' => 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&q=80',
       'fit' => TRUE,
