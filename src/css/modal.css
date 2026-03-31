@@ -388,8 +388,11 @@ body.has-neo-modal--loader {
 
 /* Footer. */
 .neo-modal--footer {
-  @apply pointer-events-none fixed bottom-0 left-0 z-20 flex w-full items-center justify-center;
+  @apply pointer-events-none fixed z-20 flex items-center justify-center;
   bottom: calc(5px + var(--modal-displace-bottom, 0px));
+  width: calc(
+    100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
+  );
 }
 
 .neo-modal--footer-inner {
@@ -623,6 +626,23 @@ body.has-neo-modal--loader {
       display: none;
     }
   }
+
+  .neo-modal--fit & {
+
+    &:has(img) {
+      background: transparent;
+      pointer-events: none;
+
+      img {
+        pointer-events: auto;
+      }
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
 }
 
 .neo-modal--content {
@@ -649,6 +669,7 @@ body.has-neo-modal--loader {
     > *,
     > picture img {
       width: auto;
+      height: 100%;
       max-height: calc(
         100vh - var(--modal-displace-top, 0px) - var(
             --modal-displace-bottom,
