@@ -244,6 +244,12 @@ class NeoModal {
     'backdrop',
     'header',
     'headerInContent',
+    'headerAnimateIn',
+    'headerAnimateInSpeed',
+    'headerAnimateInDelay',
+    'headerAnimateOut',
+    'headerAnimateOutSpeed',
+    'headerAnimateOutDelay',
     'footer',
     'downloadLink',
     'shareLink',
@@ -314,7 +320,6 @@ class NeoModal {
   protected canZoom:boolean = false;
   protected canClickContent:boolean = true;
   protected throttle:ReturnType<typeof setTimeout>|null = null;
-  // protected watchInterval:ReturnType<typeof setInterval>|null = null;
   protected popper:Popper.instance|null = null;
   private eventSettings = new Signal<NeoModal, neoModal.NeoModalOptions>();
   private eventBeforeOpen = new Signal<NeoModal, void>();
@@ -649,7 +654,12 @@ class NeoModal {
             else if (typeof this.options.width === 'number') {
               width += 'px';
             }
-            this.content.style.width = width + '';
+            if (this.options.fit) {
+              this.content.style.maxWidth = width + '';
+            }
+            else {
+              this.content.style.width = width + '';
+            }
           }
         }
         if (this.options.height) {
@@ -667,7 +677,12 @@ class NeoModal {
             else {
               height += 'px';
             }
-            this.content.style.minHeight = height + '';
+            if (this.options.fit) {
+              this.content.style.maxHeight = height + '';
+            }
+            else {
+              this.content.style.minHeight = height + '';
+            }
           }
         }
       }
@@ -1325,6 +1340,7 @@ class NeoModal {
       if (child) {
         switch (child.tagName) {
           case 'IMAGE':
+          case 'IMG':
             const image = child as HTMLImageElement;
             image.onload = () => {
               resolve(element);
@@ -1421,6 +1437,9 @@ class NeoModal {
           // When set to auto width, default to 100%.
           if (['auto'].includes(this.options.width as string) && this.content) {
             this.content.style.width = 'calc(100% - 6rem)';
+          }
+          else if (this.content) {
+            this.content.style.width = '100%';
           }
           this.shareUrl = this.options.video;
           this.downloadUrl = this.options.video;
