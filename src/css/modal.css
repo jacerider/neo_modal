@@ -705,7 +705,8 @@ body.has-neo-modal--loader {
 }
 
 .neo-modal--iframe {
-  @apply h-full w-full;
+  width: 100% !important;
+  height: 100% !important;
 
   .neo-modal--focus & {
     @apply pointer-events-none;

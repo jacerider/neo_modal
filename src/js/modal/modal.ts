@@ -1435,7 +1435,7 @@ class NeoModal {
           wrapper.appendChild(iframe);
           content.appendChild(wrapper);
           // When set to auto width, default to 100%.
-          if (['auto'].includes(this.options.width as string) && this.content) {
+          if ((['auto'].includes(this.options.width as string)) && this.content) {
             this.content.style.width = 'calc(100% - 6rem)';
           }
           else if (this.content) {
@@ -1478,6 +1478,15 @@ class NeoModal {
         resolve(content);
       };
       content.appendChild(iframe);
+      // When set to auto width, default to 100%.
+      if ((['auto'].includes(this.options.width as string)) && this.content) {
+        this.content.style.width = 'calc(100% - 6rem)';
+        this.content.style.height = 'calc(100% - 6rem)';
+      }
+      else if (this.content) {
+        this.content.style.width = this.options.width.toString();
+        this.content.style.height = this.options.height.toString();
+      }
     }
     return content;
   }
