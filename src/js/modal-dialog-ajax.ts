@@ -112,4 +112,42 @@ import NeoModal from "./modal/modal";
     } as drupal.Core.IAjaxCommand;
   }
 
+  // Prevent views AJAX (exposed filters, pagers) from rewriting the browser URL
+  // when the triggering element lives inside a Neo modal.
+  //
+  // Core's views `setBrowserUrl` command (core/modules/views/js/ajax_view.js)
+  // calls window.history.replaceState() with the current request's query string
+  // — which, inside a modal, includes that modal's opener parameters and hash.
+  // Core suppresses this only when the element is inside a `.ui-dialog-content`
+  // wrapper (its jQuery UI dialog). Neo modals replace that dialog and have no
+  // such wrapper, so without this the first exposed-filter request inside a
+  // modal pollutes window.location. The next request then re-sends and
+  // double-encodes those parameters, breaking e.g. the Media Library hash check
+  // ("Invalid media library parameters specified.").
+  //
+  // We can't simply add the `.ui-dialog-content` class to Neo modals: core's
+  // dialog.ajax.js also keys off that class and would call jQuery UI `.dialog()`
+  // methods on a non-dialog element, throwing on every AJAX attach inside a
+  // modal. So we wrap the command instead. This runs in a behavior (rather than
+  // at file-eval time) because ajax_view.js assigns setBrowserUrl when its
+  // library loads — load order relative to this file is not guaranteed, but
+  // behaviors always run afterward.
+  (Drupal as any).behaviors.neoModalSuppressBrowserUrl = {
+    attach: function () {
+      const commands:any = Drupal.AjaxCommands && Drupal.AjaxCommands.prototype;
+      if (!commands || typeof commands.setBrowserUrl !== 'function' || commands.setBrowserUrl.neoModalPatched) {
+        return;
+      }
+      const original = commands.setBrowserUrl;
+      const patched:any = function (this:any, ajax:any, response:any, status:any) {
+        if (ajax && ajax.element && ajax.element.closest && ajax.element.closest('.neo-modal')) {
+          return;
+        }
+        return original.call(this, ajax, response, status);
+      };
+      patched.neoModalPatched = true;
+      commands.setBrowserUrl = patched;
+    },
+  };
+
 })(Drupal);
