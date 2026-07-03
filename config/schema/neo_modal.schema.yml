@@ -40,12 +40,14 @@ neo_modal_block:
           type: sequence
           label: Heading blocks
           sequence:
-            type: string
+            type: mapping
+            label: Block settings
         footer:
           type: sequence
           label: Footer blocks
           sequence:
-            type: string
+            type: mapping
+            label: Block settings
     trigger_text:
       type: string
       label: Trigger text
