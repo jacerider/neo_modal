@@ -24,6 +24,117 @@ block.settings.neo_modal_slide_menu:
       type: boolean
       label: All status
 
+block.settings.neo_modal_account:
+  type: neo_modal_block
+  label: 'Neo modal account block'
+  mapping:
+    menu_account_anon:
+      type: boolean
+      label: 'Show account menu for anonymous users'
+    menu_account_auth:
+      type: boolean
+      label: 'Show account menu for authenticated users'
+    menu_tools_anon:
+      type: boolean
+      label: 'Show tools menu for anonymous users'
+    menu_tools_auth:
+      type: boolean
+      label: 'Show tools menu for authenticated users'
+    user_teaser:
+      type: boolean
+      label: 'Show user teaser'
+    user_welcome:
+      type: boolean
+      label: 'Show user welcome message'
+    login_display:
+      type: string
+      label: 'Login display'
+    login_text:
+      type: string
+      label: 'Login text'
+    register_display:
+      type: string
+      label: 'Registration display'
+    register_title:
+      type: string
+      label: 'Registration title'
+    register_text:
+      type: string
+      label: 'Registration text'
+    link_anon_text:
+      type: string
+      label: 'Anonymous link text'
+    link_anon_url:
+      type: string
+      label: 'Anonymous link URL'
+    link_anon_modal:
+      type: boolean
+      label: 'Anonymous link in modal'
+    link_auth_text:
+      type: string
+      label: 'Authenticated link text'
+    link_auth_url:
+      type: string
+      label: 'Authenticated link URL'
+    link_auth_modal:
+      type: boolean
+      label: 'Authenticated link in modal'
+    # Nested form-group values retained in stored configuration. These mirror
+    # the flat keys above and are not present on every saved block.
+    login:
+      requiredKey: false
+      type: mapping
+      label: Login
+      mapping:
+        login_display:
+          type: string
+          label: 'Login display'
+        login_text:
+          type: string
+          label: 'Login text'
+    register:
+      requiredKey: false
+      type: mapping
+      label: Registration
+      mapping:
+        register_display:
+          type: string
+          label: 'Registration display'
+        register_title:
+          type: string
+          label: 'Registration title'
+        register_text:
+          type: string
+          label: 'Registration text'
+    link_anon:
+      requiredKey: false
+      type: mapping
+      label: 'Extra link for anonymous users'
+      mapping:
+        link_anon_text:
+          type: string
+          label: 'Link text'
+        link_anon_url:
+          type: string
+          label: 'Link URL'
+        link_anon_modal:
+          type: boolean
+          label: 'Show in modal'
+    link_auth:
+      requiredKey: false
+      type: mapping
+      label: 'Extra link for authenticated users'
+      mapping:
+        link_auth_text:
+          type: string
+          label: 'Link text'
+        link_auth_url:
+          type: string
+          label: 'Link URL'
+        link_auth_modal:
+          type: boolean
+          label: 'Show in modal'
+
 
 neo_modal_block:
   type: block_settings
