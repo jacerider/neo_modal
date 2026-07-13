@@ -33,11 +33,13 @@ class NeoModalAccountLoginForm extends UserLoginForm {
     $form['#neo_style'] = 'clean';
     $form['#action'] = Url::fromRoute('user.login')->toString();
 
-    $form['forgot'] = [
-      '#type' => 'neo_modal_link',
-      '#title' => $this->t('Forgot your password?'),
-      '#url' => Url::fromRoute('neo_modal.api.account.password', ['block' => $block->id()]),
-    ];
+    if ($block) {
+      $form['forgot'] = [
+        '#type' => 'neo_modal_link',
+        '#title' => $this->t('Forgot your password?'),
+        '#url' => Url::fromRoute('neo_modal.api.account.password', ['block' => $block->id()]),
+      ];
+    }
 
     $form['actions']['#attributes']['class'][] = 'flex gap-4';
     $form['actions']['close'] = [
@@ -49,10 +51,12 @@ class NeoModalAccountLoginForm extends UserLoginForm {
       '#check_ajax' => TRUE,
     ];
 
-    $configuration = $block->getPlugin()->getConfiguration();
-    if ($this->isAjax() && $configuration['modal'] ?? NULL) {
-      $form['forgot']['#modal'] = ['nest' => TRUE, 'smartActions' => TRUE] + $configuration['modal'];
-      $form['forgot']['#modal_preset'] = $configuration['modal_preset'] ?? NULL;
+    if ($block && isset($form['forgot'])) {
+      $configuration = $block->getPlugin()->getConfiguration();
+      if ($this->isAjax() && ($configuration['modal'] ?? NULL)) {
+        $form['forgot']['#modal'] = ['nest' => TRUE, 'smartActions' => TRUE] + $configuration['modal'];
+        $form['forgot']['#modal_preset'] = $configuration['modal_preset'] ?? NULL;
+      }
     }
     return $form;
   }
