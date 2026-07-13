@@ -2,6 +2,8 @@
 
 namespace Drupal\neo_modal\Plugin\Block;
 
+use Drupal\block\BlockForm;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -127,6 +129,17 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
   public function blockForm($form, FormStateInterface $form_state) {
     $form = parent::blockForm($form, $form_state);
 
+    $formObject = $form_state->getFormObject();
+    if (!$formObject instanceof BlockForm) {
+      $form['standalone_notice'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => ['class' => ['messages', 'messages--warning']],
+        '#value' => $this->t('This block works best if it is created as an actual block entity. Its login, registration and password-reset actions load in a nested modal via a route tied to the saved block. When embedded elsewhere (for example inside a component) those actions fall back to the core account pages.'),
+        '#weight' => -100,
+      ];
+    }
+
     $form['menu_account_anon'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show account menu for anonymous users'),
@@ -176,7 +189,9 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
       '#options' => [
         'form' => $this->t('Form'),
         'link' => $this->t('Link'),
+        'page' => $this->t('Login page link'),
       ],
+      '#description' => $this->t('For anonymous users: <em>Form</em> shows the login form inside the modal, <em>Link</em> shows a link that opens it in a nested modal, and <em>Login page link</em> makes the trigger link directly to the core login page (no modal).'),
     ];
     $form['login']['login_text'] = [
       '#type' => 'textfield',
@@ -310,6 +325,34 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
   /**
    * {@inheritdoc}
    */
+  public function build() {
+    // For anonymous users, the "Login page" display makes the trigger a plain
+    // link straight to the core login page instead of opening the modal.
+    if ($this->currentUser->isAnonymous() && $this->configuration['login_display'] === 'page') {
+      return [
+        '#type' => 'link',
+        '#title' => $this->icon($this->configuration['trigger_text'], $this->configuration['trigger_icon'])
+          ->iconPosition($this->configuration['trigger_icon_position'])->iconOnly($this->configuration['trigger_icon_only']),
+        '#url' => Url::fromRoute('user.login'),
+      ];
+    }
+    return parent::build();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    // The trigger and modal content differ between anonymous and authenticated
+    // visitors, so the block must vary by authentication state.
+    return Cache::mergeContexts(parent::getCacheContexts(), [
+      'user.roles:authenticated',
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildModalContent(): array {
     $build = parent::buildModalContent();
 
@@ -361,7 +404,15 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
         ];
       }
 
-      switch ($this->configuration['login_display']) {
+      // The 'link' display opens the login form in a nested modal via an AJAX
+      // route that requires a saved block config entity. When this block is
+      // embedded (e.g. within an Alchemist component) there is no block entity
+      // to reference, so fall back to rendering the login form inline.
+      $login_display = $this->configuration['login_display'];
+      if ($login_display === 'link' && empty($this->configuration['block_id'])) {
+        $login_display = 'form';
+      }
+      switch ($login_display) {
         case 'link':
           $build['#primary_link'] = [
             '#type' => 'neo_modal_link',
@@ -375,7 +426,11 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
           break;
 
         case 'form':
-          $build['#form'] = $this->formBuilder->getForm('\Drupal\neo_modal\Form\NeoModalAccountLoginForm', $this->configuration['modal'], $this->configuration['modal_preset']);
+          $block = NULL;
+          if (!empty($this->configuration['block_id'])) {
+            $block = $this->entityTypeManager->getStorage('block')->load($this->configuration['block_id']);
+          }
+          $build['#form'] = $this->formBuilder->getForm('\Drupal\neo_modal\Form\NeoModalAccountLoginForm', $block);
           break;
       }
 
@@ -383,15 +438,26 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
         case 'link':
           if ($this->registerAccessCheck->access($this->currentUser)->isAllowed()) {
             $build['#register_title'] = $this->configuration['register_title'];
-            $build['#register'] = [
-              '#type' => 'neo_modal_link',
-              '#title' => $this->icon($this->configuration['register_text'], 'user-plus'),
-              '#url' => Url::fromRoute('neo_modal.api.account.register', [
-                'block' => $this->configuration['block_id'],
-              ]),
-              '#modal' => ['nest' => TRUE, 'smartActions' => TRUE] + $this->configuration['modal'],
-              '#modal_preset' => $this->configuration['modal_preset'],
-            ];
+            if (!empty($this->configuration['block_id'])) {
+              $build['#register'] = [
+                '#type' => 'neo_modal_link',
+                '#title' => $this->icon($this->configuration['register_text'], 'user-plus'),
+                '#url' => Url::fromRoute('neo_modal.api.account.register', [
+                  'block' => $this->configuration['block_id'],
+                ]),
+                '#modal' => ['nest' => TRUE, 'smartActions' => TRUE] + $this->configuration['modal'],
+                '#modal_preset' => $this->configuration['modal_preset'],
+              ];
+            }
+            else {
+              // No block entity to build the AJAX modal route; link directly
+              // to the core registration form.
+              $build['#register'] = [
+                '#type' => 'link',
+                '#title' => $this->icon($this->configuration['register_text'], 'user-plus'),
+                '#url' => Url::fromRoute('user.register'),
+              ];
+            }
           }
           break;
       }
