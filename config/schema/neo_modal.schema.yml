@@ -23,6 +23,9 @@ block.settings.neo_modal_slide_menu:
     all_status:
       type: boolean
       label: All status
+    expand_depth:
+      type: integer
+      label: 'Expand children from level'
 
 block.settings.neo_modal_account:
   type: neo_modal_block

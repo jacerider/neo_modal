@@ -23,6 +23,7 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
       'menus' => [],
       'back_status' => FALSE,
       'all_status' => FALSE,
+      'expand_depth' => 0,
     ];
   }
 
@@ -43,6 +44,14 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
       '#title' => $this->t('Enable View All Link'),
       '#description' => $this->t('If enabled, a link will be added to nested menus that allows users to visit the parent.'),
       '#default_value' => $this->configuration['all_status'],
+    ];
+
+    $form['expand_depth'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Expand children from level'),
+      '#description' => $this->t('Menu items at this level (and deeper) no longer slide to another level; their children render expanded beneath them as a grouped list. For example, 2 turns second-level items into group headings with their links listed inline — a mobile mega menu. Use 0 to always slide.'),
+      '#min' => 0,
+      '#default_value' => $this->configuration['expand_depth'],
     ];
 
     $settings = $this->configuration['menus'];
@@ -104,6 +113,7 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
     parent::blockSubmit($form, $form_state);
     $this->configuration['back_status'] = (bool) $form_state->getValue(['back_status']);
     $this->configuration['all_status'] = (bool) $form_state->getValue(['all_status']);
+    $this->configuration['expand_depth'] = (int) $form_state->getValue(['expand_depth']);
     $this->configuration['menus'] = $form_state->getValue(['menus']);
   }
 
@@ -117,6 +127,7 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
       '#menu_ids' => $this->configuration['menus'],
       '#back_status' => $this->configuration['back_status'],
       '#all_status' => $this->configuration['all_status'],
+      '#expand_depth' => $this->configuration['expand_depth'] ?? 0,
     ];
     return $build;
   }
