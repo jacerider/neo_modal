@@ -9,6 +9,10 @@ modal:
   dependencies:
     - core/drupal
     - core/drupalSettings
+    - core/once
+    # Deliberately NOT core/jquery: the chunk's only jQuery use sits behind
+    # `if (typeof jQuery < "u")`, so it is optional by design. Declaring it
+    # would force jQuery onto every page that opens a dialog.
     - neo/animate
     - neo/library.popper
     - neo/library.body-scroll-lock
@@ -37,3 +41,7 @@ modal-dialog-ajax:
   neo: true
   js:
     src/js/modal-dialog-ajax.ts: {}
+  dependencies:
+    # Not core/drupal.dialog.ajax: neo_modal_library_info_alter() makes that
+    # library depend on this one, so declaring it back is a cycle.
+    - core/drupal
