@@ -539,18 +539,18 @@ neo_modal:
     prevAnimateOutSpeed:
       type: string
       label: Prev Animate Out Speed
-    overlayAnimateIn:
+    backdropAnimateIn:
       type: string
-      label: Overlay Animate In
-    overlayAnimateInSpeed:
+      label: Backdrop Animate In
+    backdropAnimateInSpeed:
       type: string
-      label: Overlay Animate In Speed
-    overlayAnimateOut:
+      label: Backdrop Animate In Speed
+    backdropAnimateOut:
       type: string
-      label: Overlay Animate Out
-    overlayAnimateOutSpeed:
+      label: Backdrop Animate Out
+    backdropAnimateOutSpeed:
       type: string
-      label: Overlay Animate Out Speed
+      label: Backdrop Animate Out Speed
     loaderAnimateIn:
       type: string
       label: Loader Animate In

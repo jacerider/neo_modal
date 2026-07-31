@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for Neo | Modal.
+ *
+ * @ingroup neo_modal
+ */
+
+declare(strict_types=1);
+
+/**
+ * Rename the overlay animation settings to match the backdrop naming.
+ *
+ * The settings form and the JavaScript have always used `backdropAnimate*`,
+ * while the shipped configuration and schema declared `overlayAnimate*`. The
+ * mismatch meant the four Animations > Backdrop selects had no default value
+ * and saved keys that were absent from the schema.
+ */
+function neo_modal_update_11001(): void {
+  $map = [
+    'overlayAnimateIn' => 'backdropAnimateIn',
+    'overlayAnimateInSpeed' => 'backdropAnimateInSpeed',
+    'overlayAnimateOut' => 'backdropAnimateOut',
+    'overlayAnimateOutSpeed' => 'backdropAnimateOutSpeed',
+  ];
+
+  $rename = function (array $values) use ($map): ?array {
+    $changed = FALSE;
+    foreach ($map as $old => $new) {
+      if (!array_key_exists($old, $values)) {
+        continue;
+      }
+      // A value already stored under the new key wins.
+      if (!array_key_exists($new, $values)) {
+        $values[$new] = $values[$old];
+      }
+      unset($values[$old]);
+      $changed = TRUE;
+    }
+    return $changed ? $values : NULL;
+  };
+
+  // The base settings.
+  $config = \Drupal::configFactory()->getEditable('neo_modal.settings');
+  if ($values = $rename($config->getRawData())) {
+    $config->setData($values)->save();
+  }
+
+  // Any preset that stored the old keys.
+  $storage = \Drupal::entityTypeManager()->getStorage('neo_settings');
+  /** @var \Drupal\neo_settings\SettingsInterface $variation */
+  foreach ($storage->loadMultiple() as $variation) {
+    if ($variation->getPluginId() !== 'neo_modal') {
+      continue;
+    }
+    if ($values = $rename($variation->getSettings())) {
+      $variation->setSettings($values)->save();
+    }
+  }
+}

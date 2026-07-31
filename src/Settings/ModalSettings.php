@@ -619,7 +619,7 @@ class ModalSettings extends SettingsBase {
         'delay' => FALSE,
       ],
       'backdrop' => [
-        'label' => $this->t('Overlay'),
+        'label' => $this->t('Backdrop'),
         'delay' => FALSE,
       ],
       'loader' => [
