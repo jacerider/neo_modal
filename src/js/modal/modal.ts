@@ -2075,7 +2075,22 @@ class NeoModal {
       focusableElements
     );
     if (focusableElement && focusableElement !== document.body) {
-      focusableElement.focus();
+      // `preventScroll` because focusing scrolls the element's nearest
+      // scrollable ancestor into view, and here that ancestor is the modal's
+      // own content pane. A modal holding a whole page of content therefore
+      // opened part-way down — as far down as its first focusable element
+      // happened to sit. Measured at 1139px on a page whose first focusable
+      // element was a collapsed panel's toggle, so the reader arrived with the
+      // heading already scrolled away.
+      //
+      // It presents as the modal "jumping" on open, and it varies with the
+      // content loaded, which makes it read as a content bug rather than a
+      // focus one: a page whose first link sits near the top looks fine, the
+      // next one does not.
+      //
+      // Focus still moves, so keyboard and screen-reader behaviour is
+      // unchanged; only the scrolling side effect is suppressed.
+      focusableElement.focus({ preventScroll: true });
       if (focusableElement instanceof HTMLInputElement) {
         focusableElement.select();
       }
