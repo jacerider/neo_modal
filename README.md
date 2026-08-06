@@ -405,6 +405,20 @@ run `Drupal.attachBehaviors()` and `Drupal.detachBehaviors()` on the modal
 content. Supplying your own handler for those options replaces the default —
 subscribe with `modal.event(...).on()` instead if you need both.
 
+### `trigger` and `triggerBind`
+
+`trigger` names the element a modal belongs to. It drives focus restore on
+close, the argument passed to a `content()` callback, `data-neo-modal-*` option
+scraping, group navigation and `appendToClosest` — and, separately, a
+click-to-toggle binding controlled by `triggerBind` (default `true`).
+
+`Drupal.neoModal.open()` forces `triggerBind: false`, because it builds a new
+instance per call and opens it immediately: keeping the binding would leave a
+live toggle behind on every call, so the second click would open two modals and
+the third three. Construct a `new NeoModal({trigger})` **without** calling
+`open()` when you want the trigger to own the modal — that is what the
+declarative `.use-neo-modal` behavior does.
+
 Every live modal element exposes its instance as `element.neoModal`.
 
 

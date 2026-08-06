@@ -76,7 +76,11 @@ declare global {
 
   Drupal.neoModal = {
     open: (options:any) => {
-      const modal = new NeoModal(options);
+      // Imperative open: this instance is built to be opened right now, not to
+      // sit on the trigger waiting for clicks. Leaving the click binding on
+      // would stack one more modal onto the trigger per call.
+      // @see NeoModal.buildTrigger()
+      const modal = new NeoModal(Object.assign({}, options, { triggerBind: false }));
       modal.event('onBeforeOpen').on(() => {
         const modalElement = modal.getModal();
         if (modalElement) {

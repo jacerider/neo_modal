@@ -28,6 +28,7 @@ declare namespace neoModal {
     colorScheme:string|null;
     colorSchemeInherit:boolean;
     trigger:NeoModalTriggerElement|null;
+    triggerBind:boolean;
     placement:Placement;
     width:number|string|Size;
     height:number|string|Size;

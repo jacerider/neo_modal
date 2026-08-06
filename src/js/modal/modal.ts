@@ -27,6 +27,7 @@ class NeoModal {
     colorScheme: 'scheme--reset',
     colorSchemeInherit: false,
     trigger: null,
+    triggerBind: true,
     placement: 'center',
     width: 'auto',
     height: 'auto',
@@ -446,8 +447,24 @@ class NeoModal {
     return Object.assign({}, this.options, opts);
   }
 
+  /**
+   * Wires the trigger element to toggle this modal when clicked.
+   *
+   * Only the DECLARATIVE path wants this. There, one instance is constructed
+   * per `.use-neo-modal` element and never opened by hand, so the binding IS
+   * the modal's reason to exist.
+   *
+   * An imperative `Drupal.neoModal.open()` is the opposite: it constructs an
+   * instance per call and opens it immediately, usually from inside the
+   * trigger's own click handler. Binding there leaves a live toggle behind on
+   * every call, so the second click opens two modals, the third opens three,
+   * and the user has to dismiss a stack of them. That is why `open()` passes
+   * `triggerBind: false` — `trigger` still does its other jobs there (focus
+   * restore, the `content()` argument, `data-neo-modal-*` options, group
+   * navigation, `appendToClosest`), it just does not own the click.
+   */
   protected buildTrigger():void {
-    if (this.options.trigger instanceof HTMLElement) {
+    if (this.options.triggerBind && this.options.trigger instanceof HTMLElement) {
       const trigger = this.options.trigger;
       trigger.addEventListener('click', (event) => {
         event.preventDefault();
