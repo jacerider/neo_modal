@@ -429,10 +429,27 @@ For fields, the **"Neo | Modal Gallery"** formatters generate the whole thing
 - `Drupal.AjaxCommands.openDialog` / `closeDialog` / `openModalDialogWithUrl`
   are reimplemented; `setDialogOption` is a no-op that logs.
 - A jQuery `.dialog()` shim exists for legacy callers
-  ([modal.ts:123](web/modules/contrib/neo_modal/src/js/modal.ts#L123)).
+  ([modal.ts:147](web/modules/contrib/neo_modal/src/js/modal.ts#L147)).
+- `dialog:beforecreate/aftercreate/beforeclose/afterclose` are dispatched as
+  **native events only**, like core. A jQuery special-event bridge
+  ([modal.ts:30](web/modules/contrib/neo_modal/src/js/modal.ts#L30), mirroring
+  core's `dialog-deprecation.js`, which the library replacement removes) feeds
+  legacy `$(window).on('dialog:aftercreate', (e, dialog, $element, settings))`
+  listeners (e.g. webform's) their arguments. Never additionally
+  `jQuery.trigger()` these events — handlers would fire twice.
 - `hook_ajax_render_alter()` translates core dialog options and applies
-  per-integration fixes (Media Library, Webform off-canvas, Views UI get
-  `width/height: 100%`; Views UI additionally `nest: false`).
+  per-integration **sizing** fixes (Media Library, Webform off-canvas, Views UI
+  get `width/height: 100%`).
+- **Replace-vs-stack is decided client-side from the command's selector**
+  ([modal-dialog-ajax.ts](web/modules/contrib/neo_modal/src/js/modal-dialog-ajax.ts)),
+  mirroring core's same-selector-replaces contract: opening a dialog whose
+  `response.selector` (e.g. `#drupal-modal`) already owns an open Neo modal
+  closes that modal first; other modals are left alone. An incoming
+  `#drupal-off-canvas` dialog additionally closes all open selector-tracked
+  dialogs (webform relies on this; its own close handler targets `.ui-dialog`
+  markup that doesn't exist here). `closeDialog` also closes by selector. An
+  explicit `nest` option overrides: `true` always stacks (Media Library keeps
+  this so it survives a selector collision), `false` closes the top modal.
 - Views' `setBrowserUrl` command is suppressed inside `.neo-modal` to stop
   modal query parameters leaking into `window.location`.
 - Local actions: add a `modal` key to a local action definition and
@@ -466,7 +483,7 @@ modal.event('onAfterOpen').on(cb)     // signal-based subscription
 
 Drupal registers default `onContentLoaded` / `onAfterClose` handlers that call
 `Drupal.attachBehaviors()` / `detachBehaviors()` on the modal content
-([modal.ts:32](web/modules/contrib/neo_modal/src/js/modal.ts#L32)).
+([modal.ts:50](web/modules/contrib/neo_modal/src/js/modal.ts#L50)).
 
 ## Styling
 

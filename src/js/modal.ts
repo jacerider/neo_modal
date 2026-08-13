@@ -17,16 +17,34 @@ declare global {
       this.settings = settings;
     }
 
-    // Add a method to dispatch with jQuery compatibility
     dispatchOn(element: Element) {
-      // Use jQuery for backwards compatibility. Will be removed in Drupal 12.
-      if (typeof jQuery !== 'undefined') {
-        const eventType = this.type;
-        jQuery(element).trigger(eventType, [this.dialog, jQuery(element), this.settings]);
-      }
-      // Dispatch native event
       element.dispatchEvent(this);
     }
+  }
+
+  // Replacing core/drupal.dialog also removes core's dialog-deprecation.js,
+  // whose jQuery special-event bridge feeds the legacy
+  // (event, dialog, $element, settings) arguments to jQuery-bound listeners
+  // (e.g. webform) when the native event bubbles up. Recreate that bridge here;
+  // without it those listeners would fire with the extra arguments undefined.
+  if (typeof jQuery !== 'undefined') {
+    const eventSpecial = {
+      handle($event:any, ...args:any[]) {
+        const event = $event.originalEvent;
+        if (event instanceof DrupalDialogEvent) {
+          return $event.handleObj.handler.call(this, $event, event.dialog, jQuery($event.target), event.settings);
+        }
+        return $event.handleObj.handler.apply(this, [$event, ...args]);
+      },
+    };
+    [
+      'dialog:beforecreate',
+      'dialog:aftercreate',
+      'dialog:beforeclose',
+      'dialog:afterclose',
+    ].forEach((type) => {
+      jQuery.event.special[type] = eventSpecial;
+    });
   }
 
   const defaultOptions = {
@@ -110,6 +128,7 @@ declare global {
         }
       });
       modal.open();
+      return modal;
     },
     close: () => {
       NeoModal.closeTop();

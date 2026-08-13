@@ -160,8 +160,14 @@ function neo_modal_ajax_render_alter(array &$data) {
         if (!empty($command['dialogOptions']['position']['my'])) {
           $data[$delta]['settings']['placement'] = str_replace(' ', '-', str_replace('top', 'start', str_replace('bottom', 'end', $command['dialogOptions']['position']['my'])));
         }
+        // Whether a dialog replaces the previous one or stacks is decided
+        // client-side from the command's selector (see modal-dialog-ajax.ts),
+        // matching core's same-selector-replaces contract. The class checks
+        // below only carry per-integration sizing.
         if (!empty($command['dialogOptions']['classes'])) {
-          // Media library support.
+          // Media library support. `nest` forces stacking even when the
+          // selector collides with an open dialog (e.g. a media field widget
+          // inside a form that is itself in a dialog).
           if (in_array('media-library-widget-modal', $command['dialogOptions']['classes'])) {
             $data[$delta]['settings']['width'] = '100%';
             $data[$delta]['settings']['height'] = '100%';
@@ -172,14 +178,12 @@ function neo_modal_ajax_render_alter(array &$data) {
             if (strstr($class, 'webform-off-canvas') || strstr($class, 'webform-ui-dialog')) {
               $data[$delta]['settings']['width'] = '100%';
               $data[$delta]['settings']['height'] = '100%';
-              $data[$delta]['settings']['nest'] = TRUE;
             }
           }
           // Views UI support.
           if (in_array('views-ui-dialog js-views-ui-dialog', $command['dialogOptions']['classes'])) {
             $data[$delta]['settings']['width'] = '100%';
             $data[$delta]['settings']['height'] = '100%';
-            $data[$delta]['settings']['nest'] = FALSE;
           }
           $data[$delta]['settings']['modalClasses'] = implode(' ', $command['dialogOptions']['classes']);
         }

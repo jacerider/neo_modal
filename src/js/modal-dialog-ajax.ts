@@ -2,6 +2,14 @@ import NeoModal from "./modal/modal";
 
 (function (Drupal) {
 
+  // Open dialogs keyed by the selector core would render them into
+  // (`response.selector`, e.g. `#drupal-modal` for every data-dialog-type
+  // link). Core reuses the DOM element with that id, so opening a dialog whose
+  // selector is already on screen replaces it, while dialogs with different
+  // selectors (modal vs off-canvas) coexist. openDialog mirrors that contract
+  // through this registry instead of stacking unconditionally.
+  const dialogModals: {[selector: string]: NeoModal} = {};
+
   if (Drupal.AjaxCommands) {
 
     /**
@@ -38,12 +46,47 @@ import NeoModal from "./modal/modal";
             });
           }
         };
-        // Close any existing. May need to be reworked. Doing this just for
-        // views_ui right now.
-        if (typeof options.nest === 'undefined' || options.nest === false || options.nest === 'false') {
-          Drupal.neoModal.close();
+        // `nest` may arrive as a boolean or a data-attribute-style string.
+        const nest = options.nest === true || options.nest === 'true' ? true
+          : options.nest === false || options.nest === 'false' ? false
+          : undefined;
+        if (nest !== undefined) {
+          options.nest = nest;
         }
-        Drupal.neoModal.open(options);
+        const selector = typeof response.selector === 'string' ? response.selector : '';
+        // Same selector already open: replace it, exactly like core reusing
+        // the `#drupal-modal` element. Other modals (custom overlays, other
+        // selectors) are left alone. An explicit `nest` option still wins:
+        // true always stacks, false closes the top modal (NeoModal.open()
+        // handles that itself).
+        if (nest === undefined && selector) {
+          if (dialogModals[selector]) {
+            dialogModals[selector].close();
+            delete dialogModals[selector];
+          }
+          // An off-canvas panel replaces any open dialogs: no core flow layers
+          // a dialog-modal under an off-canvas (jQuery UI's modal overlay
+          // would block the tray), and webform depends on this — its own
+          // "close modals on off-canvas open" handler is a no-op here because
+          // it targets `.ui-dialog` markup that Neo modals don't render.
+          // Dialogs opening OVER an off-canvas (e.g. media library from
+          // layout builder) still stack.
+          if (selector.indexOf('#drupal-off-canvas') === 0) {
+            Object.keys(dialogModals).forEach((key) => {
+              dialogModals[key].close();
+              delete dialogModals[key];
+            });
+          }
+        }
+        const modal = Drupal.neoModal.open(options);
+        if (modal && selector) {
+          dialogModals[selector] = modal;
+          modal.event('onAfterClose').on(() => {
+            if (dialogModals[selector] === modal) {
+              delete dialogModals[selector];
+            }
+          });
+        }
       }
     } as drupal.Core.IAjaxCommand;
 
@@ -63,8 +106,13 @@ import NeoModal from "./modal/modal";
      * @param {number} [status]
      *   The HTTP status code.
      */
-    Drupal.AjaxCommands.prototype.closeDialog = function (_ajax, _response, _status) {
-      if (Drupal.neoModal) {
+    Drupal.AjaxCommands.prototype.closeDialog = function (_ajax, response, _status) {
+      const selector = response && typeof response.selector === 'string' ? response.selector : '';
+      if (selector && dialogModals[selector]) {
+        dialogModals[selector].close();
+        delete dialogModals[selector];
+      }
+      else if (Drupal.neoModal) {
         Drupal.neoModal.close();
       }
     } as drupal.Core.IAjaxCommand;
