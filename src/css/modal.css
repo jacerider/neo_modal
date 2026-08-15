@@ -361,8 +361,17 @@ body.has-neo-modal--loader {
     @apply block opacity-80 transition;
   }
 
+  /* `:focus-visible`, not `:focus`. The modal moves focus to this control when
+     it opens, so a plain `:focus` ring appeared on every open — including
+     pointer-driven ones, where it reads as a stray box drawn around the glyph
+     rather than as a focus indicator.
+
+     The ring answers "where will my next keystroke go?", which is a question
+     only a keyboard user has — a pointer user's cursor is already the answer.
+     `:focus-visible` is the browser making exactly that call from the input
+     mode, so keyboard users keep the ring and nobody else sees it. */
   &:active,
-  &:focus {
+  &:focus-visible {
     > span {
       @apply z-10 rounded ring ring-primary;
     }
