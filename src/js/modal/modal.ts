@@ -1864,10 +1864,19 @@ class NeoModal {
 
   protected buildCloseButton():HTMLElement|null {
     if (this.options.closeButton) {
-      this.closeButton = document.createElement('a');
+      // A <button>, not an <a href="">. This control dismisses a dialog — it is
+      // an action, not a navigation — and the element decides three things the
+      // anchor got wrong: Space did nothing (anchors activate on Enter only,
+      // Space scrolls the page), screen readers announced a link, and the empty
+      // href would reload the page if the click handler ever failed to bind.
+      //
+      // Neo's base.css styles form buttons, so .neo-modal--close carries the
+      // resets that keep this looking exactly as it did as an anchor.
+      this.closeButton = document.createElement('button');
+      this.closeButton.setAttribute('type', 'button');
       this.closeButton.classList.add('neo-modal--close');
       this.closeButton.classList.add('neo-modal--tooltip');
-      this.closeButton.setAttribute('href', '');
+      this.closeButton.setAttribute('aria-label', 'Close');
       this.closeButton.setAttribute('data-tippy-theme', 'modal');
       this.closeButton.setAttribute('data-tippy-content', 'Close');
       this.closeButton.setAttribute('data-tippy-placement', 'bottom');

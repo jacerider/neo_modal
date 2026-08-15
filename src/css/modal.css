@@ -351,7 +351,11 @@ body.has-neo-modal--loader {
 }
 
 .neo-modal--close {
-  @apply block leading-none;
+  /* Built from a <button>, so these resets are what keep it looking as it did
+     as an anchor — Neo's base.css styles form buttons. */
+  @apply block cursor-pointer appearance-none border-0 bg-transparent p-0 leading-none;
+  color: inherit;
+  font: inherit;
 
   > span {
     @apply block opacity-80 transition;
