@@ -702,7 +702,10 @@ class Modal {
       'backOutLeft' => 'Back Out Left',
       'backOutRight' => 'Back Out Right',
       'backOutUp' => 'Back Out Up',
-      'bounceOut' => 'Bounce Out',
+      // No plain 'bounceOut'. The neo catalog (neo/src/css/animate.css) ships
+      // only the four directional variants below, so that class would start no
+      // animation, animate() would never get its animationend, and the callback
+      // that completes an out-animation would never run.
       'bounceOutDown' => 'Bounce Out Down',
       'bounceOutLeft' => 'Bounce Out Left',
       'bounceOutRight' => 'Bounce Out Right',
@@ -883,6 +886,24 @@ class Modal {
       $colorScheme = 'scheme-' . $colorScheme;
     }
     $this->colorScheme = str_replace('_', '-', $colorScheme);
+    $this->colorSchemeInherit = $inherit;
+    return $this;
+  }
+
+  /**
+   * Sets whether the color scheme is inherited from the parent element.
+   *
+   * Previously reachable only as setColorScheme()'s second argument, which made
+   * it impossible to set independently -- and impossible to set at all from an
+   * options array. @see setDrag() for why the option-key spelling has to exist
+   * as a method name.
+   *
+   * @param bool $inherit
+   *   TRUE to inherit the color scheme from the parent element.
+   *
+   * @return $this
+   */
+  public function setColorSchemeInherit(bool $inherit = TRUE):self {
     $this->colorSchemeInherit = $inherit;
     return $this;
   }
@@ -1265,6 +1286,24 @@ class Modal {
   public function setDraggable(bool $drag = TRUE):self {
     $this->drag = $drag;
     return $this;
+  }
+
+  /**
+   * Sets whether the modal can be dragged.
+   *
+   * Named for the `drag` option key rather than for readability. The
+   * constructor resolves an option to a setter by name
+   * ('set' . ucfirst(Str::camel($key))), so without this alias a `drag` value
+   * coming from a preset, a block's modal settings, a #modal render array or
+   * the twig filter silently resolves to nothing and is dropped.
+   *
+   * @param bool $drag
+   *   TRUE if the modal can be dragged, FALSE otherwise.
+   *
+   * @return $this
+   */
+  public function setDrag(bool $drag = TRUE):self {
+    return $this->setDraggable($drag);
   }
 
   /**
@@ -2022,6 +2061,21 @@ class Modal {
   public function setBackdropColor(string $color):self {
     $this->backdropColorBg = $color;
     return $this;
+  }
+
+  /**
+   * Set the backdrop background color.
+   *
+   * Named for the `backdropColorBg` option key. @see setDrag() for why the
+   * option-key spelling has to exist as a method name.
+   *
+   * @param string $color
+   *   The color.
+   *
+   * @return $this
+   */
+  public function setBackdropColorBg(string $color):self {
+    return $this->setBackdropColor($color);
   }
 
   /**

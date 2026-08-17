@@ -10,6 +10,7 @@ use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceFormatterBase;
+use Drupal\media\MediaInterface;
 use Drupal\neo_image\NeoImage;
 use Drupal\neo_modal\Modal;
 use Drupal\neo_settings\Element\NeoSettingsVariation;
@@ -175,6 +176,73 @@ class NeoModalGalleryBaseFormatter extends EntityReferenceFormatterBase {
   }
 
   /**
+   * Resolves one of the getTitleOptions() choices to a string.
+   *
+   * The alt and title properties live on the field item, not on the rendered
+   * image. Both title settings used to read them back out of
+   * $elements[$delta]['image'], which is not built until later in the loop, so
+   * 'image_alt' and 'image_title' resolved to NULL -- silently dropping the
+   * thumbnail caption, and reaching the non-nullable Modal::setTitle() as a
+   * TypeError for the modal title.
+   *
+   * @param string $setting
+   *   One of the getTitleOptions() keys.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The media or file entity being displayed.
+   *
+   * @return string
+   *   The resolved title, or an empty string when there is none.
+   */
+  protected function resolveTitle($setting, EntityInterface $entity) {
+    switch ($setting) {
+      case 'entity_title':
+        return (string) $entity->label();
+
+      case 'image_alt':
+        return $this->getImageProperty($entity, 'alt');
+
+      case 'image_title':
+        return $this->getImageProperty($entity, 'title');
+    }
+    return '';
+  }
+
+  /**
+   * Reads a property off the image item behind the displayed entity.
+   *
+   * For a media entity that is the source field's item; for a file it is the
+   * referring image item, which is where an image field stores alt and title.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The media or file entity being displayed.
+   * @param string $property
+   *   The item property to read, 'alt' or 'title'.
+   *
+   * @return string
+   *   The property value, or an empty string when it is unset or the item
+   *   does not carry that property.
+   */
+  protected function getImageProperty(EntityInterface $entity, $property) {
+    $item = NULL;
+    if ($entity instanceof MediaInterface) {
+      $source = $entity->getSource();
+      $fieldName = $source->getSourceFieldDefinition($entity->bundle->entity)->getName();
+      $item = $entity->get($fieldName)->first();
+    }
+    elseif (isset($entity->_referringItem)) {
+      // Set by EntityReferenceFormatterBase::getEntitiesToView().
+      $item = $entity->_referringItem;
+    }
+    if (!$item) {
+      return '';
+    }
+    // Read the raw values rather than $item->{$property}, which throws when the
+    // item type has no such property.
+    $values = $item->getValue();
+    return (string) ($values[$property] ?? '');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function settingsSummary() {
@@ -245,20 +313,7 @@ class NeoModalGalleryBaseFormatter extends EntityReferenceFormatterBase {
 
     foreach ($entity_items as $delta => $entity) {
       /** @var \Drupal\media\MediaInterface|\Drupal\file\FileInterface $entity */
-      $title = '';
-      switch ($this->getSetting('thumbnail_title')) {
-        case 'entity_title':
-          $title = $entity->label();
-          break;
-
-        case 'image_alt':
-          $title = $elements[$delta]['image']['#alt'];
-          break;
-
-        case 'image_title':
-          $title = $elements[$delta]['image']['#title'];
-          break;
-      }
+      $title = $this->resolveTitle($this->getSetting('thumbnail_title'), $entity);
 
       $thumbnail = NeoImage::createFromEntity($entity, $title);
       $thumbnail->autoFromDimensions($thumbnailDimensions);
@@ -280,18 +335,10 @@ class NeoModalGalleryBaseFormatter extends EntityReferenceFormatterBase {
         $full->autoFromDimensions($fullDimensions);
         $modal = new Modal($full->toRenderable(), [], $this->getSetting('modal_variation'));
         $modal->setGroup($this->getSetting('modal_group') ?: 'gallery');
-        switch ($this->getSetting('modal_title')) {
-          case 'entity_title':
-            $modal->setTitle($entity->label());
-            break;
-
-          case 'image_alt':
-            $modal->setTitle($elements[$delta]['image']['#alt']);
-            break;
-
-          case 'image_title':
-            $modal->setTitle($elements[$delta]['image']['#title']);
-            break;
+        // setTitle() is not nullable, so an unresolvable title must not reach
+        // it.
+        if ($modalTitle = $this->resolveTitle($this->getSetting('modal_title'), $entity)) {
+          $modal->setTitle($modalTitle);
         }
         if (in_array($entity->bundle(), ['remote_video', 'video'])) {
           $modal->setTriggerOverlay(t('View Video'), 'play-circle');

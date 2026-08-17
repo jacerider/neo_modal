@@ -251,6 +251,9 @@ neo_modal:
     bodyLock:
       type: boolean
       label: Body Lock
+    backdrop:
+      type: boolean
+      label: Backdrop
     header:
       type: boolean
       label: Header

@@ -321,6 +321,13 @@ class NeoModal {
   protected canZoom:boolean = false;
   protected canClickContent:boolean = true;
   protected throttle:ReturnType<typeof setTimeout>|null = null;
+  // The bound listeners attached to document.body on open. addEventListener()
+  // stores the function object it was handed, so removeEventListener() has to
+  // be given that same object -- passing the unbound method never matches and
+  // silently leaves the listener attached for the life of the page.
+  protected boundKeyboardDown:((event:KeyboardEvent) => void)|null = null;
+  protected boundKeyboardUp:(() => void)|null = null;
+  protected boundFocusWatch:(() => void)|null = null;
   protected popper:Popper.instance|null = null;
   private eventSettings = new Signal<NeoModal, neoModal.NeoModalOptions>();
   private eventBeforeOpen = new Signal<NeoModal, void>();
@@ -2082,12 +2089,15 @@ class NeoModal {
 
   protected finishOpen():void {
     if (this.options.navKeyboard) {
-      document.body.addEventListener('keydown', this.onKeyboardDown.bind(this));
-      document.body.addEventListener('keyup', this.onKeyboardUp.bind(this));
+      this.boundKeyboardDown = this.onKeyboardDown.bind(this);
+      this.boundKeyboardUp = this.onKeyboardUp.bind(this);
+      document.body.addEventListener('keydown', this.boundKeyboardDown);
+      document.body.addEventListener('keyup', this.boundKeyboardUp);
     }
 
     if (this.options.fit) {
-      document.body.addEventListener('mousemove', this.focusWatch.bind(this), false);
+      this.boundFocusWatch = this.focusWatch.bind(this);
+      document.body.addEventListener('mousemove', this.boundFocusWatch, false);
       this.focusWatch();
     }
 
@@ -2255,12 +2265,23 @@ class NeoModal {
       this.originalOptions = null;
     }
 
-    if (this.options.navKeyboard) {
-      document.body.removeEventListener('keydown', this.onKeyboardDown);
-      document.body.removeEventListener('keyup', this.onKeyboardUp);
+    // Detach whatever was actually attached, rather than re-deriving it from
+    // this.options -- which rebuild() may have swapped, and which the block
+    // above has just restored, so the add-gate and the remove-gate can no
+    // longer disagree.
+    if (this.boundKeyboardDown) {
+      document.body.removeEventListener('keydown', this.boundKeyboardDown);
+      this.boundKeyboardDown = null;
+    }
+    if (this.boundKeyboardUp) {
+      document.body.removeEventListener('keyup', this.boundKeyboardUp);
+      this.boundKeyboardUp = null;
     }
     this.wrapper = null;
-    document.body.removeEventListener('mousemove', this.focusWatch);
+    if (this.boundFocusWatch) {
+      document.body.removeEventListener('mousemove', this.boundFocusWatch);
+      this.boundFocusWatch = null;
+    }
   }
 
   protected restoreContentToPlaceholder(): void {
@@ -2478,11 +2499,23 @@ class NeoModal {
   protected animate(el:HTMLElement, key:string, direction:neoModal.Movement, callback?:Function|null, speed?:string):void {
     const op = direction.charAt(0).toUpperCase() + direction.slice(1);
     const animationKey = key + 'Animate' + op as keyof neoModal.NeoModalOptions;
-    if (typeof this.options[animationKey] === 'string') {
+    // An empty animation name is the "None" choice. It has to take the no-op
+    // branch below: adding `neo-animate--` starts no animation, so the
+    // animationend that fires our callback would never arrive, and for an
+    // out-animation that callback is what completes the close.
+    if (typeof this.options[animationKey] === 'string' && this.options[animationKey] !== '') {
       const animation = this.options[animationKey];
       const animationSpeed = key + 'Animate' + op + 'Speed' as keyof neoModal.NeoModalOptions;
       const animationDelay = key + 'Animate' + op + 'Delay' as keyof neoModal.NeoModalOptions;
-      const parentCallback = () => {
+      const parentCallback = (event:AnimationEvent) => {
+        // animationend/animationcancel bubble. Without this guard a descendant
+        // finishing its own animation -- injected content carrying
+        // neo-animate--* reveals, or the zoom rules on .neo-modal--content --
+        // completes this element's run, stripping its classes mid-flight and,
+        // for an out-animation, hiding it and resolving the close early.
+        if (event.target !== el) {
+          return;
+        }
         el.removeEventListener('animationend', parentCallback);
         el.removeEventListener('animationcancel', parentCallback);
         el.classList.remove('neo-animate--animated');

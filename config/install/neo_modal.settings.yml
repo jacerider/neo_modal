@@ -18,6 +18,7 @@ nest: true
 drag: true
 inputFocus: true
 bodyLock: true
+backdrop: true
 header: true
 headerAnimate: true
 headerInContent: false
