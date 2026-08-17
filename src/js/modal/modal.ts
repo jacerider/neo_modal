@@ -283,10 +283,6 @@ class NeoModal {
     'content',
     'trigger',
   ];
-  // Options that, when boolean, should be set to default.
-  protected optionsFromBoolToDefault:Array<string> = [
-    'icon',
-  ];
   protected loader:HTMLElement|null = null;
   protected loading:boolean = false;
   protected trigger:HTMLElement|null = null;
@@ -396,14 +392,7 @@ class NeoModal {
 
   protected buildOptions(options:neoModal.NeoModalOptions):neoModal.NeoModalOptions {
     options = Object.assign({}, NeoModal.defaults, options);
-    // Set boolean options to default.
     const opts:any = {};
-    this.optionsFromBoolToDefault.forEach((key) => {
-      const val = options[key as keyof neoModal.NeoModalOptions];
-      if (typeof val === 'boolean' && val === true) {
-        opts[key] = val;
-      }
-    });
     // Get options from trigger data attributes.
     if (options.trigger instanceof HTMLElement) {
       const trigger = options.trigger;

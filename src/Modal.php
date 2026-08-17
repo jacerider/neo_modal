@@ -1118,7 +1118,7 @@ class Modal {
     $icon = $this->loadIcon($title, NULL, NULL, $prefix);
     if ($icon) {
       $this->setRawIcon($icon->getSelector());
-      $this->libraries[] = 'neo_modal/' . $icon->getLibrary()->getLibraryName();
+      $this->addIconLibrary($icon);
     }
     return $this;
   }
@@ -1150,8 +1150,35 @@ class Modal {
     $icon = $this->loadIcon(NULL, $icon, NULL, $prefix);
     if ($icon) {
       $this->setRawIcon($icon->getSelector());
+      $this->addIconLibrary($icon);
     }
     return $this;
+  }
+
+  /**
+   * Attaches the stylesheet an icon needs.
+   *
+   * The icon reaches the browser as a bare class name, so nothing else pulls in
+   * the font that renders it. neo_icon attaches only its *global* libraries on
+   * page load, so an icon from a non-global set (light, duo, brands, solid)
+   * renders as a blank glyph without this.
+   *
+   * The libraries are registered by neo_icon's hook_library_info_build(), so
+   * they belong to the neo_icon extension -- naming them 'neo_modal/…' asks for
+   * a library that does not exist and silently attaches nothing.
+   *
+   * @param \Drupal\neo_icon\IconInterface $icon
+   *   The icon whose library should be attached.
+   */
+  protected function addIconLibrary($icon):void {
+    $library = $icon->getLibrary();
+    if (!$library) {
+      return;
+    }
+    $name = 'neo_icon/' . $library->getLibraryName();
+    if (!in_array($name, $this->libraries, TRUE)) {
+      $this->libraries[] = $name;
+    }
   }
 
   /**
@@ -2351,7 +2378,7 @@ class Modal {
       if ($this->triggerOverlayIcon) {
         if ($icon = $this->loadIcon(NULL, $this->triggerOverlayIcon)) {
           $overlay['#icon'] = $icon->render();
-          $this->libraries[] = 'neo_modal/' . $icon->getLibrary()->getLibraryName();
+          $this->addIconLibrary($icon);
         }
       }
       switch ($build['#type']) {

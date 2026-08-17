@@ -484,7 +484,7 @@ body.has-neo-modal--loader {
     @apply items-start;
   }
 
-  .neo-modal--placement-top-end,
+  .neo-modal--placement-top-end &,
   .neo-modal--placement-right-start &,
   .neo-modal--placement-bottom-end &,
   .neo-modal--placement-right-end &,

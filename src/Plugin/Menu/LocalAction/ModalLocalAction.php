@@ -25,8 +25,17 @@ class ModalLocalAction extends LocalActionDefault {
       'data-dialog-type' => 'modal',
       'data-dialog-options' => Json::encode($modalOptions),
     ];
-    $options['attributes'] = $this->pluginDefinition['attributes'] ?? [];
-    $options['attributes'] = NestedArray::mergeDeep($options['attributes'], $attributes);
+    // Merge onto what the parent returned. This used to overwrite it with
+    // $this->pluginDefinition['attributes'] first, which is not a local-action
+    // plugin key at all -- so it was always empty, and the assignment silently
+    // discarded any attributes the action declared under the standard
+    // options.attributes.
+    $options['attributes'] = NestedArray::mergeDeep($options['attributes'] ?? [], $attributes);
+    if (!empty($options['attributes']['class'])) {
+      // mergeDeep appends numerically keyed values, so a caller that also
+      // declares use-ajax would otherwise get it twice.
+      $options['attributes']['class'] = array_values(array_unique($options['attributes']['class']));
+    }
 
     return $options;
   }

@@ -126,7 +126,19 @@ class NeoModal extends RenderElementBase {
     $attributes = $element['#title_attributes'] ?? $element['#attributes'];
     $element['#attributes'] = $element['#wrapper_attributes'] ?? [];
 
+    // #parents is set by FormBuilder, so its presence is what distinguishes a
+    // modal inside a form from a standalone one.
+    $inForm = !empty($element['#parents']);
+
     $options = $element['#modal'] ?: $element['#options'] ?? [];
+    if ($inForm) {
+      // A form modal defaults to smart actions, but only as a default. This
+      // used to be applied by calling setSmartActions() after construction,
+      // which overwrote whatever the caller had asked for -- making
+      // '#modal' => ['smartActions' => FALSE] impossible to express on any
+      // form modal. Union order matters: values already in $options win.
+      $options += ['smartActions' => TRUE];
+    }
     $options += [
       'title' => $element['#title'],
       'subtitle' => $element['#description'] ?? NULL,
@@ -136,16 +148,14 @@ class NeoModal extends RenderElementBase {
 
     $modal = new Modal($content, $options, $preset);
     $modal->mergeTriggerAttributes($attributes);
-    if (!empty($element['#parents'])) {
-      $modal->setSmartActions();
+    if ($inForm) {
       $modal->applyToForm($element['#title'], $content);
-      $element['trigger'] = $element['#title'];
       $element['content'] = $content;
     }
     else {
       $modal->applyTo($element['#title']);
-      $element['trigger'] = $element['#title'];
     }
+    $element['trigger'] = $element['#title'];
     return $element;
   }
 

@@ -8,9 +8,7 @@ use Drupal\neo_build\Event\NeoBuildEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class UserLoginSubscriber.
- *
- * @package Drupal\custom_events\EventSubscriber
+ * Contributes the modal's Tailwind variant and spacing scale to the Neo build.
  */
 class NeoBuildEventSubscriber implements EventSubscriberInterface {
 
@@ -22,8 +20,6 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
    */
   public function onBuild(NeoBuildEvent $event) {
     $collection = $event->getCollection();
-    $config['tailwind']['variants']['modal'] = ['.neo-modal &'];
-
     $collection->addTailwindVariants([
       'modal' => ['.neo-modal &'],
     ]);
@@ -37,24 +33,6 @@ class NeoBuildEventSubscriber implements EventSubscriberInterface {
     }
     $collection->addTailwindTheme($theme);
   }
-
-  // /**
-  //  * Subscribe to the Neo build event dispatched.
-  //  *
-  //  * @param \Drupal\custom_events\Event\UserLoginEvent $event
-  //  *   Our custom event object.
-  //  */
-  // public function onBuild(NeoBuildEvent $event) {
-  //   $config = $event->getConfig();
-  //   $config['tailwind']['variants']['modal'] = ['.neo-modal &'];
-  //   foreach ([
-  //     't', 'r', 'b', 'l',
-  //   ] as $pos) {
-  //     $theme['extend']['spacing']['modal-' . $pos] = 'var(--modal-' . $pos . ', 0px)';
-  //     $theme['extend']['spacing']['modal-content-' . $pos] = 'var(--modal-content-' . $pos . ', 0px)';
-  //   }
-  //   $event->setConfig($config);
-  // }
 
   /**
    * {@inheritdoc}

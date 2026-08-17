@@ -60,7 +60,13 @@ class TwigExtension extends AbstractExtension {
    *   The trigger element with modal functionality applied.
    */
   public static function renderModal(mixed $trigger, array $options = [], ?string $preset = NULL, $attributes = [], $trigger_attributes = []) {
-    $modal = new Modal('Modal Content', $options + [
+    // NULL, not a placeholder string. This function builds a modal whose body
+    // comes from its options (image/video/iframe/attach), so it has no inline
+    // content -- and Modal already models that as NULL. Passing text here made
+    // applyTo() emit a <template> carrying it beside every trigger, which for
+    // any option set other than the media ones rendered those literal words as
+    // the modal body.
+    $modal = new Modal(NULL, $options + [
       'scope' => TRUE,
     ], $preset);
     if ($trigger_attributes) {

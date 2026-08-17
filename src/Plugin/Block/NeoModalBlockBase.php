@@ -220,39 +220,6 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
   }
 
   /**
-   * Builds the modal trigger link.
-   *
-   * This method constructs an array representing a link that triggers the
-   * modal. The link includes an icon and text specified in the block
-   * configuration. The URL for the link is generated from a route with the
-   * block ID as a parameter.
-   *
-   * @return array
-   *   A render array representing the modal trigger link.
-   */
-  protected function buildModalTrigger(): array {
-    $modal = $this->buildModal();
-    $build = [
-      '#type' => 'link',
-      '#title' => $this->icon($this->configuration['trigger_text'], $this->configuration['trigger_icon'])
-        ->iconPosition($this->configuration['trigger_icon_position']),
-      '#url' => Url::fromRoute('neo_modal.api.block.view', [
-        'block' => $this->configuration['block_id'],
-      ]),
-    ];
-    if ($this->configuration['modal_ajax']) {
-      $build['#type'] = 'neo_modal_link';
-      $build['#modal'] = $modal->getValues();
-      $build['#modal_preset'] = $this->configuration['modal_preset'];
-    }
-    else {
-      $modal->setContent($this->buildModalContent());
-      $modal->applyTo($build);
-    }
-    return $build;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function buildModalContent(): array {
