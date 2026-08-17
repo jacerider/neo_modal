@@ -285,6 +285,9 @@ class NeoModal {
   ];
   protected loader:HTMLElement|null = null;
   protected loading:boolean = false;
+  // Increments per content build, so a build that resolves late can tell it
+  // has been superseded. @see buildContent()
+  protected contentBuildId:number = 0;
   protected trigger:HTMLElement|null = null;
   protected wrapper:HTMLElement|null = null;
   protected modal:neoModal.NeoModalElement|null = null;
@@ -296,7 +299,9 @@ class NeoModal {
   protected contentBlock:HTMLElement|null = null;
   protected contentWrapper:HTMLElement|null = null;
   protected contentInner:HTMLElement|null = null;
-  protected contentPlaceholder:HTMLElement|null = null;
+  // Content borrowed from the page, held as the node and the marker standing
+  // in for it, so it can always be handed back to exactly where it came from.
+  protected adoptedContent:{node:HTMLElement, placeholder:HTMLElement}|null = null;
   protected header:HTMLElement|null = null;
   protected headerStartOut:HTMLElement|null = null;
   protected headerEndOut:HTMLElement|null = null;
@@ -324,6 +329,7 @@ class NeoModal {
   protected boundKeyboardDown:((event:KeyboardEvent) => void)|null = null;
   protected boundKeyboardUp:(() => void)|null = null;
   protected boundFocusWatch:(() => void)|null = null;
+  protected bodyTransitionEnd:((event:Event) => void)|null = null;
   protected popper:Popper.instance|null = null;
   private eventSettings = new Signal<NeoModal, neoModal.NeoModalOptions>();
   private eventBeforeOpen = new Signal<NeoModal, void>();
@@ -363,7 +369,12 @@ class NeoModal {
   }
 
   public static getTop():NeoModal|null {
-    const modal = document.querySelector<HTMLElement>('.neo-modal:last-child') as neoModal.NeoModalElement;
+    // Taken from the open stack rather than `.neo-modal:last-child`, which
+    // also matched a modal already animating out, and which depended on the
+    // modal happening to be the last child of the wrapper it shares with the
+    // backdrop.
+    const modals = NeoModal.openModals();
+    const modal = modals[modals.length - 1] as neoModal.NeoModalElement;
     if (modal && modal.neoModal) {
       return modal.neoModal;
     }
@@ -480,6 +491,7 @@ class NeoModal {
       else {
         if (this.wrapper) {
           this.isBuilt = true;
+          this.resetBuildParts();
           this.modal = document.createElement('div') as neoModal.NeoModalElement;
           this.modal.setAttribute('id', 'neo-modal-' + Math.random().toString(36).slice(2, 11));
           this.modal.classList.add('neo-modal');
@@ -526,6 +538,10 @@ class NeoModal {
     return new Promise((resolve) => {
       if (this.modal && this.container) {
         this.container.style.setProperty('visibility', 'hidden');
+        // Hand back any page DOM the outgoing item borrowed before its
+        // container is torn down, or the node is destroyed with it.
+        this.restoreContentToPlaceholder();
+        this.resetBuildParts();
         // Reset values that may be altered in the content.
         this.canClickContent = true;
         this.canZoom = false;
@@ -767,9 +783,12 @@ class NeoModal {
       this.focusWatch();
     }
     if (this.options.closeOnEscape === true && event.key === 'Escape') {
-      const modal = document.querySelector<HTMLElement>('.neo-modal:last-child');
-      // We may have multiple modals open. Only close the top level.
-      if (modal === this.modal) {
+      // We may have multiple modals open. Only close the top level. Asking
+      // getTop() rather than comparing against `.neo-modal:last-child` also
+      // means a closed instance can no longer match: that comparison was
+      // null === null once remove() had nulled this.modal, so every dead
+      // instance still listening re-ran close() on every Escape.
+      if (NeoModal.getTop() === this) {
         this.close();
       }
     }
@@ -984,12 +1003,59 @@ class NeoModal {
     }
   }
 
+  /**
+   * The modals currently on screen, oldest first.
+   *
+   * A modal that is closing is still in the DOM until its out-animation
+   * finishes, but it is no longer part of the stack: it must not be counted
+   * when working out nesting depth, and it must not keep body-level effects
+   * alive. Every site that reasons about the stack goes through here so those
+   * sites cannot disagree with each other.
+   */
+  protected static openModals():NodeListOf<HTMLElement> {
+    return document.querySelectorAll<HTMLElement>('.neo-modal:not(.neo-modal--closing)');
+  }
+
   protected remove():void {
     if (this.modal) {
       this.modal.remove();
       this.modal = null;
       this.isBuilt = false;
     }
+    this.resetBuildParts();
+  }
+
+  /**
+   * Forget the elements that belong to one build of this modal.
+   *
+   * These are recreated by every build, but only some builders cleared their
+   * own field first -- so a rebuild (gallery navigation) could append the
+   * previous item's close button or title into the new header, and after a
+   * close the stale references were still animated and still counted by
+   * size(). Clearing them in one place means adding a part cannot introduce a
+   * forgotten reset.
+   *
+   * Deliberately NOT reset here: wrapper, backdrop, container, modal and
+   * popper belong to an open rather than a build; groupTriggers is cached
+   * across builds on purpose; adoptedContent tracks page DOM this modal
+   * borrowed and is released by restoreContentToPlaceholder().
+   */
+  protected resetBuildParts():void {
+    this.header = null;
+    this.headerStartOut = null;
+    this.headerEndOut = null;
+    this.footer = null;
+    this.footerContent = null;
+    this.content = null;
+    this.contentBlock = null;
+    this.contentWrapper = null;
+    this.contentInner = null;
+    this.title = null;
+    this.subtitle = null;
+    this.icon = null;
+    this.closeButton = null;
+    this.prev = null;
+    this.next = null;
   }
 
   /**
@@ -1250,7 +1316,21 @@ class NeoModal {
 
       element.appendChild(this.content);
 
+      // Content can resolve asynchronously -- an image onload, a video or
+      // iframe load -- and nothing cancels a build that has been superseded.
+      // Without an identity for "which build is this?", a slow item resolving
+      // after the gallery moved on re-ran bindContentEvents() against the new
+      // item (so every wheel tick zoomed twice) and hid the new item's loader
+      // early; one resolving after close ran attachBehaviors on a detached
+      // tree that detachBehaviors had already been through.
+      const buildId = ++this.contentBuildId;
       this.buildContentByType(this.contentBlock).then(() => {
+        if (buildId !== this.contentBuildId || !this.modal) {
+          // Superseded, or the modal closed while this was in flight. The
+          // promise still resolves so callers are not left hanging.
+          resolve();
+          return;
+        }
         this.eventContentLoaded.trigger(this);
         this.hideLoader();
         this.bindContentEvents();
@@ -1325,10 +1405,16 @@ class NeoModal {
       if (this.options.trigger) {
         const content = this.options.content(this.options.trigger);
         if (content instanceof HTMLElement) {
-          this.contentPlaceholder = document.createElement('template');
-          this.contentPlaceholder.classList.add('neo-modal--content-placeholder');
-          content.parentNode?.insertBefore(this.contentPlaceholder, content);
+          const placeholder = document.createElement('template');
+          placeholder.classList.add('neo-modal--content-placeholder');
+          content.parentNode?.insertBefore(placeholder, content);
           element.appendChild(content);
+          // Remember the node itself, not just where it came from. Restoring
+          // used to search the modal for `.neo-modal--template` -- a class
+          // this file does not own and that a nested trigger's own template
+          // can match first -- so content adopted from the page could be put
+          // back as the wrong node, or not at all.
+          this.adoptedContent = { node: content, placeholder };
         }
         else {
           element.innerHTML = content;
@@ -1893,14 +1979,23 @@ class NeoModal {
   }
 
   protected loaderTimeout:ReturnType<typeof setTimeout>|null = null;
+  // How this loader was shown, recorded so that hiding it does not have to
+  // re-derive the answer from this.options -- which rebuild() swaps between
+  // showLoader() and hideLoader() during gallery navigation. Reading the new
+  // item's options to tear down the previous item's loader left the
+  // full-viewport scrim painted and the body lock stranded.
+  protected loaderCallback:((movement:neoModal.Movement) => void)|null = null;
+  protected loaderLocked:boolean = false;
   protected showLoader(delay?:number):void {
     delay = typeof delay === 'number' ? delay : 300;
     if (this.options.loader && !this.loading) {
       this.loading = true;
       if (typeof this.options.loader === 'function') {
-        this.options.loader('in');
+        this.loaderCallback = this.options.loader as (movement:neoModal.Movement) => void;
+        this.loaderCallback('in');
       }
       else {
+        this.loaderCallback = null;
         this.loaderTimeout = setTimeout(() => {
           if (this.wrapper) {
             if (typeof bodyScrollLock !== 'undefined') {
@@ -1909,6 +2004,7 @@ class NeoModal {
             else {
               document.body.classList.add('has-neo-modal--loader');
             }
+            this.loaderLocked = true;
             this.loader = document.createElement('div');
             this.loader.classList.add('neo-modal--loader');
             this.loader.innerHTML = '<div><div class="neo-modal--spinner"><div></div><div></div></div></div>';
@@ -1928,23 +2024,36 @@ class NeoModal {
 
   protected hideLoader():void {
     clearTimeout(this.loaderTimeout as ReturnType<typeof setTimeout>);
-    if (this.loading && this.options.loader) {
-      this.loading = false;
-      if (typeof this.options.loader === 'function') {
-        this.options.loader('out');
+    this.loaderTimeout = null;
+    if (!this.loading) {
+      return;
+    }
+    this.loading = false;
+    // Tear down the way this loader was actually shown. Gating on
+    // this.options.loader here meant a loader shown for one gallery item could
+    // not be hidden once the next item's options replaced it.
+    if (this.loaderCallback) {
+      this.loaderCallback('out');
+      this.loaderCallback = null;
+      return;
+    }
+    if (this.loaderLocked) {
+      if (typeof bodyScrollLock !== 'undefined') {
+        bodyScrollLock.unlock();
       }
-      else if (this.loader) {
-        if (typeof bodyScrollLock !== 'undefined') {
-          bodyScrollLock.unlock();
-        }
-        else {
-          document.body.classList.remove('has-neo-modal--loader');
-        }
-        this.animateOut(this.loader, 'loader', () => {
-          this.loader?.remove();
-          this.loader = null;
-        });
+      else {
+        document.body.classList.remove('has-neo-modal--loader');
       }
+      this.loaderLocked = false;
+    }
+    if (this.loader) {
+      // Captured, because the shared slot may be reassigned by a loader shown
+      // again before this one finishes animating out.
+      const loader = this.loader;
+      this.loader = null;
+      this.animateOut(loader, 'loader', () => {
+        loader.remove();
+      });
     }
   }
 
@@ -1991,6 +2100,11 @@ class NeoModal {
       this.trigger = document.activeElement as HTMLElement;
     }
     this.isOpen = true;
+    // Re-opening during the out-animation reuses the element that close() is
+    // still tearing down, and `neo-modal--closing` is only ever added, never
+    // removed. Left on, it excludes this modal from its own stack -- so depth
+    // came up short and the backdrop teardown it gates never ran.
+    this.modal?.classList.remove('neo-modal--closing');
     this.originalOptions = Object.assign({}, this.options);
     this.buildStack();
     this.build().then(() => {
@@ -2002,6 +2116,13 @@ class NeoModal {
   }
 
   protected doOpen():void {
+    // open() defers this behind build() and a timeout, so a close() in between
+    // can have removed the modal already. Everything below dereferences it --
+    // getFixedOrStickyParents() walks parentElement from it -- and the casts
+    // hid that from the compiler.
+    if (!this.modal) {
+      return;
+    }
     this.eventOpen.trigger(this);
     // this.watchInterval = setInterval(this.watch.bind(this), 200);
     this.modal?.style.setProperty('visibility', '');
@@ -2017,7 +2138,7 @@ class NeoModal {
     this.scrollLock();
 
     // Nest other modals.
-    const modals = document.querySelectorAll<HTMLElement>('.neo-modal:not(.neo-modal--closing)');
+    const modals = NeoModal.openModals();
     this.depth = modals.length;
     for (let i = 0; i < modals.length; i++) {
       const delta = modals.length - (i + 1);
@@ -2170,7 +2291,7 @@ class NeoModal {
       this.transitionBodyOut();
 
       // Unnest other modals.
-      const modals = document.querySelectorAll<HTMLElement>('.neo-modal');
+      const modals = NeoModal.openModals();
       for (let i = 0; i < modals.length; i++) {
         const delta = modals.length - (i + 2);
         if (delta >= 0) {
@@ -2228,6 +2349,18 @@ class NeoModal {
   }
 
   protected finishClose():void {
+    // A loader scheduled but not yet painted would otherwise appear after the
+    // modal it belonged to is gone, and take the body lock with it.
+    this.hideLoader();
+
+    // The focus watcher re-arms itself on a timer. Left running, it fired
+    // three seconds after close, animated detached chrome and set focused =
+    // true on an instance that is reused the next time its trigger is clicked.
+    clearTimeout(this.focusTimeout as ReturnType<typeof setTimeout>);
+    this.focusTimeout = null;
+    this.focused = false;
+    this.focusing = false;
+
     // Restore content into placeholder.
     this.restoreContentToPlaceholder();
 
@@ -2273,14 +2406,20 @@ class NeoModal {
     }
   }
 
+  /**
+   * Return content borrowed from the page to where it came from.
+   *
+   * Identity and position are held together, so this cannot restore the wrong
+   * node and cannot leave the placeholder stranded: either the pair is present
+   * and the swap happens, or there is nothing to do.
+   */
   protected restoreContentToPlaceholder(): void {
-    if (this.contentPlaceholder) {
-      const content = this.contentInner?.querySelector('.neo-modal--template');
-      if (content) {
-        this.contentPlaceholder.parentNode?.replaceChild(content, this.contentPlaceholder);
-        this.contentPlaceholder = null;
-      }
+    if (!this.adoptedContent) {
+      return;
     }
+    const { node, placeholder } = this.adoptedContent;
+    this.adoptedContent = null;
+    placeholder.parentNode?.replaceChild(node, placeholder);
   }
 
   protected globalInit():void {
@@ -2441,7 +2580,7 @@ class NeoModal {
   // --------------------------------------------------------------------------
 
   protected transitionBodyIn():void {
-    const modals = document.querySelectorAll<HTMLElement>('.neo-modal');
+    const modals = NeoModal.openModals();
     if (modals.length > 1) {
       return;
     }
@@ -2457,7 +2596,7 @@ class NeoModal {
   }
 
   protected transitionBodyOut():void {
-    const modals = document.querySelectorAll<HTMLElement>('.neo-modal');
+    const modals = NeoModal.openModals();
     if (modals.length > 1) {
       return;
     }
@@ -2465,11 +2604,24 @@ class NeoModal {
       const body = document.querySelector(this.options.bodySelector);
       if (body) {
         body.classList.remove(...this.transitionBodyClasses());
-        const parentCallback = () => {
-          body.removeEventListener('transitionend', parentCallback);
+        // A previous close may have left one attached: if no transition ever
+        // runs, the handler below never fires and never removes itself.
+        if (this.bodyTransitionEnd) {
+          body.removeEventListener('transitionend', this.bodyTransitionEnd);
+        }
+        this.bodyTransitionEnd = (event:Event) => {
+          // transitionend bubbles, so any transition on anything inside the
+          // page wrapper would otherwise strip the class early.
+          if (event.target !== body) {
+            return;
+          }
+          if (this.bodyTransitionEnd) {
+            body.removeEventListener('transitionend', this.bodyTransitionEnd);
+            this.bodyTransitionEnd = null;
+          }
           body.classList.remove('neo-modal--body-transition');
         };
-        body.addEventListener('transitionend', parentCallback);
+        body.addEventListener('transitionend', this.bodyTransitionEnd);
       }
     }
   }

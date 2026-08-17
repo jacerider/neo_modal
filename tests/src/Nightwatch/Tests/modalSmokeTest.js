@@ -112,6 +112,45 @@ module.exports = {
       .waitForElementNotPresent(MODAL, 5000);
   },
 
+  /**
+   * Regression guard for reopening during the out-animation.
+   *
+   * close() marks the modal `neo-modal--closing` and only removes it once the
+   * animation finishes. Clicking the trigger inside that window reuses the
+   * element that is still being torn down — and that class was never removed,
+   * so the modal was excluded from its own stack: depth came up short and the
+   * backdrop teardown it gates never ran, leaving a dead backdrop over the
+   * page.
+   *
+   * close() and open() are driven back to back in one tick through the
+   * instance itself rather than through two WebDriver clicks. A click pair
+   * cannot reach this: the round trip between them is long enough for the
+   * animation to finish and the element to be removed and rebuilt, so the test
+   * passes whether or not the bug is present.
+   */
+  'reopening during the close animation clears the closing state': (browser) => {
+    openModal(browser).execute(
+      function () {
+        var el = document.querySelector('.neo-modal');
+        if (!el || !el.neoModal) {
+          return -1;
+        }
+        el.neoModal.close();
+        // Same tick: the element is still mid-teardown here.
+        el.neoModal.open();
+        return document.querySelectorAll('.neo-modal--closing').length;
+      },
+      [],
+      (result) => {
+        browser.assert.strictEqual(
+          result.value,
+          0,
+          'A modal reopened mid-close is no longer marked as closing.',
+        );
+      },
+    );
+  },
+
   'repeated open/close leaves a single wrapper behind': (browser) => {
     openModal(browser)
       .neoPressKey(browser.Keys.ESCAPE)
