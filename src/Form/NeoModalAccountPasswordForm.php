@@ -2,7 +2,6 @@
 
 namespace Drupal\neo_modal\Form;
 
-use Drupal\block\BlockInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Form\UserPasswordForm;
 
@@ -15,8 +14,12 @@ class NeoModalAccountPasswordForm extends UserPasswordForm {
 
   /**
    * {@inheritDoc}
+   *
+   * Takes no block argument. The route carries one and the controller used to
+   * forward it, but nothing here ever read it -- unlike the login form, which
+   * uses it to reach the block's modal settings.
    */
-  public function buildForm(array $form, FormStateInterface $form_state, ?BlockInterface $block = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
     $form['#id'] = 'exo-modal-account-password';
     $form['#attributes']['class'][] = 'exo-modal-account--password';

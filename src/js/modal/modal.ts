@@ -330,6 +330,8 @@ class NeoModal {
   protected boundKeyboardUp:(() => void)|null = null;
   protected boundFocusWatch:(() => void)|null = null;
   protected bodyTransitionEnd:((event:Event) => void)|null = null;
+  protected boundResize:(() => void)|null = null;
+  protected resizeFrame:number|null = null;
   protected popper:Popper.instance|null = null;
   private eventSettings = new Signal<NeoModal, neoModal.NeoModalOptions>();
   private eventBeforeOpen = new Signal<NeoModal, void>();
@@ -1226,19 +1228,29 @@ class NeoModal {
   protected dragEndY:number = 0;
   protected dragThreshold:number = 50;
   protected dragging:boolean = false;
+  /**
+   * The pointer position for a mouse or touch event.
+   *
+   * Read from the event's own shape rather than its type. Both handlers used
+   * to test `e.type === 'touchmove'`, but onDragStart is bound to touchstart
+   * and mousedown -- neither of which is touchmove -- so a touch drag took the
+   * mouse branch and read pageX/pageY, which a TouchEvent does not have. Drag
+   * to navigate was silently dead on touch.
+   */
+  protected pointerPosition(e:MouseEvent|TouchEvent):{x:number, y:number} {
+    if ('touches' in e && e.touches.length) {
+      return { x: e.touches[0].pageX, y: e.touches[0].pageY };
+    }
+    const mouse = e as MouseEvent;
+    return { x: mouse.pageX, y: mouse.pageY };
+  }
+
   protected onDragStart(e:MouseEvent|TouchEvent):void {
     if (this.contentWrapper) {
       this.dragging = true;
-      if (e.type === 'touchmove') {
-        e = e as TouchEvent;
-        this.dragStartX = this.dragEndX = e.touches[0].pageX;
-        this.dragStartY = this.dragEndY = e.touches[0].pageY;
-      }
-      else {
-        e = e as MouseEvent;
-        this.dragStartX = this.dragEndX = e.pageX;
-        this.dragStartY = this.dragEndY = e.pageY;
-      }
+      const point = this.pointerPosition(e);
+      this.dragStartX = this.dragEndX = point.x;
+      this.dragStartY = this.dragEndY = point.y;
     }
   }
 
@@ -1268,16 +1280,9 @@ class NeoModal {
   protected onDrag(e:MouseEvent|TouchEvent):void {
     if (this.dragging) {
       if (this.contentWrapper) {
-        if (e.type === 'touchmove') {
-          e = e as TouchEvent;
-          this.dragEndX = e.touches[0].pageX;
-          this.dragEndY = e.touches[0].pageY;
-        }
-        else {
-          e = e as MouseEvent;
-          this.dragEndX = e.pageX;
-          this.dragEndY = e.pageY;
-        }
+        const point = this.pointerPosition(e);
+        this.dragEndX = point.x;
+        this.dragEndY = point.y;
         const diffX = this.dragEndX - this.dragStartX;
         const diffY = this.dragEndY - this.dragStartY;
         const absDiffX = Math.abs(diffX);
@@ -2211,6 +2216,24 @@ class NeoModal {
       this.focusWatch();
     }
 
+    // size() writes the --modal-* custom properties that content lays itself
+    // out against, and decides the flush state from the container width. It
+    // ran only on build and on content mutation, so rotating a device or
+    // resizing the window left both stale. Debounced through rAF because a
+    // resize fires continuously and size() reads layout.
+    this.boundResize = () => {
+      if (this.resizeFrame !== null) {
+        return;
+      }
+      this.resizeFrame = requestAnimationFrame(() => {
+        this.resizeFrame = null;
+        if (this.modal) {
+          this.size();
+        }
+      });
+    };
+    window.addEventListener('resize', this.boundResize);
+
     const focusableElements = 'a[href], details, [tabindex]';
     const focusableFormElements = 'input:not([type=hidden]):not([type=checkbox]), textarea, select, button';
     const focusableElement = (this.options.inputFocus === true ? this.contentInner?.querySelector<HTMLElement>(
@@ -2318,7 +2341,7 @@ class NeoModal {
             this.animateOut(this.title.parentElement || this.title, 'title');
           }
           if (this.subtitle) {
-            this.animateOut(this.subtitle, 'title');
+            this.animateOut(this.subtitle, 'subtitle');
           }
           if (this.icon) {
             this.animateOut(this.icon, 'icon');
@@ -2403,6 +2426,14 @@ class NeoModal {
     if (this.boundFocusWatch) {
       document.body.removeEventListener('mousemove', this.boundFocusWatch);
       this.boundFocusWatch = null;
+    }
+    if (this.boundResize) {
+      window.removeEventListener('resize', this.boundResize);
+      this.boundResize = null;
+    }
+    if (this.resizeFrame !== null) {
+      cancelAnimationFrame(this.resizeFrame);
+      this.resizeFrame = null;
     }
   }
 

@@ -30,10 +30,10 @@ final class NeoModalAccountController extends ControllerBase {
    */
   public function register(BlockInterface $block): array {
     $user = $this->entityTypeManager()->getStorage('user')->create();
-    return $this->entityFormBuilder()->getForm($user, 'register', [
-      'block' => $block,
-      'neo_modal_account' => TRUE,
-    ]);
+    // No form-state extras: the 'block' and 'neo_modal_account' keys passed
+    // here had no reader anywhere, so they looked like an extension point that
+    // did not exist.
+    return $this->entityFormBuilder()->getForm($user, 'register');
   }
 
   /**

@@ -277,6 +277,15 @@ class NeoModalGalleryBaseFormatter extends EntityReferenceFormatterBase {
       ]);
     }
 
+    // No full image means no modal is built at all, so describing the modal
+    // settings below would advertise a lightbox this display does not have.
+    // Clearing the Full Image fieldset is the supported way to render these
+    // as plain images, so say that rather than listing inert settings.
+    if (!$fullDimensions) {
+      $summary[] = $this->t('No full image configured: images render without a modal.');
+      return $summary;
+    }
+
     if ($this->getSetting('modal_variation')) {
       $options = NeoSettingsVariation::getOptions('neo_modal.settings');
       $summary[] = $this->t('<strong>@label</strong> @value', [
@@ -309,7 +318,10 @@ class NeoModalGalleryBaseFormatter extends EntityReferenceFormatterBase {
     $thumbnailSettings = $this->getSetting('thumbnail');
     $thumbnailDimensions = $thumbnailSettings['dimensions'] ?? [];
     $fullSettings = $this->getSetting('full');
-    $fullDimensions = $fullSettings['dimensions'] ?? [];
+    // array_filter to match settingsSummary(): the two used to disagree about
+    // what counts as "no full image configured", so the summary could describe
+    // a modal that viewElements() then declined to build.
+    $fullDimensions = array_filter($fullSettings['dimensions'] ?? []);
 
     foreach ($entity_items as $delta => $entity) {
       /** @var \Drupal\media\MediaInterface|\Drupal\file\FileInterface $entity */

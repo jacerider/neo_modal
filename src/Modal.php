@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\neo_modal;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
 use Drupal\neo\Helpers\Str;
@@ -2420,11 +2421,16 @@ class Modal {
       $attribute->merge(new Attribute($triggerAttributes));
     }
     $build['#attributes'] = $attribute->toArray();
-    foreach ($this->getAttachments() as $attachmentType => $attachments) {
-      foreach ($attachments as $key => $attachment) {
-        $build['#attached'][$attachmentType][$key] = $attachment;
-      }
-    }
+    // Merged through core's own API rather than assigned key by key. `library`
+    // is a LIST, so writing $build['#attached']['library'][$key] overwrote
+    // whatever the caller already had at index 0 and 1; drupalSettings was
+    // likewise replaced two levels deep rather than merged. mergeAttachments()
+    // knows the per-type rules, so the shape of #attached stops being this
+    // method's problem.
+    $build['#attached'] = BubbleableMetadata::mergeAttachments(
+      $build['#attached'] ?? [],
+      $this->getAttachments()
+    );
     return $build;
   }
 

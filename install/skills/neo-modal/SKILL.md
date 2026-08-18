@@ -553,3 +553,27 @@ In the browser: the trigger must carry `class="use-neo-modal"` plus your
 `data-neo-modal-*` attributes; `drupalSettings.neoModal.defaults` holds the
 site-wide layer; `document.querySelector('.neo-modal').neoModal` is the live
 instance.
+
+## Tests
+
+```bash
+ddev phpunit --testsuite neo_modal     # PHP: option round trip, gallery titles, animation catalog
+ddev nightwatch neo_modal              # browser: open/close/reopen against the running site
+```
+
+The PHP suite is where the wire format is pinned — that an option handed in as
+`['drag' => FALSE]` actually comes back out of `getValues()`, that every offered
+animation names a class the neo catalog defines, and that a form modal's
+`smartActions` default stays overridable. Add to it when you add an option; a
+setter named more prettily than its option key is silently dropped by the
+constructor's name-based dispatch, and `testEmittableBooleansRoundTrip…` is what
+catches that.
+
+The Nightwatch suite is install-free: it drives the running site rather than
+building a throwaway one, so it exercises the presets actually configured here.
+Two things it needs that are easy to get wrong — wait for
+`neoWaitForAnimations()` before asserting (a modal is visible well before it has
+finished opening, and it binds its keyboard handlers in the open animation's
+callback), and use `neoPressKey()` rather than `browser.keys()`, which silently
+sends nothing under W3C. Both helpers come from neo_build. `modalInstallTest` is
+tagged `neo_install` only and does **not** pass yet — see its docblock.
