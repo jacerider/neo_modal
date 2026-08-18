@@ -9,6 +9,18 @@ neo_modal.settings:
 neo_settings.settings.neo_modal:
   type: neo_modal
 
+block.settings.neo_modal:
+  type: neo_modal_block
+  label: 'Neo modal block'
+  mapping:
+    block:
+      type: sequence
+      label: 'Content blocks'
+      sequence:
+        type: mapping
+        label: Block
+        mapping: {}
+
 block.settings.neo_modal_slide_menu:
   type: neo_modal_block
   mapping:

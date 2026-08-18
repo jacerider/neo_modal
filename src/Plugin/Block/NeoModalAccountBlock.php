@@ -129,6 +129,13 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
   public function blockForm($form, FormStateInterface $form_state) {
     $form = parent::blockForm($form, $form_state);
 
+    // This block cannot render header or footer blocks -- its theme hook has
+    // no variables for them -- so offering the chooser only collected config
+    // that was then stored, validated and never used. Existing selections are
+    // left in place rather than stripped: they are still schema-valid, and
+    // removing them would be destructive for no gain.
+    unset($form['blocks']);
+
     $formObject = $form_state->getFormObject();
     if (!$formObject instanceof BlockForm) {
       $form['standalone_notice'] = [
@@ -354,8 +361,11 @@ class NeoModalAccountBlock extends NeoModalBlockBase {
    * {@inheritdoc}
    */
   public function buildModalContent(): array {
-    $build = parent::buildModalContent();
-
+    // Deliberately not calling parent::buildModalContent(): this block renders
+    // through the neo_modal_account theme hook, whose variables are a closed
+    // list with no header or footer, and whose template never prints children.
+    // The parent's wrappers have nowhere to go, so the call was made and its
+    // result discarded on the next line. @see blockForm()
     $build = [
       '#theme' => 'neo_modal_account',
       '#account' => $this->currentUser,

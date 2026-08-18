@@ -318,7 +318,10 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
         '#type' => 'number',
         '#title' => t('Weight for @title', ['@title' => $label]),
         '#title_display' => 'invisible',
-        '#default_value' => 0,
+        // Seeded with this row's position rather than 0 for every row. With a
+        // flat 0 the drag handles had nothing to reorder relative to, so the
+        // values tabledrag wrote back carried no ordering.
+        '#default_value' => $weight,
         '#attributes' => ['class' => ['block-weight']],
       ];
       $count++;
@@ -334,6 +337,14 @@ abstract class NeoModalBlockBase extends BlockBase implements NeoModalBlockInter
     $values = $form_state->getValue($element['#parents']) ?: [];
     $values = array_filter($values, function ($value) {
       return $value['status'] == 1;
+    });
+    // Order is carried by key order in the stored map, so it has to be applied
+    // before the weights are discarded below. Without this the submitted
+    // weights -- the only thing the drag handles actually rewrite -- were
+    // thrown away and the rows kept whatever order the form tree happened to
+    // build them in, which is why dragging a row appeared to do nothing.
+    uasort($values, function ($a, $b) {
+      return ($a['weight'] ?? 0) <=> ($b['weight'] ?? 0);
     });
     array_walk($values, function (&$value) {
       unset($value['status'], $value['weight']);

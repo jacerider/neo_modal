@@ -54,11 +54,19 @@ class NeoModalConfirm extends NeoModal {
       '#submit_element' => [],
       '#modal_title' => t('Confirm'),
       '#modal_preset' => 'shelf_top',
-      '#modal' => [
-        'scope' => TRUE,
-        'smartActions' => TRUE,
-      ],
     ] + parent::getInfo();
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * These used to live in #modal here, where a caller passing their own #modal
+   * replaced the array wholesale and silently lost them. smartActions is no
+   * longer listed: a confirm is always a form element, and form modals default
+   * to smart actions already.
+   */
+  protected static function modalDefaults(): array {
+    return ['scope' => TRUE] + parent::modalDefaults();
   }
 
   /**

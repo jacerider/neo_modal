@@ -50,6 +50,12 @@ class NeoModal extends RenderElementBase {
       '#title' => '',
       '#close' => '',
       '#modal' => [],
+      // Declared because preRenderModal() reads them. Undeclared, a bare
+      // ['#type' => 'neo_modal'] warned on the missing key and then handed
+      // NULL to Attribute, which warns again and drops the trigger's
+      // attributes entirely.
+      '#attributes' => [],
+      '#title_attributes' => NULL,
       '#modal_preset' => NULL,
       '#optional' => FALSE,
       '#process' => [
@@ -65,6 +71,20 @@ class NeoModal extends RenderElementBase {
       '#wrapper_attributes' => [],
       '#value' => NULL,
     ];
+  }
+
+  /**
+   * Modal options a subclass wants by default.
+   *
+   * Returned separately rather than declared inside #modal in getInfo(),
+   * because element info is applied with a shallow union: a caller passing any
+   * #modal at all would replace the whole array and lose them.
+   *
+   * @return array
+   *   Modal options, each overridable by the caller's own #modal.
+   */
+  protected static function modalDefaults(): array {
+    return [];
   }
 
   /**
@@ -123,14 +143,22 @@ class NeoModal extends RenderElementBase {
       ];
     }
 
-    $attributes = $element['#title_attributes'] ?? $element['#attributes'];
+    // Both are declared in getInfo(), but this is a public static that can be
+    // called with a hand-built element, so neither key is assumed present.
+    $attributes = ($element['#title_attributes'] ?? NULL) ?: ($element['#attributes'] ?? []);
     $element['#attributes'] = $element['#wrapper_attributes'] ?? [];
 
     // #parents is set by FormBuilder, so its presence is what distinguishes a
     // modal inside a form from a standalone one.
     $inForm = !empty($element['#parents']);
 
-    $options = $element['#modal'] ?: $element['#options'] ?? [];
+    // Unioned per key, not chosen between. Drupal applies element info with a
+    // shallow +=, so a subclass declaring its defaults inside #modal loses all
+    // of them the moment a caller passes a #modal of their own -- writing
+    // '#modal' => ['title' => 'X'] on a neo_modal_confirm used to drop its
+    // scope, and with it the neo-modal--scoped class, silently. Defaults now
+    // come from modalDefaults(), which merges rather than replaces.
+    $options = $element['#modal'] + ($element['#options'] ?? []) + static::modalDefaults();
     if ($inForm) {
       // A form modal defaults to smart actions, but only as a default. This
       // used to be applied by calling setSmartActions() after construction,

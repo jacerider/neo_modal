@@ -6,6 +6,7 @@ namespace Drupal\Tests\neo_modal\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\neo_modal\Element\NeoModal;
+use Drupal\neo_modal\Element\NeoModalConfirm;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
@@ -69,6 +70,38 @@ class NeoModalElementTest extends KernelTestBase {
   public function testNonFormModalDoesNotSetSmartActions(): void {
     $attributes = $this->triggerAttributes([]);
     $this->assertArrayNotHasKey('data-neo-modal-smartActions', $attributes);
+  }
+
+  /**
+   * A subclass default survives a caller passing its own #modal.
+   *
+   * The neo_modal_confirm element wants scope on, which is what puts
+   * neo-modal--scoped on the modal. That default used to live inside #modal in
+   * getInfo(), and Drupal applies element info with a shallow union — so a
+   * caller passing any #modal of their own replaced the whole array and
+   * silently dropped it. The shelf_top preset it uses ships scope: false, so
+   * nothing downstream restored it.
+   */
+  public function testSubclassModalDefaultSurvivesCallerOptions(): void {
+    // Real element info, so the shallow union Drupal performs is the one under
+    // test rather than something reconstructed here.
+    $info = $this->container->get('plugin.manager.element_info')
+      ->getInfo('neo_modal_confirm');
+    $element = [
+      '#title' => 'Delete',
+      '#parents' => ['thing'],
+      // The caller cares about the title and says nothing about scope.
+      '#modal' => ['title' => 'Are you sure?'],
+      '#description' => NULL,
+      '#modal_title' => NULL,
+      '#children' => '',
+    ] + $info;
+
+    $result = NeoModalConfirm::preRenderModal($element);
+    // Scope becomes a class on the modal, carried to the client through the
+    // modalClasses data attribute rather than applied to the trigger.
+    $modalClasses = $result['trigger']['#attributes']['data-neo-modal-modalClasses'] ?? '';
+    $this->assertStringContainsString('neo-modal--scoped', $modalClasses);
   }
 
   /**
