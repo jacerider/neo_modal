@@ -344,7 +344,7 @@ Extend `NeoModalBlockBase` (or apply `NeoModalBlockTrait` to an existing block)
 to get a *Modal Preset* selector, the full modal settings subform, a configurable
 trigger (text, icon, icon-only, icon position, URL) and an optional **Load modal
 content via AJAX** mode that renders the block body at
-`/api/modal/block/{block}/{arg1}/{arg2}` instead of inlining it.
+`/api/modal/block/{block}` instead of inlining it.
 
 Implement `buildModalContent()`; override `neoModalForceConfiguration()` to
 hard-lock options that site builders should not change. The module ships

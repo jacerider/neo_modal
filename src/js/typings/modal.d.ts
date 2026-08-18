@@ -52,7 +52,7 @@ declare namespace neoModal {
     videoAutoplay:boolean;
     videoRatio:VideoRatio;
     smartActions:boolean;
-    buttons:NeoModalButtons?;
+    buttons:NeoModalButtons|null;
     content:((ref: HTMLElement) => HTMLElement|string)|HTMLElement|string|null;
     contentPadding:string|number;
     contentScroll:boolean;
@@ -97,7 +97,7 @@ declare namespace neoModal {
     footerColor:string;
     footerColorBg:string;
     title:string|null;
-    titleCallback:?string;
+    titleCallback:string|null;
     titleAnimateIn:AnimationIn|boolean;
     titleAnimateInSpeed:AnimationSpeed|null;
     titleAnimateInDelay:AnimationDelay|null;
@@ -169,43 +169,64 @@ declare namespace neoModal {
     svgIconDownload:string;
     svgIconShare:string;
     svgIconLink:string;
-    onSettings:((modal:NeoModal, data?:any) => void)|null;
-    onBeforeOpen:((modal:NeoModal, data?:any) => void)|null;
-    onOpen:((modal:NeoModal, data?:any) => void)|null;
-    onAfterOpen:((modal:NeoModal, data?:any) => void)|null;
-    onBeforeClose:((modal:NeoModal, data?:any) => void)|null;
-    onClose:((modal:NeoModal, data?:any) => void)|null;
-    onAfterClose:((modal:NeoModal, data?:any) => void)|null;
-    onBeforeNext:((modal:NeoModal, data?:any) => void)|null;
-    onNext:((modal:NeoModal, data?:any) => void)|null;
-    onAfterNext:((modal:NeoModal, data?:any) => void)|null;
-    onBeforePrev:((modal:NeoModal, data?:any) => void)|null;
-    onPrev:((modal:NeoModal, data?:any) => void)|null;
-    onAfterPrev:((modal:NeoModal, data?:any) => void)|null;
-    onContentLoaded:((content:HTMLElement, modal:NeoModal) => void)|null;
-  };
-
-  interface NeoModalElement extends HTMLDivElement {
-    neoModal:NeoModal;
+    onSettings:((modal:NeoModalInstance, data?:any) => void)|null;
+    onBeforeOpen:((modal:NeoModalInstance, data?:any) => void)|null;
+    onOpen:((modal:NeoModalInstance, data?:any) => void)|null;
+    onAfterOpen:((modal:NeoModalInstance, data?:any) => void)|null;
+    onBeforeClose:((modal:NeoModalInstance, data?:any) => void)|null;
+    onClose:((modal:NeoModalInstance, data?:any) => void)|null;
+    onAfterClose:((modal:NeoModalInstance, data?:any) => void)|null;
+    onBeforeNext:((modal:NeoModalInstance, data?:any) => void)|null;
+    onNext:((modal:NeoModalInstance, data?:any) => void)|null;
+    onAfterNext:((modal:NeoModalInstance, data?:any) => void)|null;
+    onBeforePrev:((modal:NeoModalInstance, data?:any) => void)|null;
+    onPrev:((modal:NeoModalInstance, data?:any) => void)|null;
+    onAfterPrev:((modal:NeoModalInstance, data?:any) => void)|null;
+    onContentLoaded:((content:HTMLElement, modal:NeoModalInstance) => void)|null;
   }
 
-  interface NeoModalTriggerElement extends HTMLDivElement {
-    neoModalOptions:NeoModalOptions;
-  }
+  /**
+   * The options a caller supplies.
+   *
+   * Every NeoModalOptions member is required, because that interface describes
+   * the RESOLVED option set after the defaults are merged in. Demanding all of
+   * them at the call site made the type unusable, so every caller reached for
+   * `any` instead -- including consumers outside this module. This is the
+   * shape to accept from callers; NeoModalOptions is what the modal holds.
+   */
+  type NeoModalUserOptions = Partial<NeoModalOptions>;
 
-  interface NeoModalStatic {
-    new (options:NeoModalOptions):NeoModal;
-    static setDefaultOptions(options:any):void;
-    static closeTop():void;
-    static getTop():NeoModal|null;
-    open ():void;
-    close ():void;
+  /** The public surface of a modal instance. */
+  interface NeoModalInstance {
+    open():void;
+    close():void;
     size():void;
     refreshContent():void;
     getModal():HTMLElement|null;
     getContent():HTMLElement|null;
     getOption(option:string):any;
     event(eventName:string):any|null;
+  }
+
+  interface NeoModalElement extends HTMLElement {
+    neoModal:NeoModalInstance;
+  }
+
+  interface NeoModalTriggerElement extends HTMLElement {
+    neoModalOptions:NeoModalOptions;
+  }
+
+  /**
+   * The constructor object.
+   *
+   * Split from the instance surface: this interface used to describe both, and
+   * marked three members `static`, which is not valid on an interface member.
+   */
+  interface NeoModalStatic {
+    new (options:NeoModalUserOptions):NeoModalInstance;
+    setDefaultOptions(options:NeoModalUserOptions):void;
+    closeTop():void;
+    getTop():NeoModalInstance|null;
   }
 
   type Placement =
@@ -386,5 +407,5 @@ declare namespace neoModal {
 declare var NeoModal: neoModal.NeoModalStatic;
 
 interface Window {
-  NeoModal: NeoModal;
+  NeoModal: neoModal.NeoModalStatic;
 }

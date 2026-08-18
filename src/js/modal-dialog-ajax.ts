@@ -8,7 +8,7 @@ import NeoModal from "./modal/modal";
   // selector is already on screen replaces it, while dialogs with different
   // selectors (modal vs off-canvas) coexist. openDialog mirrors that contract
   // through this registry instead of stacking unconditionally.
-  const dialogModals: {[selector: string]: NeoModal} = {};
+  const dialogModals: {[selector: string]: neoModal.NeoModalInstance} = {};
 
   if (Drupal.AjaxCommands) {
 

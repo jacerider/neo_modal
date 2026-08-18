@@ -42,8 +42,8 @@ final class NeoModalAccountController extends ControllerBase {
    * @return array
    *   A render array.
    */
-  public function password(BlockInterface $block): array {
-    return $this->formBuilder()->getForm('\Drupal\neo_modal\Form\NeoModalAccountPasswordForm', $block);
+  public function password(): array {
+    return $this->formBuilder()->getForm('\Drupal\neo_modal\Form\NeoModalAccountPasswordForm');
   }
 
 }

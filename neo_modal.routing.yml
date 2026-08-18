@@ -1,10 +1,8 @@
 neo_modal.api.block.view:
-  path: '/api/modal/block/{block}/{arg1}/{arg2}'
+  path: '/api/modal/block/{block}'
   defaults:
     _title_callback: '\Drupal\neo_modal\Controller\NeoModalBlockController::getTitle'
     _controller: '\Drupal\neo_modal\Controller\NeoModalBlockController'
-    arg1: NULL
-    arg2: NULL
   requirements:
     _entity_access: 'block.view'
 
@@ -28,8 +26,10 @@ neo_modal.api.account.register:
   options:
     _maintenance_access: TRUE
 
+# No {block}: the password form reads nothing from it. The login form links
+# here, and it is the only thing that does.
 neo_modal.api.account.password:
-  path: '/api/modal/block/{block}/password'
+  path: '/api/modal/account/password'
   defaults:
     _controller: '\Drupal\neo_modal\Controller\NeoModalAccountController::password'
     _title: 'Log in'

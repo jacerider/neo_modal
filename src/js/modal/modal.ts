@@ -378,7 +378,7 @@ class NeoModal {
     const modals = NeoModal.openModals();
     const modal = modals[modals.length - 1] as neoModal.NeoModalElement;
     if (modal && modal.neoModal) {
-      return modal.neoModal;
+      return modal.neoModal as unknown as NeoModal;
     }
     return null;
   }
@@ -494,7 +494,7 @@ class NeoModal {
         if (this.wrapper) {
           this.isBuilt = true;
           this.resetBuildParts();
-          this.modal = document.createElement('div') as neoModal.NeoModalElement;
+          this.modal = document.createElement('div') as unknown as neoModal.NeoModalElement;
           this.modal.setAttribute('id', 'neo-modal-' + Math.random().toString(36).slice(2, 11));
           this.modal.classList.add('neo-modal');
           if (this.options.modalClasses) {
@@ -2152,7 +2152,7 @@ class NeoModal {
     if (modals.length > 1) {
       const modal = modals[modals.length - 2] as neoModal.NeoModalElement;
       if (modal.neoModal) {
-        modal.neoModal.focusIn();
+        (modal.neoModal as unknown as NeoModal).focusIn();
       }
     }
 
@@ -2324,8 +2324,8 @@ class NeoModal {
       if (modals.length - 1 > 0) {
         const modal = modals[modals.length - 2] as neoModal.NeoModalElement;
         if (modal.neoModal) {
-          modal.neoModal.focusOut();
-          modal.neoModal.buildStack();
+          (modal.neoModal as unknown as NeoModal).focusOut();
+          (modal.neoModal as unknown as NeoModal).buildStack();
         }
       }
 
@@ -2746,6 +2746,6 @@ class NeoModal {
 
 }
 
-window.NeoModal = NeoModal;
+window.NeoModal = NeoModal as unknown as neoModal.NeoModalStatic;
 
 export default NeoModal;

@@ -17,20 +17,16 @@ final class NeoModalBlockController extends ControllerBase {
    * Builds the response.
    *
    * @param \Drupal\block\BlockInterface $block
-   *   The eXo toolbar item.
-   * @param string|null $arg1
-   *   An optional argument.
-   * @param string|null $arg2
-   *   An optional argument.
+   *   The block whose modal content is being requested.
    *
    * @return array
    *   A render array.
    */
-  public function __invoke(BlockInterface $block, ?string $arg1 = NULL, ?string $arg2 = NULL): array {
+  public function __invoke(BlockInterface $block): array {
     $build = [];
     $plugin = $block->getPlugin();
     if ($plugin instanceof NeoModalBlockInterface) {
-      $build = $plugin->buildModalContent($arg1, $arg2);
+      $build = $plugin->buildModalContent();
     }
     return $build;
   }
@@ -39,20 +35,16 @@ final class NeoModalBlockController extends ControllerBase {
    * Title callback for the route.
    *
    * @param \Drupal\block\BlockInterface $block
-   *   The eXo toolbar item.
-   * @param string|null $arg1
-   *   An optional argument.
-   * @param string|null $arg2
-   *   An optional argument.
+   *   The block whose modal title is being requested.
    *
    * @return string
    *   The modal title.
    */
-  public function getTitle(BlockInterface $block, ?string $arg1 = NULL, ?string $arg2 = NULL): string {
+  public function getTitle(BlockInterface $block): string {
     $title = '';
     $plugin = $block->getPlugin();
     if ($plugin instanceof NeoModalBlockInterface) {
-      $title = $plugin->getModalTitle($arg1, $arg2);
+      $title = $plugin->getModalTitle();
     }
     return $title;
   }

@@ -6,6 +6,7 @@ use Drupal\block\BlockInterface;
 use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\neo_modal\Plugin\Block\NeoModalBlockInterface;
 use Drupal\user\Form\UserLoginForm;
 
 /**
@@ -37,7 +38,7 @@ class NeoModalAccountLoginForm extends UserLoginForm {
       $form['forgot'] = [
         '#type' => 'neo_modal_link',
         '#title' => $this->t('Forgot your password?'),
-        '#url' => Url::fromRoute('neo_modal.api.account.password', ['block' => $block->id()]),
+        '#url' => Url::fromRoute('neo_modal.api.account.password'),
       ];
     }
 
@@ -51,7 +52,10 @@ class NeoModalAccountLoginForm extends UserLoginForm {
       '#check_ajax' => TRUE,
     ];
 
-    if ($block && isset($form['forgot'])) {
+    // Guarded like NeoModalBlockController does: any block id resolves on this
+    // route, and reading ['modal'] off an unrelated plugin's configuration
+    // degraded quietly instead of simply not decorating the link.
+    if ($block && isset($form['forgot']) && $block->getPlugin() instanceof NeoModalBlockInterface) {
       $configuration = $block->getPlugin()->getConfiguration();
       if ($this->isAjax() && ($configuration['modal'] ?? NULL)) {
         $form['forgot']['#modal'] = ['nest' => TRUE, 'smartActions' => TRUE] + $configuration['modal'];

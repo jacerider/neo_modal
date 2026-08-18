@@ -464,7 +464,7 @@ Extend
 (or use `NeoModalBlockTrait` on an existing block) to get a "Modal Preset" +
 full modal settings subform, a trigger (text/icon/icon-only/position/URL), and
 an optional **Load modal content via AJAX** mode that renders the block body at
-`/api/modal/block/{block}/{arg1}/{arg2}` instead of inlining it. Implement
+`/api/modal/block/{block}` instead of inlining it. Implement
 `buildModalContent()`; override `neoModalForceConfiguration()` to hard-lock
 options. Shipped blocks: `neo_modal_slide_menu`, `neo_modal_account`.
 
