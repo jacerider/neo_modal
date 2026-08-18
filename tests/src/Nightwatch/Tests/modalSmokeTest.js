@@ -151,6 +151,89 @@ module.exports = {
     );
   },
 
+  /**
+   * Regression guard for closing the upper half of a nested pair.
+   *
+   * A stacked modal pushes the one under it down a level: it takes a
+   * `data-neo-modal--depth` the stylesheet fades and shrinks it by, and its
+   * chrome is animated away behind `neo-modal--focus`. Closing the modal on top
+   * has to hand both back, or what is left on screen is a half-transparent,
+   * scaled-down panel that nothing can be done with — and no way out of it,
+   * because the close control went with the chrome.
+   *
+   * The stack is read from `.neo-modal:not(.neo-modal--closing)`, so a modal
+   * counts itself while opening and not while closing. Depth arithmetic written
+   * for one of those is off by one in the other, and this is the case that
+   * catches it: with a single modal left, the wrong offset skips it entirely
+   * and its depth is never cleared.
+   *
+   * The nested modal is opened through the JS API rather than a second trigger
+   * because the front page renders exactly one modal trigger to anonymous
+   * visitors, and this file does not install a site to add another.
+   */
+  'closing a nested modal restores the one underneath': (browser) => {
+    const NESTED = '.neo-modal--nested-probe';
+
+    openModal(browser)
+      .execute(
+        function () {
+          Drupal.neoModal.open({
+            modalClasses: 'neo-modal--nested-probe',
+            content: '<p>Nested</p>',
+          });
+        },
+        [],
+      )
+      .waitForElementVisible(NESTED, 5000)
+      .neoWaitForAnimations(NESTED)
+      .execute(
+        function () {
+          const below = document.querySelector(
+            '.neo-modal:not(.neo-modal--nested-probe)',
+          );
+          return below ? below.getAttribute('data-neo-modal--depth') : null;
+        },
+        [],
+        (result) => {
+          browser.assert.strictEqual(
+            result.value,
+            '1',
+            'The modal underneath dropped a level while one was stacked on it.',
+          );
+        },
+      )
+      // closeTop(), the same path the close control and Escape take.
+      .execute(function () {
+        Drupal.neoModal.close();
+      }, [])
+      .waitForElementNotPresent(NESTED, 5000)
+      .execute(
+        function () {
+          const below = document.querySelector('.neo-modal');
+          return {
+            depth: below ? below.getAttribute('data-neo-modal--depth') : 'gone',
+            focus: below ? below.classList.contains('neo-modal--focus') : true,
+          };
+        },
+        [],
+        (result) => {
+          browser.assert.strictEqual(
+            result.value.depth,
+            null,
+            'The modal left behind is back at the top of the stack.',
+          );
+          browser.assert.strictEqual(
+            result.value.focus,
+            false,
+            'The modal left behind got its chrome back.',
+          );
+        },
+      )
+      // It has to be usable again, which is the point of all of the above.
+      .neoPressKey(browser.Keys.ESCAPE)
+      .waitForElementNotPresent(MODAL, 5000);
+  },
+
   'repeated open/close leaves a single wrapper behind': (browser) => {
     openModal(browser)
       .neoPressKey(browser.Keys.ESCAPE)

@@ -856,6 +856,15 @@ class NeoModal {
       this.animateOut(this.footer, 'footer', callback, 'default');
       callback = null;
     }
+    // Nothing was animated, so nothing is going to report back. Settling here
+    // instead of waiting for a callback that will never come: a modal with no
+    // chrome to hide -- headerInContent and no nav or footer, which is what an
+    // AJAX dialog is -- otherwise stayed `focusing` for good, and focusOut()
+    // returns early while that is set. It kept `neo-modal--focus`, and on an
+    // iframe modal that class is pointer-events: none.
+    if (callback) {
+      callback();
+    }
     this.focused = true;
   }
 
@@ -1016,6 +1025,31 @@ class NeoModal {
    */
   protected static openModals():NodeListOf<HTMLElement> {
     return document.querySelectorAll<HTMLElement>('.neo-modal:not(.neo-modal--closing)');
+  }
+
+  /**
+   * Stamp each modal with how far it sits below the top of the stack.
+   *
+   * The top modal carries no `data-neo-modal--depth`; the one under it carries
+   * `1`, and so on -- the attribute the stylesheet reads to shrink and fade a
+   * modal that something is stacked on top of.
+   *
+   * Derived from the live stack rather than from an offset the caller supplies,
+   * because openModals() drops a modal the moment it starts closing: open()
+   * counted itself and close() did not, so the two callers needed different
+   * arithmetic to mean the same thing, and the closing one was left with the
+   * arithmetic for the other. That put the modal underneath a nested one at
+   * depth 1 forever -- half-faded, scaled down and unusable -- once the modal
+   * above it went away.
+   */
+  protected static restack():void {
+    const modals = NeoModal.openModals();
+    for (let i = 0; i < modals.length; i++) {
+      const depth = modals.length - (i + 1);
+      depth === 0
+        ? modals[i].removeAttribute('data-neo-modal--depth')
+        : modals[i].setAttribute('data-neo-modal--depth', depth + '');
+    }
   }
 
   protected remove():void {
@@ -2142,13 +2176,11 @@ class NeoModal {
     this.transitionBodyIn();
     this.scrollLock();
 
-    // Nest other modals.
+    // Nest other modals. This modal is now the top of the stack, so everything
+    // already open drops a level.
     const modals = NeoModal.openModals();
     this.depth = modals.length;
-    for (let i = 0; i < modals.length; i++) {
-      const delta = modals.length - (i + 1);
-      delta === 0 ? modals[i].removeAttribute('data-neo-modal--depth') : modals[i].setAttribute('data-neo-modal--depth', delta + '');
-    }
+    NeoModal.restack();
     if (modals.length > 1) {
       const modal = modals[modals.length - 2] as neoModal.NeoModalElement;
       if (modal.neoModal) {
@@ -2313,16 +2345,14 @@ class NeoModal {
 
       this.transitionBodyOut();
 
-      // Unnest other modals.
+      // Unnest other modals. close() has already taken this one out of the
+      // stack, so whatever is left rises a level and the last of them is the
+      // new top: it gets its chrome back and re-asserts its own wrapper and
+      // backdrop styling, which this modal overwrote when it stacked on top.
       const modals = NeoModal.openModals();
-      for (let i = 0; i < modals.length; i++) {
-        const delta = modals.length - (i + 2);
-        if (delta >= 0) {
-          delta === 0 ? modals[i].removeAttribute('data-neo-modal--depth') : modals[i].setAttribute('data-neo-modal--depth', delta + '');
-        }
-      }
-      if (modals.length - 1 > 0) {
-        const modal = modals[modals.length - 2] as neoModal.NeoModalElement;
+      NeoModal.restack();
+      if (modals.length > 0) {
+        const modal = modals[modals.length - 1] as neoModal.NeoModalElement;
         if (modal.neoModal) {
           (modal.neoModal as unknown as NeoModal).focusOut();
           (modal.neoModal as unknown as NeoModal).buildStack();
@@ -2611,6 +2641,8 @@ class NeoModal {
   // --------------------------------------------------------------------------
 
   protected transitionBodyIn():void {
+    // `> 1` because this modal is already in the stack by now: anything beyond
+    // it is a modal that was open first and has already done this.
     const modals = NeoModal.openModals();
     if (modals.length > 1) {
       return;
@@ -2627,8 +2659,11 @@ class NeoModal {
   }
 
   protected transitionBodyOut():void {
+    // Not `> 1` as on the way in: close() has already dropped this modal from
+    // the stack, so a single survivor here is another modal still on screen,
+    // and the page behind it has to stay scaled and blurred for it.
     const modals = NeoModal.openModals();
-    if (modals.length > 1) {
+    if (modals.length > 0) {
       return;
     }
     if (this.options.bodyTransitionScale || this.options.bodyTransitionBlur) {
