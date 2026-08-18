@@ -56,7 +56,12 @@ class NeoModalCommand implements CommandInterface, CommandWithAttachedAssetsInte
     return [
       'command' => 'neoModal',
       'data' => $this->getRenderedContent(),
-      'settings' => $this->settings,
+      // Callers commonly hand this Modal::getValues(), which renders booleans
+      // as the strings 'true'/'false' for data-neo-modal-* attributes. Nothing
+      // coerces them back on this path, so 'false' would arrive truthy and
+      // switch the option on. Decoding is a no-op for values that are already
+      // booleans, so passing either form works.
+      'settings' => _neo_modal_decode_values($this->settings),
     ];
   }
 

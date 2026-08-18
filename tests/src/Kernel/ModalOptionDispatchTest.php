@@ -162,6 +162,35 @@ class ModalOptionDispatchTest extends KernelTestBase {
   }
 
   /**
+   * Setting both header options emits both.
+   *
+   * These are two independent options, but were emitted from the two arms of
+   * one if/elseif — and the first arm fires whenever `header` merely differs
+   * from config, so headerInContent was silently dropped alongside it.
+   */
+  public function testHeaderAndHeaderInContentAreIndependent(): void {
+    $values = (new Modal(NULL, [
+      'header' => FALSE,
+      'headerInContent' => TRUE,
+    ]))->getValues();
+
+    $this->assertSame('false', $values['header'] ?? NULL);
+    $this->assertSame('true', $values['headerInContent'] ?? NULL);
+  }
+
+  /**
+   * An attach placement is emitted on its own.
+   *
+   * It used to be nested inside the `attach` branch, which tests difference
+   * from config rather than whether a value was set — so a modal whose attach
+   * selector matched the configured one lost its placement too.
+   */
+  public function testAttachPlacementIsEmittedIndependently(): void {
+    $values = (new Modal(NULL, ['attachPlacement' => 'top-start']))->getValues();
+    $this->assertSame('top-start', $values['attachPlacement'] ?? NULL);
+  }
+
+  /**
    * An unmodified modal emits nothing.
    *
    * The serializer returns a diff against the active settings, so the

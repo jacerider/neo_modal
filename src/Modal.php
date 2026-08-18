@@ -2150,14 +2150,21 @@ class Modal {
     }
     if ($this->attach && $this->attach !== $this->getSettings()->getDiffConfigValue('attach')) {
       $settings['attach'] = $this->attach;
-      if ($this->attachPlacement && $this->attachPlacement !== $this->getSettings()->getDiffConfigValue('attachPlacement')) {
-        $settings['attachPlacement'] = $this->attachPlacement;
-      }
     }
-    if (!is_null($this->header) && (bool) $this->header !== (bool) $this->getSettings()->getDiffConfigValue('header', TRUE)) {
+    // Emitted independently of `attach`. Nesting it inside that branch meant a
+    // modal whose attach selector happened to equal the configured one lost
+    // its placement too, because the outer condition tests difference from
+    // config rather than whether a value was set.
+    if ($this->attachPlacement && $this->attachPlacement !== $this->getSettings()->getDiffConfigValue('attachPlacement')) {
+      $settings['attachPlacement'] = $this->attachPlacement;
+    }
+    // Two independent options, not two branches of one choice. As an elseif,
+    // setting both emitted only `header`: the first arm fires whenever header
+    // merely *differs* from config, so headerInContent was silently dropped.
+    if (!is_null($this->header) && (bool) $this->header !== (bool) $this->getSettings()->getConfigValue('header')) {
       $settings['header'] = (bool) $this->header ? 'true' : 'false';
     }
-    elseif (!is_null($this->headerInContent) && (bool) $this->headerInContent !== (bool) $this->getSettings()->getDiffConfigValue('headerInContent', FALSE)) {
+    if (!is_null($this->headerInContent) && (bool) $this->headerInContent !== (bool) $this->getSettings()->getConfigValue('headerInContent')) {
       $settings['headerInContent'] = (bool) $this->headerInContent ? 'true' : 'false';
     }
     if (!is_null($this->modalClasses)) {
@@ -2216,26 +2223,37 @@ class Modal {
         $settings[$key] = $this->$key;
       }
     }
-    // Boolean options.
+    // Boolean options. The baseline for each comes from the shipped settings,
+    // which is where these defaults are declared — restating them here meant
+    // two copies that nothing kept in step, and a key missing from config (as
+    // `backdrop` was) looked correct here while the settings form silently
+    // discarded it.
     foreach ([
-      'colorSchemeInherit' => FALSE,
-      'backdrop' => TRUE,
-      'footer' => TRUE,
-      'drag' => TRUE,
-      'contentScroll' => FALSE,
-      'smartActions' => FALSE,
-      'numeration' => FALSE,
-      'fit' => FALSE,
-      'nest' => TRUE,
-      'inputFocus' => TRUE,
-      'bodyLock' => TRUE,
-      'downloadLink' => TRUE,
-      'shareLink' => TRUE,
-      'copyLink' => TRUE,
-      'bodyTransitionScale' => FALSE,
-      'bodyTransitionBlur' => FALSE,
-    ] as $key => $default) {
-      if (!is_null($this->$key) && (bool) $this->$key !== (bool) $this->getSettings()->getDiffConfigValue($key, $default)) {
+      'backdrop',
+      'footer',
+      'drag',
+      'contentScroll',
+      'smartActions',
+      'numeration',
+      'fit',
+      'nest',
+      'inputFocus',
+      'bodyLock',
+      'downloadLink',
+      'shareLink',
+      'copyLink',
+      'bodyTransitionScale',
+      'bodyTransitionBlur',
+      // colorSchemeInherit is deliberately absent: it is a client-side option
+      // with no settings-form entry, so it has no configured baseline and
+      // falls back to FALSE below.
+      'colorSchemeInherit',
+    ] as $key) {
+      // getConfigValue(), not getDiffConfigValue(): the latter reports a value
+      // only when config *differs* from the shipped default, so for the usual
+      // case of an untouched setting it returns nothing — which is exactly why
+      // this loop used to carry its own copy of every default.
+      if (!is_null($this->$key) && (bool) $this->$key !== (bool) $this->getSettings()->getConfigValue($key)) {
         $settings[$key] = (bool) $this->$key ? 'true' : 'false';
       }
     }

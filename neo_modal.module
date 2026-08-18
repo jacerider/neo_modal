@@ -83,9 +83,6 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
   if ($extension == 'core') {
     $path = '/' . \Drupal::service('extension.list.module')->getPath('neo');
 
-    // $libraries['drupal.dialog.off_canvas']['css'] = [];
-    // $libraries['drupal.dialog.off_canvas']['js'] = [];
-
     $libraries['drupal.dialog']['css'] = [];
     $libraries['drupal.dialog']['js'] = [];
 
@@ -106,12 +103,6 @@ function neo_modal_library_info_alter(&$libraries, $extension) {
   if ($extension == 'webform') {
     $path = '/' . \Drupal::service('extension.list.module')->getPath('neo_modal');
     $libraries['webform.ajax']['js'][$path . '/js/neo.webform.ajax.js'] = [];
-    // $libraries['webform.admin.off_canvas']['css'] = [];
-    // $libraries['webform.admin.off_canvas']['js'] = [];
-    // $libraries['webform.dialog']['css'] = [];
-    // $libraries['webform.dialog']['js'] = [];
-    // $libraries['drupal.dialog']['css'] = [];
-    // $libraries['drupal.dialog']['js'] = [];
   }
   if ($extension == 'focal_point') {
     // Focal point relies on core.dialog loading JQuery UI. But since we replace
@@ -136,67 +127,119 @@ function neo_modal_ajax_render_alter(array &$data) {
     if ($command['command'] == 'ajaxRedirect') {
       if (!empty($command['data']['dialog']['neo'])) {
         $modal = new Modal(NULL, $command['data']['dialog']['neo'], $command['data']['dialog']['neo']['preset'] ?? 'dialog');
-        $data[$delta]['data']['dialog']['neo'] = $modal->getValues();
+        $data[$delta]['data']['dialog']['neo'] = _neo_modal_decode_values($modal->getValues());
       }
     }
     if ($command['command'] == 'openDialog') {
       if (!empty($command['dialogOptions'])) {
-        $data[$delta]['settings'] = $data[$delta]['settings'] ?? [];
-        if (!empty($command['dialogOptions']['title'])) {
-          $data[$delta]['settings']['title'] = $command['dialogOptions']['title'];
-          if (empty($command['dialogOptions']['neo']['icon'])) {
-            $iconElement = new IconElement($command['dialogOptions']['title'], NULL, NULL, ['any']);
+        $dialogOptions = $command['dialogOptions'];
+        $neo = $dialogOptions['neo'] ?? [];
+
+        // Lowest layer: what core's jQuery-UI dialog options translate to.
+        $translated = [];
+        if (!empty($dialogOptions['title'])) {
+          $translated['title'] = $dialogOptions['title'];
+          if (empty($neo['icon'])) {
+            $iconElement = new IconElement($dialogOptions['title'], NULL, NULL, ['any']);
             if ($icon = $iconElement->getIcon()) {
-              $data[$delta]['settings']['icon'] = $icon->getSelector();
+              $translated['icon'] = $icon->getSelector();
             }
           }
         }
-        if (!empty($command['dialogOptions']['width']) && $command['dialogOptions']['width'] != 'auto') {
-          $data[$delta]['settings']['width'] = $command['dialogOptions']['width'];
+        if (!empty($dialogOptions['width']) && $dialogOptions['width'] != 'auto') {
+          $translated['width'] = $dialogOptions['width'];
         }
-        if (!empty($command['dialogOptions']['height']) && $command['dialogOptions']['height'] != 'auto') {
-          $data[$delta]['settings']['height'] = $command['dialogOptions']['height'];
+        if (!empty($dialogOptions['height']) && $dialogOptions['height'] != 'auto') {
+          $translated['height'] = $dialogOptions['height'];
         }
-        if (!empty($command['dialogOptions']['position']['my'])) {
-          $data[$delta]['settings']['placement'] = str_replace(' ', '-', str_replace('top', 'start', str_replace('bottom', 'end', $command['dialogOptions']['position']['my'])));
-        }
-        // Whether a dialog replaces the previous one or stacks is decided
-        // client-side from the command's selector (see modal-dialog-ajax.ts),
-        // matching core's same-selector-replaces contract. The class checks
-        // below only carry per-integration sizing.
-        if (!empty($command['dialogOptions']['classes'])) {
-          // Media library support. `nest` forces stacking even when the
-          // selector collides with an open dialog (e.g. a media field widget
-          // inside a form that is itself in a dialog).
-          if (in_array('media-library-widget-modal', $command['dialogOptions']['classes'])) {
-            $data[$delta]['settings']['width'] = '100%';
-            $data[$delta]['settings']['height'] = '100%';
-            $data[$delta]['settings']['nest'] = TRUE;
-          }
-          foreach ($command['dialogOptions']['classes'] as $class) {
-            // Webform support.
-            if (strstr($class, 'webform-off-canvas') || strstr($class, 'webform-ui-dialog')) {
-              $data[$delta]['settings']['width'] = '100%';
-              $data[$delta]['settings']['height'] = '100%';
-            }
-          }
-          // Views UI support.
-          if (in_array('views-ui-dialog js-views-ui-dialog', $command['dialogOptions']['classes'])) {
-            $data[$delta]['settings']['width'] = '100%';
-            $data[$delta]['settings']['height'] = '100%';
-          }
-          $data[$delta]['settings']['modalClasses'] = implode(' ', $command['dialogOptions']['classes']);
-        }
-        if (!empty($command['dialogOptions']['neo'])) {
-          $data[$delta]['settings'] += $command['dialogOptions']['neo'];
-          unset($data[$delta]['settings']['neo']);
+        if (!empty($dialogOptions['position']['my'])) {
+          $translated['placement'] = str_replace(' ', '-', str_replace('top', 'start', str_replace('bottom', 'end', $dialogOptions['position']['my'])));
         }
 
-        $modal = new Modal(NULL, $data[$delta]['settings'], $data[$delta]['settings']['preset'] ?? 'dialog');
-        $data[$delta]['settings'] = $modal->getValues() + $data[$delta]['settings'];
+        // Middle layer: per-integration sizing, keyed by the class that asks
+        // for it. Whether a dialog replaces the previous one or stacks is
+        // decided client-side from the command's selector (see
+        // modal-dialog-ajax.ts), matching core's same-selector-replaces
+        // contract; these only carry sizing, plus the media library's `nest`.
+        $overrides = [];
+        if (!empty($dialogOptions['classes'])) {
+          // core's `classes` is a map keyed by jQuery-UI widget part, whose
+          // values are space-separated class strings — and the deprecated
+          // dialogClass is appended into the same value. Matching whole values
+          // therefore breaks the moment anything else adds a class: CKEditor 5
+          // appends `ui-dialog--narrow` beside `media-library-widget-modal`,
+          // so the media library opened from a Drupal Media button missed its
+          // override entirely. Compare tokens instead.
+          $tokens = array_flip(preg_split('/\s+/', trim(implode(' ', (array) $dialogOptions['classes'])), -1, PREG_SPLIT_NO_EMPTY) ?: []);
+          $sizing = ['width' => '100%', 'height' => '100%'];
+          $byClass = [
+            // `nest` forces stacking even when the selector collides with an
+            // open dialog, e.g. a media field widget inside a form that is
+            // itself in a dialog.
+            'media-library-widget-modal' => $sizing + ['nest' => TRUE],
+            'webform-off-canvas' => $sizing,
+            'webform-ui-dialog' => $sizing,
+            'views-ui-dialog' => $sizing,
+          ];
+          foreach (array_intersect_key($byClass, $tokens) as $classOverrides) {
+            $overrides += $classOverrides;
+          }
+          $translated['modalClasses'] = implode(' ', $dialogOptions['classes']);
+        }
+
+        // One precedence order, stated once: the caller's explicit neo options
+        // beat per-integration overrides, which beat the jQuery-UI
+        // translation, which beats whatever the command already carried. This
+        // used to be a `+=` that put `neo` LAST, which is why `icon` needed a
+        // hand-written escape hatch above while title, width, height and
+        // placement had none and could never be overridden.
+        $settings = $neo + $overrides + $translated + ($data[$delta]['settings'] ?? []);
+        unset($settings['neo']);
+
+        $modal = new Modal(NULL, $settings, $settings['preset'] ?? 'dialog');
+        // Ship only what the Modal produced. Unioning the raw input back on
+        // top re-introduced values the setters had deliberately rejected — a
+        // jQuery-UI `position.my` of "center center" becomes the placement
+        // "center-center", which is not a valid placement and was dropped by
+        // setPlacement() and then shipped anyway.
+        $data[$delta]['settings'] = _neo_modal_decode_values($modal->getValues());
       }
     }
   }
+}
+
+/**
+ * Decodes Modal::getValues() for a JSON payload.
+ *
+ * getValues() renders booleans as the strings 'true' and 'false', which is
+ * correct for its main consumer: they are written into data-neo-modal-*
+ * attributes, and the JS coerces those strings back when it reads them off a
+ * trigger.
+ *
+ * Nothing coerces them on the AJAX path. Options handed to
+ * Drupal.neoModal.open() are merged as-is, so the string 'false' arrived as a
+ * truthy value and switched the option ON — `#modal => ['backdrop' => FALSE]`
+ * still rendered a backdrop. It only appeared to work when the value happened
+ * to match the site's global setting, because getValues() then omits the key
+ * entirely and the JS default applies. Same input, opposite behaviour,
+ * decided by unrelated configuration.
+ *
+ * @param array $values
+ *   The values from Modal::getValues().
+ *
+ * @return array
+ *   The values with attribute-encoded booleans turned back into booleans.
+ */
+function _neo_modal_decode_values(array $values): array {
+  return array_map(function ($value) {
+    if ($value === 'true') {
+      return TRUE;
+    }
+    if ($value === 'false') {
+      return FALSE;
+    }
+    return $value;
+  }, $values);
 }
 
 /**
