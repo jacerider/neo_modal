@@ -216,7 +216,7 @@ function neo_modal_ajax_render_alter(array &$data) {
 /**
  * Decodes Modal::getValues() for a JSON payload.
  *
- * getValues() renders booleans as the strings 'true' and 'false', which is
+ * GetValues() renders booleans as the strings 'true' and 'false', which is
  * correct for its main consumer: they are written into data-neo-modal-*
  * attributes, and the JS coerces those strings back when it reads them off a
  * trigger.
@@ -266,6 +266,9 @@ function neo_modal_element_info_alter(array &$info) {
   $info['submit']['#process'][] = 'neo_modal_submit_process';
 }
 
+/**
+ * Process callback for submit elements that close a modal.
+ */
 function neo_modal_submit_process(&$element, FormStateInterface $form_state, $form) {
   if (!empty($element['#modal_close'])) {
     $element['#attributes']['data-neo-modal-close-submit'] = TRUE;

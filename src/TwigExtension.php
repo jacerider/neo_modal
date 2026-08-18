@@ -46,15 +46,19 @@ class TwigExtension extends AbstractExtension {
    * Renders a modal dialog with a trigger element.
    *
    * @param mixed $trigger
-   *   The trigger element that will open the modal. Can be a render array or string.
+   *   The trigger element that will open the modal. Can be a render array
+   *   or string.
    * @param array $options
-   *   (Optional) An associative array of modal options. Defaults to an empty array.
+   *   (Optional) An associative array of modal options. Defaults to an
+   *   empty array.
    * @param string|null $preset
    *   (Optional) The preset configuration name for the modal. Defaults to NULL.
    * @param array $attributes
-   *   (Optional) An associative array of HTML attributes to apply to the modal. Defaults to an empty array.
+   *   (Optional) An associative array of HTML attributes to apply to the
+   *   modal. Defaults to an empty array.
    * @param array $trigger_attributes
-   *   (Optional) An associative array of HTML attributes to apply to the trigger element. Defaults to an empty array.
+   *   (Optional) An associative array of HTML attributes to apply to the
+   *   trigger element. Defaults to an empty array.
    *
    * @return mixed
    *   The trigger element with modal functionality applied.
@@ -80,24 +84,29 @@ class TwigExtension extends AbstractExtension {
   /**
    * Applies a modal dialog to a trigger element.
    *
-   * This method wraps content in a modal dialog and attaches it to a trigger element.
-   * It handles various input types for both the modal content and trigger, converting
-   * them to appropriate render arrays as needed.
+   * This method wraps content in a modal dialog and attaches it to a trigger
+   * element. It handles various input types for both the modal content and
+   * trigger, converting them to appropriate render arrays as needed.
    *
    * @param mixed $build
-   *   The modal content to be displayed. Can be a string, Markup object, or render array.
+   *   The modal content to be displayed. Can be a string, Markup object, or
+   *   render array.
    *   If empty, the build is returned unchanged.
    * @param mixed $trigger
-   *   The element that triggers the modal. Can be a string, Markup object, or render array.
+   *   The element that triggers the modal. Can be a string, Markup object,
+   *   or render array.
    * @param array $options
-   *   (Optional) Configuration options for the modal. Defaults to an empty array.
+   *   (Optional) Configuration options for the modal. Defaults to an empty
+   *   array.
    *   The 'scope' option is set to TRUE by default.
    * @param string|null $preset
    *   (Optional) The name of a preset modal configuration. Defaults to NULL.
    * @param array $attributes
-   *   (Optional) HTML attributes to apply to the modal element. Defaults to an empty array.
+   *   (Optional) HTML attributes to apply to the modal element. Defaults to
+   *   an empty array.
    * @param array $trigger_attributes
-   *   (Optional) HTML attributes to apply to the trigger element. Defaults to an empty array.
+   *   (Optional) HTML attributes to apply to the trigger element. Defaults
+   *   to an empty array.
    *
    * @return mixed
    *   The trigger element with the modal applied to it.
