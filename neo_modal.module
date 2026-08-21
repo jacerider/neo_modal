@@ -207,7 +207,32 @@ function neo_modal_ajax_render_alter(array &$data) {
         // jQuery-UI `position.my` of "center center" becomes the placement
         // "center-center", which is not a valid placement and was dropped by
         // setPlacement() and then shipped anyway.
-        $data[$delta]['settings'] = _neo_modal_decode_values($modal->getValues());
+        $values = _neo_modal_decode_values($modal->getValues());
+
+        // `nest` is a tri-state on this path rather than a styled default, so
+        // it cannot be shipped the way every other option is. On the AJAX
+        // dialog path (see modal-dialog-ajax.ts) TRUE always stacks, FALSE
+        // replaces the modal on top, and *absent* means "follow core's
+        // same-selector-replaces contract". getValues() serialises a diff
+        // against the configured baseline, which collapses that third state:
+        // `nest` ships as TRUE in neo_modal.settings, so an explicit TRUE
+        // equals the baseline and is dropped, and the client cannot tell
+        // "stack this one" from "nothing was asked for".
+        //
+        // That is how the media library closed the dialog it was opened from.
+        // Its widget button renders into `#drupal-modal`, the same selector as
+        // any other `data-dialog-type="modal"` link — so a media field inside
+        // a dialog (a Neo Alchemist component form, a node form in a modal)
+        // hit the same-selector rule and replaced its own opener. The
+        // `nest => TRUE` override above exists precisely to exempt it, and was
+        // being discarded before it left PHP.
+        if (isset($settings['nest'])) {
+          // Normalised as _neo_modal_decode_values() would, so an
+          // attribute-style 'false' is not the truthy string it literally is.
+          $values['nest'] = $settings['nest'] !== 'false' && (bool) $settings['nest'];
+        }
+
+        $data[$delta]['settings'] = $values;
       }
     }
   }

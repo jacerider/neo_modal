@@ -450,6 +450,16 @@ For fields, the **"Neo | Modal Gallery"** formatters generate the whole thing
   markup that doesn't exist here). `closeDialog` also closes by selector. An
   explicit `nest` option overrides: `true` always stacks (Media Library keeps
   this so it survives a selector collision), `false` closes the top modal.
+- ⚠️ On this path **`nest` is a tri-state, and absent is a real third value** —
+  it means "use the selector rule". `Modal::getValues()` serialises booleans as
+  a *diff against configured defaults*, so a value equal to config is omitted;
+  since `neo_modal.settings` ships `nest: true`, an explicit `true` vanished and
+  read as "nothing was asked for". `hook_ajax_render_alter()` therefore re-adds
+  an explicitly-set `nest` after `getValues()`. Adding another integration
+  override that needs to stack means keeping it in that re-add, not just in the
+  `$byClass` map. Symptom when it breaks: a media field inside a dialog (an
+  Alchemist component form, a node form in a modal) opens the Media Library and
+  **replaces its own opener**, so closing the library leaves nothing behind.
 - Views' `setBrowserUrl` command is suppressed inside `.neo-modal` to stop
   modal query parameters leaking into `window.location`.
 - Local actions: add a `modal` key to a local action definition and
