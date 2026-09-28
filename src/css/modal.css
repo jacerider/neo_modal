@@ -538,8 +538,6 @@ body.has-neo-modal--loader {
 
 .neo-modal--content--container {
   @apply relative;
-  /* The panel's own edge, set with the `shadow` option. */
-  box-shadow: var(--modal-shadow, none);
   max-width: calc(
     100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
   );
@@ -569,6 +567,11 @@ body.has-neo-modal--loader {
 
 .neo-modal--content-block {
   @apply flex h-full flex-col;
+  /* The panel's own edge, set with the `shadow` option. On this element, not
+     the container around it, because this is the one the content animation
+     moves: on the container the shadow stood at the panel's final edge while
+     the panel was still sliding in. */
+  box-shadow: var(--modal-shadow, none);
   max-width: calc(
     100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
   );

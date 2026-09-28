@@ -2123,9 +2123,9 @@ class Modal {
   /**
    * Set the shadow of the modal's panel.
    *
-   * Applied to the panel and to a header placed outside it (`start-out` or
-   * `end-out`), which sits against the panel's edge and reads as part of it.
-   * No shadow by default.
+   * Applied to the panel (the content block the content animation moves) and
+   * to a header placed outside it (`start-out` or `end-out`), which sits
+   * against the panel's edge and reads as part of it. No shadow by default.
    *
    * @param string $shadow
    *   A CSS box-shadow value.
