@@ -234,6 +234,10 @@ body.has-neo-modal--loader {
 .neo-modal--header-out {
   @apply absolute top-0 z-10;
   background: var(--modal-header-bg, rgb(var(--color-base-950)));
+  /* Sits against the panel's edge, so it takes the panel's shadow and can be
+     rounded into a tab of it (`headerOutRadius`). Both default to nothing. */
+  border-radius: var(--modal-header-out-radius, 0);
+  box-shadow: var(--modal-shadow, none);
 }
 
 .neo-modal--header-start-out {
@@ -534,6 +538,8 @@ body.has-neo-modal--loader {
 
 .neo-modal--content--container {
   @apply relative;
+  /* The panel's own edge, set with the `shadow` option. */
+  box-shadow: var(--modal-shadow, none);
   max-width: calc(
     100vw - var(--modal-displace-left, 0px) - var(--modal-displace-right, 0px)
   );

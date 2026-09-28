@@ -420,6 +420,20 @@ class Modal {
   protected string|null $backdropColorBg = NULL;
 
   /**
+   * The box-shadow of the modal's panel and its outside header.
+   *
+   * @var string|null
+   */
+  protected string|null $shadow = NULL;
+
+  /**
+   * The border-radius of the header placed outside the panel.
+   *
+   * @var string|null
+   */
+  protected string|null $headerOutRadius = NULL;
+
+  /**
    * The nav color of the modal.
    *
    * @var string|null
@@ -2107,6 +2121,40 @@ class Modal {
   }
 
   /**
+   * Set the shadow of the modal's panel.
+   *
+   * Applied to the panel and to a header placed outside it (`start-out` or
+   * `end-out`), which sits against the panel's edge and reads as part of it.
+   * No shadow by default.
+   *
+   * @param string $shadow
+   *   A CSS box-shadow value.
+   *
+   * @return $this
+   */
+  public function setShadow(string $shadow):self {
+    $this->shadow = $shadow;
+    return $this;
+  }
+
+  /**
+   * Set the border-radius of a header placed outside the panel.
+   *
+   * Rounds the corners away from the panel so an outside close button reads
+   * as a tab of it: `0 0.75rem 0.75rem 0` for `end-out`, `0.75rem 0 0 0.75rem`
+   * for `start-out`. Square by default.
+   *
+   * @param string $radius
+   *   A CSS border-radius value.
+   *
+   * @return $this
+   */
+  public function setHeaderOutRadius(string $radius):self {
+    $this->headerOutRadius = $radius;
+    return $this;
+  }
+
+  /**
    * Set the navigation color.
    *
    * @param string $color
@@ -2209,6 +2257,8 @@ class Modal {
       'footerColor',
       'footerColorBg',
       'backdropColorBg',
+      'shadow',
+      'headerOutRadius',
       'navColor',
       'navColorBg',
       'loaderColor',

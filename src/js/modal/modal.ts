@@ -19,6 +19,13 @@ class NeoModal {
     navColor: '',
     navColorBg: '',
   };
+  // Written onto the modal as `--modal-*` custom properties alongside the
+  // colours: `shadow` is `--modal-shadow`, `headerOutRadius` is
+  // `--modal-header-out-radius`.
+  protected static styleDefaults:neoModal.NeoModalStyleOptions = {
+    shadow: '',
+    headerOutRadius: '',
+  };
   protected static defaults:neoModal.NeoModalOptions = Object.assign({}, {
     appendTo: null,
     appendToClosest: null,
@@ -171,7 +178,7 @@ class NeoModal {
     onPrev: null,
     onAfterPrev: null,
     onContentLoaded: null,
-  }, this.colorDefaults) as neoModal.NeoModalOptions;
+  }, this.colorDefaults, this.styleDefaults) as neoModal.NeoModalOptions;
   protected eventMap:Map<string, Function> = new Map([
     ['onSettings', ():ISignal<NeoModal, any> => {
       return this.eventSettings.expose();
@@ -353,8 +360,8 @@ class NeoModal {
    * Construct.
    */
   constructor(options:neoModal.NeoModalOptions) {
-    // Colors can always be set via [data-neo-modal-*].
-    for (let key in NeoModal.colorDefaults) {
+    // Colors and styles can always be set via [data-neo-modal-*].
+    for (let key in {...NeoModal.colorDefaults, ...NeoModal.styleDefaults}) {
       this.optionsAsAttributes.push(key);
     }
 
@@ -639,7 +646,7 @@ class NeoModal {
       else {
         this.modal.classList.add('neo-modal--global-scroll');
       }
-      for (let key in NeoModal.colorDefaults) {
+      for (let key in {...NeoModal.colorDefaults, ...NeoModal.styleDefaults}) {
         if (this.options[key as keyof neoModal.NeoModalOptions]) {
           const value = this.options[key as keyof neoModal.NeoModalOptions] as string;
           const dashed = key.replace(/[A-Z]/g, m => "-" + m.toLowerCase()).replace('color-bg', 'bg');

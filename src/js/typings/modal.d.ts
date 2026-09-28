@@ -16,11 +16,20 @@ declare namespace neoModal {
     navColorBg: string;
   }
 
+  /**
+   * Options written onto the modal as `--modal-*` custom properties, the same
+   * way as the colour options, for the few non-colour values a theme sets.
+   */
+  export interface NeoModalStyleOptions {
+    shadow: string;
+    headerOutRadius: string;
+  }
+
   export interface NeoModalButtons {
     [key: string]: (...args: any[]) => any;
   }
 
-  export interface NeoModalOptions extends NeoModalColorOptions {
+  export interface NeoModalOptions extends NeoModalColorOptions, NeoModalStyleOptions {
     appendTo:HTMLElement|string|null;
     appendToClosest:string|null;
     wrapperClasses:string|null;
