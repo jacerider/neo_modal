@@ -1059,6 +1059,66 @@ class NeoModal {
     }
   }
 
+  /**
+   * Make everything behind the top modal inert.
+   *
+   * Each modal declares itself `aria-modal`, but nothing behind it was made
+   * unreachable, so Tab walked straight out of an open modal into the page --
+   * and out of a nested one into the faded modal underneath, form and all.
+   * `aria-modal` only tells assistive technology to ignore the rest; it does
+   * not move focus or stop it, so the keyboard needs `inert`.
+   *
+   * Inert are the siblings of every ancestor of the wrapper up to <body> (the
+   * page, wherever appendTo put the wrapper) and every other modal in the
+   * stack, including one still animating out. Called after each restack(), so
+   * it reads the same stack. Only what this marked is released, so an element
+   * inert for some other reason stays that way.
+   *
+   * Skipped when the top modal has no backdrop: the page is visibly still
+   * there to use, and locking it would change what such a modal is for.
+   *
+   * close() reaches this through doClose() before it refocuses the trigger,
+   * and that order matters: an inert trigger refuses focus, which would leave
+   * focus on <body> and send a keyboard user back to the top of the page.
+   */
+  protected static contain():void {
+    const mark = 'data-neo-modal-inert';
+    const modals = NeoModal.openModals();
+    const top = modals[modals.length - 1] as neoModal.NeoModalElement|undefined;
+    const behind:Element[] = [];
+    if (top && top.neoModal && (top.neoModal as unknown as NeoModal).options.backdrop) {
+      top.parentElement?.querySelectorAll(':scope > .neo-modal').forEach((modal) => {
+        if (modal !== top) {
+          behind.push(modal);
+        }
+      });
+      let node = top.parentElement;
+      while (node && node !== document.body && node.parentElement) {
+        for (const sibling of Array.from(node.parentElement.children)) {
+          // Scripts and styles hold nothing focusable; marking them is noise.
+          // A live region must stay: inert takes it out of the accessibility
+          // tree, which silenced Drupal.announce() while a modal was open.
+          if (sibling !== node && !sibling.matches('script, style, link, template, [aria-live]')) {
+            behind.push(sibling);
+          }
+        }
+        node = node.parentElement;
+      }
+    }
+    document.querySelectorAll<HTMLElement>('[' + mark + ']').forEach((element) => {
+      if (!behind.includes(element)) {
+        element.inert = false;
+        element.removeAttribute(mark);
+      }
+    });
+    behind.forEach((element) => {
+      if (element instanceof HTMLElement && !element.inert) {
+        element.inert = true;
+        element.setAttribute(mark, '');
+      }
+    });
+  }
+
   protected remove():void {
     if (this.modal) {
       this.modal.remove();
@@ -2188,6 +2248,7 @@ class NeoModal {
     const modals = NeoModal.openModals();
     this.depth = modals.length;
     NeoModal.restack();
+    NeoModal.contain();
     if (modals.length > 1) {
       const modal = modals[modals.length - 2] as neoModal.NeoModalElement;
       if (modal.neoModal) {
@@ -2358,6 +2419,7 @@ class NeoModal {
       // backdrop styling, which this modal overwrote when it stacked on top.
       const modals = NeoModal.openModals();
       NeoModal.restack();
+      NeoModal.contain();
       if (modals.length > 0) {
         const modal = modals[modals.length - 1] as neoModal.NeoModalElement;
         if (modal.neoModal) {

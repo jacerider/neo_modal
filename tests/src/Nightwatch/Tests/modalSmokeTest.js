@@ -234,6 +234,77 @@ module.exports = {
       .waitForElementNotPresent(MODAL, 5000);
   },
 
+  /**
+   * Regression guard for Tab walking out of an open modal.
+   *
+   * Every modal declares itself `aria-modal`, but nothing behind it was made
+   * inert, so the keyboard reached the page -- and from a nested modal, the
+   * form in the faded modal underneath. contain() makes the rest inert after
+   * each restack() and releases only what it marked.
+   *
+   * Asserted through `inert` rather than by pressing Tab: where focus lands
+   * after a Tab past the last element depends on browser chrome the webdriver
+   * window does not have, and a headless window without system focus fires no
+   * focus events to observe. `inert` is what decides it either way.
+   */
+  'everything behind the top modal is inert': (browser) => {
+    const NESTED = '.neo-modal--inert-probe';
+    // What contain() marked, by role in the stack, plus the live region
+    // Drupal.announce() writes to, which must stay in the accessibility tree.
+    const read = function () {
+      const below = document.querySelector('.neo-modal:not(.neo-modal--inert-probe)');
+      const announce = document.getElementById('drupal-live-announce');
+      return {
+        page: document.querySelectorAll('body > [data-neo-modal-inert]').length,
+        below: below ? below.inert : null,
+        announce: announce ? announce.inert : false,
+      };
+    };
+
+    openModal(browser)
+      .execute(read, [], (result) => {
+        browser.assert.ok(result.value.page > 0, 'The page behind the modal is inert.');
+        browser.assert.strictEqual(result.value.below, false, 'The open modal is not.');
+        browser.assert.strictEqual(result.value.announce, false, 'The live region is not.');
+      })
+      .execute(
+        function () {
+          Drupal.neoModal.open({
+            modalClasses: 'neo-modal--inert-probe',
+            content: '<p><a href="#">Nested</a></p>',
+          });
+        },
+        [],
+      )
+      .waitForElementVisible(NESTED, 5000)
+      .neoWaitForAnimations(NESTED)
+      .execute(read, [], (result) => {
+        browser.assert.strictEqual(
+          result.value.below,
+          true,
+          'The modal underneath a nested one is inert.',
+        );
+      })
+      .execute(function () {
+        Drupal.neoModal.close();
+      }, [])
+      .waitForElementNotPresent(NESTED, 5000)
+      .execute(read, [], (result) => {
+        browser.assert.strictEqual(
+          result.value.below,
+          false,
+          'The modal left on top is usable again.',
+        );
+      })
+      .neoPressKey(browser.Keys.ESCAPE)
+      .waitForElementNotPresent(MODAL, 5000)
+      .assert.elementCount(
+        '[data-neo-modal-inert]',
+        0,
+        'Closing the last modal releases everything it made inert.',
+      );
+  },
+
   'repeated open/close leaves a single wrapper behind': (browser) => {
     openModal(browser)
       .neoPressKey(browser.Keys.ESCAPE)
