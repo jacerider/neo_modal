@@ -234,6 +234,109 @@ module.exports = {
       .waitForElementNotPresent(MODAL, 5000);
   },
 
+  /**
+   * Regression guard for Tab walking out of an open modal.
+   *
+   * Every modal declares itself `aria-modal`, but nothing kept the keyboard
+   * in, so Tab reached the page -- and from a nested modal, the faded modal
+   * underneath. The trap wraps Tab at the top modal's edges and makes nothing
+   * inert: a popup a library renders into <body> for a field in the modal (a
+   * CKEditor balloon, an autocomplete menu) must stay usable.
+   *
+   * Driven by dispatched keydown events (neoPressKey): a synthetic Tab moves
+   * no focus by itself, so where focus ends up is exactly what the trap did.
+   */
+  'Tab stays in the top modal, and nothing is made inert': (browser) => {
+    const NESTED = '.neo-modal--trap-probe';
+    // Focus the top modal's first or last tabbable element, press Tab (or
+    // Shift+Tab), and report where focus went.
+    const tab = function (from, shift) {
+      const modals = document.querySelectorAll('.neo-modal:not(.neo-modal--closing)');
+      const top = modals[modals.length - 1];
+      const tabbable = Array.from(top.querySelectorAll('a[href], button, input, select, textarea, [tabindex]'))
+        .filter((element) => element.tabIndex >= 0 && element.getClientRects().length > 0);
+      const start = from === 'body' ? null : tabbable[from === 'first' ? 0 : tabbable.length - 1];
+      if (start) {
+        start.focus();
+      }
+      else {
+        document.activeElement.blur();
+      }
+      (document.activeElement || document.body).dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Tab', shiftKey: !!shift, bubbles: true, cancelable: true,
+      }));
+      const active = document.activeElement;
+      return {
+        inTop: top.contains(active),
+        isFirst: active === tabbable[0],
+        isLast: active === tabbable[tabbable.length - 1],
+        count: tabbable.length,
+        inert: document.querySelectorAll('[inert]').length,
+      };
+    };
+
+    // What the page makes inert on its own, before any modal opens.
+    let pageInert = 0;
+    browser
+      .drupalRelativeURL('/')
+      .execute(function () {
+        return document.querySelectorAll('[inert]').length;
+      }, [], (result) => {
+        pageInert = result.value;
+      });
+    openModal(browser)
+      .execute(tab, ['last', false], (result) => {
+        browser.assert.ok(result.value.count > 1, 'The modal has more than one tabbable element.');
+        browser.assert.ok(result.value.isFirst, 'Tab past the last element goes to the first.');
+        browser.assert.strictEqual(result.value.inert, pageInert, 'Opening the modal made nothing inert.');
+      })
+      .execute(tab, ['first', true], (result) => {
+        browser.assert.ok(result.value.isLast, 'Shift+Tab before the first element goes to the last.');
+      })
+      .execute(tab, ['body', false], (result) => {
+        browser.assert.ok(result.value.inTop, 'Tab with nothing focused goes into the modal.');
+      })
+      // A popup rendered into <body> keeps its own Tab order.
+      .execute(function () {
+        const popup = document.createElement('div');
+        popup.className = 'trap-probe-popup';
+        popup.innerHTML = '<button type="button">One</button><button type="button">Two</button>';
+        document.body.appendChild(popup);
+        const button = popup.querySelector('button');
+        button.focus();
+        const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+        button.dispatchEvent(event);
+        const kept = document.activeElement === button && !event.defaultPrevented;
+        popup.remove();
+        return kept;
+      }, [], (result) => {
+        browser.assert.ok(result.value, 'Tab in a popup outside the modal is left to the popup.');
+      })
+      .execute(
+        function () {
+          Drupal.neoModal.open({
+            modalClasses: 'neo-modal--trap-probe',
+            content: '<p><a href="#">One</a> <a href="#">Two</a></p>',
+          });
+        },
+        [],
+      )
+      .waitForElementVisible(NESTED, 5000)
+      .neoWaitForAnimations(NESTED)
+      .execute(tab, ['last', false], (result) => {
+        browser.assert.ok(result.value.inTop && result.value.isFirst, 'Tab wraps inside a nested modal, never into the one beneath.');
+      })
+      .execute(function () {
+        Drupal.neoModal.close();
+      }, [])
+      .waitForElementNotPresent(NESTED, 5000)
+      .execute(tab, ['last', false], (result) => {
+        browser.assert.ok(result.value.isFirst, 'The modal left on top traps Tab again.');
+      })
+      .neoPressKey(browser.Keys.ESCAPE)
+      .waitForElementNotPresent(MODAL, 5000);
+  },
+
   'repeated open/close leaves a single wrapper behind': (browser) => {
     openModal(browser)
       .neoPressKey(browser.Keys.ESCAPE)

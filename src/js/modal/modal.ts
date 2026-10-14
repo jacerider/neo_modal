@@ -1059,6 +1059,92 @@ class NeoModal {
     }
   }
 
+  /**
+   * Whether the document-level Tab listener is installed. Once per page: it
+   * acts only while a modal is open, so it is never removed.
+   */
+  protected static trapping:boolean = false;
+
+  /**
+   * Keep Tab inside the top modal.
+   *
+   * Each modal declares itself `aria-modal`, but that only tells assistive
+   * technology to ignore the rest of the page; it does not stop the keyboard.
+   * Tab walked straight out of an open modal into the page, and out of a
+   * nested one into the faded modal underneath.
+   *
+   * A trap rather than `inert` on everything else: libraries render the
+   * popups of fields inside the modal straight into <body> (CKEditor 5's
+   * balloons in `.ck-body-wrapper`, autocomplete menus, tooltips, select
+   * dropdowns, a core dialog opened from the modal), and `inert` blocks
+   * clicks as well as focus, so those popups stopped working. The trap only
+   * changes where Tab goes at the modal's edges:
+   * - Tab past the last tabbable element of the top modal goes to its first,
+   *   Shift+Tab before the first to its last;
+   * - Tab with nothing focused (the modal had nothing to focus on open) goes
+   *   into the modal;
+   * - focus anywhere else (one of those popups) is left alone, so its own
+   *   Tab order works.
+   *
+   * Only for a modal with a backdrop: without one the page is visibly still
+   * there to use. A Tab some other handler already took (a table cell in an
+   * editor) is left to it.
+   */
+  protected static trapFocus(event:KeyboardEvent):void {
+    if (event.key !== 'Tab' || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    const top = NeoModal.getTop();
+    const modal = top?.modal;
+    if (!top || !modal || !top.options.backdrop) {
+      return;
+    }
+    const active = document.activeElement;
+    const atDocument = !active || active === document.body || active === document.documentElement;
+    if (!atDocument && !modal.contains(active)) {
+      return;
+    }
+    const tabbable = NeoModal.tabbables(modal);
+    if (!tabbable.length) {
+      event.preventDefault();
+      return;
+    }
+    const first = tabbable[0];
+    const last = tabbable[tabbable.length - 1];
+    let target:HTMLElement|null = null;
+    if (atDocument || !active) {
+      target = event.shiftKey ? last : first;
+    }
+    else if (event.shiftKey) {
+      const before = tabbable.some((element) => element !== active
+        && !element.contains(active)
+        && (active.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING));
+      target = before ? null : last;
+    }
+    else {
+      const after = tabbable.some((element) => element !== active
+        && (active.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING));
+      target = after ? null : first;
+    }
+    if (target) {
+      event.preventDefault();
+      target.focus();
+    }
+  }
+
+  /**
+   * The elements in a modal that Tab reaches, in document order.
+   */
+  protected static tabbables(root:HTMLElement):HTMLElement[] {
+    const selector = 'a[href], area[href], button, input:not([type="hidden"]), select, textarea, iframe, '
+      + 'audio[controls], video[controls], summary, [contenteditable]:not([contenteditable="false"]), [tabindex]';
+    return Array.from(root.querySelectorAll<HTMLElement>(selector)).filter((element) => element.tabIndex >= 0
+      && !(element as HTMLButtonElement).disabled
+      && !element.closest('[inert]')
+      && element.getClientRects().length > 0
+      && window.getComputedStyle(element).visibility !== 'hidden');
+  }
+
   protected remove():void {
     if (this.modal) {
       this.modal.remove();
@@ -2242,6 +2328,10 @@ class NeoModal {
   }
 
   protected finishOpen():void {
+    if (!NeoModal.trapping) {
+      NeoModal.trapping = true;
+      document.addEventListener('keydown', NeoModal.trapFocus);
+    }
     if (this.options.navKeyboard) {
       this.boundKeyboardDown = this.onKeyboardDown.bind(this);
       this.boundKeyboardUp = this.onKeyboardUp.bind(this);
