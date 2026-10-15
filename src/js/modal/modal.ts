@@ -2363,8 +2363,12 @@ class NeoModal {
     };
     window.addEventListener('resize', this.boundResize);
 
-    const focusableElements = 'a[href], details, [tabindex]';
-    const focusableFormElements = 'input:not([type=hidden]):not([type=checkbox]), textarea, select, button';
+    // A help badge is a button drawn into a field's label, ahead of the field
+    // it explains, so the first field carrying a description would otherwise
+    // take focus on its badge rather than itself -- and focus is what shows
+    // the badge's tooltip, which then greeted every opening of the modal.
+    const focusableElements = 'a[href], details, [tabindex]:not([data-neo-tooltip-help])';
+    const focusableFormElements = 'input:not([type=hidden]):not([type=checkbox]), textarea, select, button:not([data-neo-tooltip-help])';
     const focusableElement = (this.options.inputFocus === true ? this.contentInner?.querySelector<HTMLElement>(
       focusableFormElements
     ) : null) || this.modal?.querySelector<HTMLElement>(
