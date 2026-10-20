@@ -25,7 +25,7 @@ import NeoModal from "./modal/modal";
      * @return {boolean|undefined}
      *   Returns false if there was no selector property in the response object.
      */
-    Drupal.AjaxCommands.prototype.openDialog = function (_ajax, response, _status) {
+    Drupal.AjaxCommands.prototype.openDialog = function (ajax, response, _status) {
       if (Drupal.neoModal) {
         let options:any = {};
         if (typeof response.settings === 'object') {
@@ -47,13 +47,28 @@ import NeoModal from "./modal/modal";
           }
         };
         // `nest` may arrive as a boolean or a data-attribute-style string.
-        const nest = options.nest === true || options.nest === 'true' ? true
+        let nest = options.nest === true || options.nest === 'true' ? true
           : options.nest === false || options.nest === 'false' ? false
           : undefined;
+        // The Edit button on a media library widget item (core #2985168, and
+        // neo_media_library_edit until core ships it) opens into
+        // `#drupal-modal` like any other data-dialog-type link. When the
+        // widget's form is itself in that modal -- a Neo Alchemist component
+        // form -- the same-selector rule below would close the form, and its
+        // unsaved input, to show the media item. It always stacks instead.
+        // Keyed on core's class so core's own button gets the same treatment.
+        if (nest === undefined && ajax?.element instanceof HTMLElement && ajax.element.classList.contains('edit-media')) {
+          nest = true;
+        }
         if (nest !== undefined) {
           options.nest = nest;
         }
         const selector = typeof response.selector === 'string' ? response.selector : '';
+        // The modal this one stacks on, when it shares its selector. Closing
+        // the stacked modal hands the selector back to it, so a later close
+        // of that selector -- the host form's own CloseModalDialogCommand --
+        // still finds the modal it means.
+        const covered = nest === true && selector ? dialogModals[selector] : undefined;
         // Same selector already open: replace it, exactly like core reusing
         // the `#drupal-modal` element. Other modals (custom overlays, other
         // selectors) are left alone. An explicit `nest` option still wins:
@@ -83,7 +98,12 @@ import NeoModal from "./modal/modal";
           dialogModals[selector] = modal;
           modal.event('onAfterClose').on(() => {
             if (dialogModals[selector] === modal) {
-              delete dialogModals[selector];
+              if (covered && covered.getModal()?.isConnected) {
+                dialogModals[selector] = covered;
+              }
+              else {
+                delete dialogModals[selector];
+              }
             }
           });
         }
