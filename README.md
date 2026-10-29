@@ -290,8 +290,8 @@ prev/next arrows, arrow keys (`navKeyboard`), drag (`drag`) and an optional
 counter (`numeration`).
 
 Navigation reuses a single modal instance and rebuilds it from the next
-trigger's options. Only `title`, `subtitle`, `icon`, `image`, `video`, `iframe`,
-`content` and `trigger` change between slides; every other option stays as it
+trigger's options. Only `title`, `subtitle`, `icon`, `iconMarkup`, `image`, `video`,
+`iframe`, `content` and `trigger` change between slides; every other option stays as it
 was on the first modal opened.
 
 For fields, the **Neo | Modal Gallery** formatters build the whole thing —
@@ -460,7 +460,8 @@ Precedence: `image` → `video` → `iframe` → `content`.
 | `title` | `''` | PHP, JS | Also `setTitleWithDynamicIcon()` |
 | `subtitle` | `''` | PHP, JS | |
 | `icon` | `''` | PHP, JS | `setIcon($name)` resolves through neo_icon; `setRawIcon($selector)` takes a class |
-| `iconClasses` | `neo-icon neo-icon-font` | JS | |
+| `iconMarkup` | `''` | PHP, JS | The icon, rendered. `setIcon()` and `setTitleWithDynamicIcon()` set it beside `icon`, and the browser prefers it, so the icon shows however its library renders (inline SVG included). `setRawIcon()` clears it |
+| `iconClasses` | `neo-icon neo-icon-font` | JS | Only used when there is no `iconMarkup` |
 | `titleCallback` | `null` | Config, JS | Name of a `window.*` function `(modal, span) => void` |
 | `closeButton` | `end` | PHP, JS | `''`, `start`, `end`, `start-out`, `end-out` |
 | `closeButtonSvg` / `closeButtonClasses` | X icon / `''` | JS | |

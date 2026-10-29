@@ -228,7 +228,8 @@ Precedence when several are set: `image` → `video` → `iframe` → `content`.
 | `title` | `''` | ✅ `setTitle()` / `setTitleWithDynamicIcon()` | The latter also picks + attaches a matching icon |
 | `subtitle` | `''` | ✅ | |
 | `icon` | `''` | ✅ `setIcon($name)` / `setRawIcon($selector)` | `setIcon()` resolves through neo_icon but does **not** attach the icon library; `setTitleWithDynamicIcon()` does |
-| `iconClasses` | `'neo-icon neo-icon-font'` (set by Drupal) | 🖥️ | |
+| `iconMarkup` | `''` | ✅ set by `setIcon()` / `setTitleWithDynamicIcon()` | The rendered icon; the browser prefers it over building `<i class>` from `icon`, so inline-SVG icon libraries show. `setRawIcon()` clears it |
+| `iconClasses` | `'neo-icon neo-icon-font'` (set by Drupal) | 🖥️ | Only used when there is no `iconMarkup` |
 | `titleCallback` | `null` | ⚙️/🖥️ | Name of a `window.*` function `(modal, span) => void` |
 | `closeButton` | `'end'` | ✅ | `''` (none), `start`, `end`, `start-out`, `end-out` (outside the modal box) |
 | `closeButtonSvg` / `closeButtonClasses` | X icon / `''` | 🖥️ | |
@@ -413,7 +414,7 @@ Give several triggers the same `group` string; they become one navigable set
 (prev/next arrows, arrow keys when `navKeyboard`, drag when `drag`,
 counter when `numeration`). Navigation reuses the same `NeoModal` instance and
 rebuilds it from the next trigger's options — only `title`, `subtitle`, `icon`,
-`image`, `video`, `iframe`, `content`, `trigger` change between slides
+`iconMarkup`, `image`, `video`, `iframe`, `content`, `trigger` change between slides
 (`optionsAsMerge`); everything else stays from the first opened modal.
 
 For fields, the **"Neo | Modal Gallery"** formatters generate the whole thing

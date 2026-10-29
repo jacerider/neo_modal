@@ -121,6 +121,7 @@ declare namespace neoModal {
     subtitleAnimateOutSpeed:AnimationSpeed|null;
     subtitleAnimateOutDelay:AnimationDelay|null;
     icon:string|null;
+    iconMarkup:string|null;
     iconClasses:string|null;
     iconAnimateIn:AnimationIn|boolean;
     iconAnimateInSpeed:AnimationSpeed|null;

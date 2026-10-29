@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\neo_modal;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Template\Attribute;
@@ -201,6 +202,25 @@ class Modal {
    * @var string|null
    */
   protected string|null $icon = NULL;
+
+  /**
+   * The icon of the modal, rendered.
+   *
+   * Set beside the icon's class whenever the icon is set from an icon the
+   * icon repository knows, and preferred by the browser. A class alone can
+   * only draw a font glyph whose stylesheet is on the page; the rendered icon
+   * is whatever the icon library renders, inline SVG included.
+   *
+   * @var string|null
+   */
+  protected string|null $iconMarkup = NULL;
+
+  /**
+   * What rendering the icon bubbled: its attachments and cacheability.
+   *
+   * @var \Drupal\Core\Render\BubbleableMetadata|null
+   */
+  protected ?BubbleableMetadata $iconMetadata = NULL;
 
   /**
    * The image of the modal.
@@ -1132,8 +1152,7 @@ class Modal {
     $this->title = $title;
     $icon = $this->loadIcon($title, NULL, NULL, $prefix);
     if ($icon) {
-      $this->setRawIcon($icon->getSelector());
-      $this->addIconLibrary($icon);
+      $this->setIconFromInstance($icon);
     }
     return $this;
   }
@@ -1164,9 +1183,46 @@ class Modal {
   public function setIcon(string $icon, $prefix = []):self {
     $icon = $this->loadIcon(NULL, $icon, NULL, $prefix);
     if ($icon) {
-      $this->setRawIcon($icon->getSelector());
-      $this->addIconLibrary($icon);
+      $this->setIconFromInstance($icon);
     }
+    return $this;
+  }
+
+  /**
+   * Sets the icon of the modal from an icon the repository resolved.
+   *
+   * The class is kept for anything reading it, and the icon is rendered as
+   * well, so the browser can show it as its library renders it rather than
+   * rebuild it from the class. Rendering happens in isolation, because a modal
+   * is often built outside any render (an AJAX response, a form build); what
+   * that rendering bubbled is kept and handed on with the modal's own
+   * attachments and cacheability.
+   *
+   * @param \Drupal\neo_icon\IconInterface $icon
+   *   The icon.
+   */
+  protected function setIconFromInstance($icon):void {
+    $this->setRawIcon($icon->getSelector());
+    $this->addIconLibrary($icon);
+    $build = $icon->render();
+    $markup = (string) \Drupal::service('renderer')->renderInIsolation($build);
+    if ($markup !== '') {
+      $this->iconMarkup = $markup;
+      $this->iconMetadata = BubbleableMetadata::createFromRenderArray($build);
+    }
+  }
+
+  /**
+   * Sets the rendered icon of the modal.
+   *
+   * @param string $markup
+   *   The icon's markup. It is inserted as HTML, so it must come from the icon
+   *   renderer or be otherwise trusted.
+   *
+   * @return $this
+   */
+  public function setIconMarkup(string $markup):self {
+    $this->iconMarkup = $markup !== '' ? $markup : NULL;
     return $this;
   }
 
@@ -1206,6 +1262,10 @@ class Modal {
    */
   public function setRawIcon(string $icon):self {
     $this->icon = $icon;
+    // A class set by hand names a different icon than any markup rendered
+    // before it, so the markup goes and the browser builds from the class.
+    $this->iconMarkup = NULL;
+    $this->iconMetadata = NULL;
     return $this;
   }
 
@@ -2235,6 +2295,7 @@ class Modal {
       'title',
       'subtitle',
       'icon',
+      'iconMarkup',
       'image',
       'video',
       'iframe',
@@ -2363,6 +2424,9 @@ class Modal {
     foreach ($this->libraries as $library) {
       $attachments['library'][] = $library;
     }
+    if ($this->iconMetadata) {
+      $attachments = BubbleableMetadata::mergeAttachments($attachments, $this->iconMetadata->getAttachments());
+    }
     if ($globalOptions = $this->getSettings()->getDiffConfigValues()) {
       $attachments['drupalSettings']['neoModal']['defaults'] = $globalOptions;
     }
@@ -2481,6 +2545,13 @@ class Modal {
       $build['#attached'] ?? [],
       $this->getAttachments()
     );
+    // The rendered icon travels in an attribute, so whatever caches the
+    // trigger has to know what the icon depended on.
+    if ($this->iconMetadata) {
+      CacheableMetadata::createFromRenderArray($build)
+        ->merge(CacheableMetadata::createFromObject($this->iconMetadata))
+        ->applyTo($build);
+    }
     return $build;
   }
 

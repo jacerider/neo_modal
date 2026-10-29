@@ -112,6 +112,7 @@ class NeoModal {
     subtitleAnimateOutSpeed: null,
     subtitleAnimateOutDelay: null,
     icon: '',
+    iconMarkup: '',
     iconClasses: '',
     iconAnimateIn: 'zoomIn',
     iconAnimateInSpeed: 'default',
@@ -268,6 +269,7 @@ class NeoModal {
     'title',
     'subtitle',
     'icon',
+    'iconMarkup',
     'placement',
     'attach',
     'attachPlacement',
@@ -284,6 +286,7 @@ class NeoModal {
     'title',
     'subtitle',
     'icon',
+    'iconMarkup',
     'image',
     'video',
     'iframe',
@@ -2058,17 +2061,25 @@ class NeoModal {
       label.appendChild(title);
     }
 
-    if (this.options.icon) {
+    if (this.options.iconMarkup || this.options.icon) {
       this.icon = document.createElement('div');
       this.icon.classList.add('neo-modal--icon');
-      const icon = document.createElement('i');
-      if (this.options.iconClasses) {
-        this.options.iconClasses.split(' ').forEach((className) => {
-          icon.classList.add(className);
-        });
+      if (this.options.iconMarkup) {
+        // Rendered on the server by the icon renderer, so it is whatever the
+        // icon's library renders, inline SVG included.
+        this.icon.innerHTML = this.options.iconMarkup;
       }
-      icon.classList.add(this.options.icon);
-      this.icon.appendChild(icon);
+      else if (this.options.icon) {
+        // A bare class: only a font glyph whose stylesheet is on the page.
+        const icon = document.createElement('i');
+        if (this.options.iconClasses) {
+          this.options.iconClasses.split(' ').forEach((className) => {
+            icon.classList.add(className);
+          });
+        }
+        icon.classList.add(this.options.icon);
+        this.icon.appendChild(icon);
+      }
       label.classList.add('has-icon');
       label.prepend(this.icon);
     }
