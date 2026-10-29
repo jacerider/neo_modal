@@ -383,6 +383,7 @@ Drupal.neoModal.open({
 
 Drupal.neoModal.close();   // close the top modal
 Drupal.neoModal.getTop();  // the top NeoModal instance, or null
+Drupal.neoModal.ready();   // a Promise: the modal code is loaded
 
 // Static helpers.
 NeoModal.setDefaultOptions(options);
@@ -399,6 +400,35 @@ modal.getContent();
 modal.getOption('width');
 modal.event('onAfterOpen').on(callback);
 ```
+
+### On-demand loading
+
+`neo_modal/modal`, the library every modal attaches, is a small stub. The modal
+code itself — the `NeoModal` class with popper, tippy and body-scroll-lock, in
+`neo_modal/modal.core` — loads when a visitor shows intent to open a modal
+(pointer over, focus on, touch or click of `.use-neo-modal`,
+`.use-modal-ajax` or `[data-dialog-type]`), or when anything calls
+`Drupal.neoModal`. A click that arrives before the code is held and replayed.
+The server passes the script URLs, minus what the page already has, in
+`drupalSettings.neoModal.core`. Never attach `neo_modal/modal.core` yourself.
+
+Until the code has loaded, `window.NeoModal` is undefined,
+`Drupal.neoModal.open()` returns a Promise for the instance rather than the
+instance, `getTop()` returns `null` and `close()` does nothing. Wait on
+`Drupal.neoModal.ready()` when you need the class.
+
+To load the code up front instead, set the escape hatch in settings.php and
+rebuild caches:
+
+```php
+$settings['neo_modal_preload'] = TRUE;               // everywhere
+$settings['neo_modal_preload'] = ['front', 'back'];  // named Neo scopes
+```
+
+It defaults to `['back']`: admin pages, where modals are everyday tools, load
+the code with the page and everything behaves synchronously.
+
+### Default handlers
 
 The module registers default `onContentLoaded` and `onAfterClose` handlers that
 run `Drupal.attachBehaviors()` and `Drupal.detachBehaviors()` on the modal

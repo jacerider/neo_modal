@@ -189,7 +189,30 @@ Drupal.neoModal.open({
 });
 Drupal.neoModal.close();     // closes the top modal
 Drupal.neoModal.getTop();    // the top NeoModal instance or null
+Drupal.neoModal.ready();     // Promise: the modal code is loaded (loads it if need be)
 ```
+
+⚠ **The modal code loads on demand.** `neo_modal/modal` is a ~4 KB stub; the
+code itself (`neo_modal/modal.core`: the `NeoModal` class, popper, tippy,
+body-scroll-lock) is fetched when a visitor points at, focuses, touches or
+clicks a trigger (`.use-neo-modal`, `.use-modal-ajax`, `[data-dialog-type]`),
+or when anything calls `Drupal.neoModal`. A click that arrives first is held
+and replayed once the code is in. Until then:
+
+- `window.NeoModal` is **undefined** — reach for `Drupal.neoModal`, or wait on
+  `Drupal.neoModal.ready()`. Code running inside an open modal can rely on it.
+- `Drupal.neoModal.open()` returns a **Promise** for the instance, not the
+  instance. Once loaded it returns the instance, as before.
+- `getTop()` is `null` and `close()` does nothing (nothing can be open).
+
+The server hands the stub the script URLs (one aggregate when aggregation is
+on, minus what the page already loaded) in `drupalSettings.neoModal.core`
+([ModalCoreLoader](web/modules/contrib/neo_modal/src/ModalCoreLoader.php)).
+**Never attach `neo_modal/modal.core` at render time.** The escape hatch is
+`$settings['neo_modal_preload']` in settings.php: `TRUE` (everywhere), `FALSE`,
+or a list of scopes. It defaults to `['back']`, so admin pages and the
+Alchemist editor load the code up front and behave synchronously. Rebuild
+caches after changing it.
 
 ## Options reference
 
@@ -482,6 +505,8 @@ options. Shipped blocks: `neo_modal_slide_menu`, `neo_modal_account`.
 ## JS API
 
 ```ts
+// The NeoModal global exists only once the modal code has loaded (see
+// "Pure JS" above); await Drupal.neoModal.ready() first outside a modal.
 NeoModal.setDefaultOptions(options)   // page-wide defaults
 NeoModal.getTop() / NeoModal.closeTop()
 
@@ -494,7 +519,8 @@ modal.event('onAfterOpen').on(cb)     // signal-based subscription
 
 Drupal registers default `onContentLoaded` / `onAfterClose` handlers that call
 `Drupal.attachBehaviors()` / `detachBehaviors()` on the modal content
-([modal.ts:50](web/modules/contrib/neo_modal/src/js/modal.ts#L50)).
+([modal.ts](web/modules/contrib/neo_modal/src/js/modal.ts), the stub, which hands them to the code
+when it loads).
 
 ## Styling
 
@@ -539,6 +565,10 @@ Editing this module's `src/js/**` or `src/css/modal.css` requires a Neo build
   `onContentLoaded` removes `Drupal.attachBehaviors()` from the content; call it
   yourself or subscribe with `modal.event('onContentLoaded').on(cb)` instead.
 - **Unknown preset IDs fall back to the active settings** with no error.
+- **`window.NeoModal` is undefined until a modal is asked for** on front-scope
+  pages. A script that calls `NeoModal.*` at load, or uses the return value of
+  `Drupal.neoModal.open()` synchronously, breaks there while working in the
+  back scope, where the code preloads. Use `Drupal.neoModal.ready().then(…)`.
 - The backdrop animation keys were named `overlayAnimate*` in config/schema
   until `neo_modal_update_11001()` renamed them to `backdropAnimate*` (what the
   form and JS have always used). Sites that skipped the update keep dead
@@ -569,6 +599,7 @@ instance.
 
 ```bash
 ddev phpunit --testsuite neo_modal     # PHP: option round trip, gallery titles, animation catalog
+ddev phpunit web/modules/contrib/neo_modal/tests/src/FunctionalJavascript  # on-demand loading
 ddev nightwatch neo_modal              # browser: open/close/reopen against the running site
 ```
 

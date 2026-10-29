@@ -1,4 +1,4 @@
-import NeoModal from "./modal/modal";
+import type NeoModal from "./modal/modal";
 
 (function (Drupal) {
 
@@ -26,7 +26,8 @@ import NeoModal from "./modal/modal";
      *   Returns false if there was no selector property in the response object.
      */
     Drupal.AjaxCommands.prototype.openDialog = function (ajax, response, _status) {
-      if (Drupal.neoModal) {
+      const api = Drupal.neoModal;
+      if (api) {
         let options:any = {};
         if (typeof response.settings === 'object') {
           options = Object.assign({}, options, response.settings);
@@ -64,50 +65,57 @@ import NeoModal from "./modal/modal";
           options.nest = nest;
         }
         const selector = typeof response.selector === 'string' ? response.selector : '';
-        // The modal this one stacks on, when it shares its selector. Closing
-        // the stacked modal hands the selector back to it, so a later close
-        // of that selector -- the host form's own CloseModalDialogCommand --
-        // still finds the modal it means.
-        const covered = nest === true && selector ? dialogModals[selector] : undefined;
-        // Same selector already open: replace it, exactly like core reusing
-        // the `#drupal-modal` element. Other modals (custom overlays, other
-        // selectors) are left alone. An explicit `nest` option still wins:
-        // true always stacks, false closes the top modal (NeoModal.open()
-        // handles that itself).
-        if (nest === undefined && selector) {
-          if (dialogModals[selector]) {
-            dialogModals[selector].close();
-            delete dialogModals[selector];
+        // The modal code may not be loaded yet (see modal.ts). Everything from
+        // here on reads or changes open modals, so it waits for it; core waits
+        // on the returned promise before running the response's next command.
+        return api.ready().then(() => {
+          // The modal this one stacks on, when it shares its selector. Closing
+          // the stacked modal hands the selector back to it, so a later close
+          // of that selector -- the host form's own CloseModalDialogCommand --
+          // still finds the modal it means.
+          const covered = nest === true && selector ? dialogModals[selector] : undefined;
+          // Same selector already open: replace it, exactly like core reusing
+          // the `#drupal-modal` element. Other modals (custom overlays, other
+          // selectors) are left alone. An explicit `nest` option still wins:
+          // true always stacks, false closes the top modal (NeoModal.open()
+          // handles that itself).
+          if (nest === undefined && selector) {
+            if (dialogModals[selector]) {
+              dialogModals[selector].close();
+              delete dialogModals[selector];
+            }
+            // An off-canvas panel replaces any open dialogs: no core flow layers
+            // a dialog-modal under an off-canvas (jQuery UI's modal overlay
+            // would block the tray), and webform depends on this — its own
+            // "close modals on off-canvas open" handler is a no-op here because
+            // it targets `.ui-dialog` markup that Neo modals don't render.
+            // Dialogs opening OVER an off-canvas (e.g. media library from
+            // layout builder) still stack.
+            if (selector.indexOf('#drupal-off-canvas') === 0) {
+              Object.keys(dialogModals).forEach((key) => {
+                dialogModals[key].close();
+                delete dialogModals[key];
+              });
+            }
           }
-          // An off-canvas panel replaces any open dialogs: no core flow layers
-          // a dialog-modal under an off-canvas (jQuery UI's modal overlay
-          // would block the tray), and webform depends on this — its own
-          // "close modals on off-canvas open" handler is a no-op here because
-          // it targets `.ui-dialog` markup that Neo modals don't render.
-          // Dialogs opening OVER an off-canvas (e.g. media library from
-          // layout builder) still stack.
-          if (selector.indexOf('#drupal-off-canvas') === 0) {
-            Object.keys(dialogModals).forEach((key) => {
-              dialogModals[key].close();
-              delete dialogModals[key];
+          // Synchronous now that the code is loaded.
+          const modal = api.open(options) as neoModal.NeoModalInstance;
+          if (modal && selector) {
+            dialogModals[selector] = modal;
+            modal.event('onAfterClose').on(() => {
+              if (dialogModals[selector] === modal) {
+                if (covered && covered.getModal()?.isConnected) {
+                  dialogModals[selector] = covered;
+                }
+                else {
+                  delete dialogModals[selector];
+                }
+              }
             });
           }
-        }
-        const modal = Drupal.neoModal.open(options);
-        if (modal && selector) {
-          dialogModals[selector] = modal;
-          modal.event('onAfterClose').on(() => {
-            if (dialogModals[selector] === modal) {
-              if (covered && covered.getModal()?.isConnected) {
-                dialogModals[selector] = covered;
-              }
-              else {
-                delete dialogModals[selector];
-              }
-            }
-          });
-        }
+        });
       }
+      return undefined;
     } as drupal.Core.IAjaxCommand;
 
     /**

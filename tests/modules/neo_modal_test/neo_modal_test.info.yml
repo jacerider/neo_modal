@@ -1,0 +1,7 @@
+name: 'Neo Modal test'
+type: module
+description: 'Pages for the neo_modal browser tests.'
+package: Testing
+hidden: true
+dependencies:
+  - neo_modal:neo_modal

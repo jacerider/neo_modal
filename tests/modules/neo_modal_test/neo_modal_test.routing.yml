@@ -1,0 +1,22 @@
+neo_modal_test.page:
+  path: '/neo-modal-test/page'
+  defaults:
+    _controller: '\Drupal\neo_modal_test\Controller\NeoModalTestController::page'
+    _title: 'Modal test page'
+  requirements:
+    _access: 'TRUE'
+
+neo_modal_test.bare:
+  path: '/neo-modal-test/bare'
+  defaults:
+    _controller: '\Drupal\neo_modal_test\Controller\NeoModalTestController::bare'
+    _title: 'Page without a modal'
+  requirements:
+    _access: 'TRUE'
+
+neo_modal_test.command:
+  path: '/neo-modal-test/command'
+  defaults:
+    _controller: '\Drupal\neo_modal_test\Controller\NeoModalTestController::command'
+  requirements:
+    _access: 'TRUE'

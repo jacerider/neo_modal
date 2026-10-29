@@ -1554,9 +1554,12 @@ class NeoModal {
         else {
           element.innerHTML = content;
           // Find and execute the script tag if it exists in the incoming content.
+          // Indirect eval: the script runs in the global scope, as an inline
+          // script on the page would, not inside this method. A direct eval
+          // would also stop the minifier renaming anything in this file.
           const script = element.querySelector('script');
           if (script && script.textContent) {
-            eval(script.textContent);
+            (0, eval)(script.textContent);
             script.remove(); // Optional: clean up
           }
         }

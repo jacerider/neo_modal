@@ -12,3 +12,14 @@ services:
     class: Drupal\neo_modal\TwigExtension
     tags:
       - { name: twig.extension }
+
+  neo_modal.core_loader:
+    class: Drupal\neo_modal\ModalCoreLoader
+    arguments:
+      - '@library.dependency_resolver'
+      - '@asset.resolver'
+      - '@asset.js.collection_renderer'
+      - '@request_stack'
+      - '@config.factory'
+      - '@state'
+      - '@?neo_build.manifest_resolver'

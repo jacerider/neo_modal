@@ -414,8 +414,12 @@ declare namespace neoModal {
     | '21x9';
 }
 
+// Defined by the modal code (`neo_modal/modal.core`), which loads on demand:
+// undefined until a modal has been asked for, unless the escape hatch loads it
+// up front. Code that runs inside an open modal can rely on it; anything else
+// goes through Drupal.neoModal.
 declare var NeoModal: neoModal.NeoModalStatic;
 
 interface Window {
-  NeoModal: neoModal.NeoModalStatic;
+  NeoModal?: neoModal.NeoModalStatic;
 }

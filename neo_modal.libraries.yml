@@ -1,3 +1,6 @@
+# The stub: what every page that can open a modal attaches. It carries the
+# styles, the Drupal.neoModal API and the core dialog replacement, and fetches
+# `modal.core` when a visitor shows intent to open a modal. See src/js/modal.ts.
 modal:
   version: VERSION
   neo: true
@@ -14,6 +17,17 @@ modal:
     # `if (typeof jQuery < "u")`, so it is optional by design. Declaring it
     # would force jQuery onto every page that opens a dialog.
     - neo/animate
+
+# The modal code proper. Never attach it at render time: the stub loads it on
+# demand, and neo_modal_library_info_alter() makes `modal` depend on it where
+# the `neo_modal_preload` setting asks for it up front. Keep it JS-only: the
+# stub injects scripts, not stylesheets.
+modal.core:
+  version: VERSION
+  neo: true
+  js:
+    src/js/modal-core.ts: {}
+  dependencies:
     - neo/library.popper
     - neo/library.body-scroll-lock
     - neo_tooltip/library.tippy
