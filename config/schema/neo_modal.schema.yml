@@ -38,6 +38,9 @@ block.settings.neo_modal_slide_menu:
     expand_depth:
       type: integer
       label: 'Expand children from level'
+    expand_levels:
+      type: integer
+      label: 'Expanded levels'
 
 block.settings.neo_modal_account:
   type: neo_modal_block

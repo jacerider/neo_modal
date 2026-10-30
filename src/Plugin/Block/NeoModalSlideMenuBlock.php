@@ -24,6 +24,7 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
       'back_status' => FALSE,
       'all_status' => FALSE,
       'expand_depth' => 0,
+      'expand_levels' => 0,
     ];
   }
 
@@ -52,6 +53,14 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
       '#description' => $this->t('Menu items at this level (and deeper) no longer slide to another level; their children render expanded beneath them as a grouped list. For example, 2 turns second-level items into group headings with their links listed inline — a mobile mega menu. Use 0 to always slide.'),
       '#min' => 0,
       '#default_value' => $this->configuration['expand_depth'],
+    ];
+
+    $form['expand_levels'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Expanded levels'),
+      '#description' => $this->t('How many levels, starting at the level above, render expanded. The level below them slides again — for example, 1 with an expand level of 2 groups the second level while a third-level item with its own children still opens a slide panel. Use 0 to expand every level from there down.'),
+      '#min' => 0,
+      '#default_value' => $this->configuration['expand_levels'] ?? 0,
     ];
 
     $settings = $this->configuration['menus'];
@@ -114,6 +123,7 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
     $this->configuration['back_status'] = (bool) $form_state->getValue(['back_status']);
     $this->configuration['all_status'] = (bool) $form_state->getValue(['all_status']);
     $this->configuration['expand_depth'] = (int) $form_state->getValue(['expand_depth']);
+    $this->configuration['expand_levels'] = (int) $form_state->getValue(['expand_levels']);
     $this->configuration['menus'] = $form_state->getValue(['menus']);
   }
 
@@ -128,6 +138,7 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
       '#back_status' => $this->configuration['back_status'],
       '#all_status' => $this->configuration['all_status'],
       '#expand_depth' => $this->configuration['expand_depth'] ?? 0,
+      '#expand_levels' => $this->configuration['expand_levels'] ?? 0,
     ];
     return $build;
   }
