@@ -64,3 +64,101 @@ brings its own attachments and cache tags onto the trigger.
   it must come from the icon renderer or be otherwise trusted.
 - In font mode the title icon looks as it did; its `<i>` now also carries
   `aria-hidden="true"`, as every rendered icon does.
+
+## 1.0.85 — 2026-10-22
+
+- A media item's edit modal stacks on the modal that hosts its media library
+  widget.
+
+## 1.0.84 — 2026-10-15
+
+- A modal never autofocuses a field's help badge when it opens.
+
+## 1.0.83 — 2026-10-14
+
+- Tab stays inside the top modal without making the rest of the page inert.
+
+## 1.0.82 — 2026-10-01
+
+- New `Modal::setShadow()` and `Modal::setHeaderOutRadius()`, written as
+  `--modal-shadow` and `--modal-header-out-radius`, so an outside close button
+  can read as a tab of the panel. Both default to the previous rendering.
+- The panel shadow sits on the element the content animation slides, so it
+  moves with the panel.
+
+## 1.0.81 — 2026-08-21
+
+- Opening the media library from a modal no longer replaces the dialog it was
+  opened from.
+
+## 1.0.80 — 2026-08-18
+
+- Closing a nested modal restores the modal underneath it.
+- Coding standard pass.
+
+## 1.0.79 — 2026-08-17
+
+A correctness sweep:
+
+- Options that were silently dropped are honoured, `smartActions` among them.
+- A formatter fatal is fixed, and listeners are torn down properly.
+- Icon libraries a modal's icon needs are attached, and an empty placeholder
+  body is no longer rendered.
+- Per-open and per-build state each have a single owner.
+- The AJAX dialog payload has one precedence order and one encoding.
+- The modal block no longer collects configuration it cannot use, and drag
+  ordering is restored.
+- Touch drag works again, and stale sizing is recalculated.
+- Phantom route parameters are dropped, and the TypeScript typings match the
+  code.
+
+## 1.0.78 — 2026-08-15
+
+- The close control is a `<button>`, not an anchor, and shows its focus ring
+  only for keyboard focus.
+
+## 1.0.77 — 2026-08-14
+
+- A dialog opened with the same selector as an open one replaces it instead of
+  stacking, and jQuery dialog events are bridged.
+
+## 1.0.76 — 2026-08-07
+
+- Opening a modal imperatively through `triggerBind` no longer stacks a second
+  one.
+
+## 1.0.75 — 2026-08-03
+
+- Focusing a modal as it opens no longer scrolls its content pane.
+
+## 1.0.74 — 2026-07-31
+
+- The backdrop animation setting keys match between the settings form and the
+  script.
+- Expanded README, and the `neo-modal` agent skill reference.
+
+## 1.0.73 — 2026-07-16
+
+- The modal libraries declare the script dependencies they were relying on.
+
+## 1.0.72 — 2026-07-15
+
+- Slide menus gain an `expand_depth` setting that renders children inline.
+
+## 1.0.71 — 2026-07-13
+
+- The `neo_modal_account` block can be embedded and can show a link to the
+  login page, and has a configuration schema.
+- The login form's forgot-password link no longer fails when its block is
+  missing.
+
+## 1.0.70 — 2026-07-09
+
+- Configuration schema: the heading and footer block sequences are mappings,
+  not strings.
+
+## Releases before 1.0.70 are not recorded
+
+This file was started in October 2026. The releases from `1.0.70` on were
+recorded afterwards from their commits; earlier ones are in the git history
+only.
