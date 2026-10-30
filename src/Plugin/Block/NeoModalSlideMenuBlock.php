@@ -58,7 +58,7 @@ class NeoModalSlideMenuBlock extends NeoModalBlockBase {
     $form['expand_levels'] = [
       '#type' => 'number',
       '#title' => $this->t('Expanded levels'),
-      '#description' => $this->t('How many levels, starting at the level above, render expanded. The level below them slides again — for example, 1 with an expand level of 2 groups the second level while a third-level item with its own children still opens a slide panel. Use 0 to expand every level from there down.'),
+      '#description' => $this->t('How many levels, starting at "Expand children from level", render expanded. The level below them slides again — for example, 1 with "Expand children from level" set to 2 groups the second level, while a third-level item with its own children still opens a slide panel. Use 0 to expand every level from there down. Has no effect while "Expand children from level" is 0.'),
       '#min' => 0,
       '#default_value' => $this->configuration['expand_levels'] ?? 0,
     ];
