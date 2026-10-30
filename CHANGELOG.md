@@ -1,5 +1,14 @@
 # Changelog
 
+## A slide menu block can limit how many levels expand
+
+**The slide menu block gains an "Expanded levels" setting (`expand_levels`).**
+It caps how many levels, from "Expand children from level", render inline, so
+the level below slides again: 1 with an expand level of 2 groups the second
+level while a third-level item with children of its own still opens a slide
+panel. 0, the default, keeps today's behaviour. It needs a `neo` release that
+supports `#expand_levels` on the `slide_menu` element; an older `neo` ignores it.
+
 ## Tests no longer install Linkit and Path alias just to start
 
 The kernel and FunctionalJavascript tests list only the modules they use, now
