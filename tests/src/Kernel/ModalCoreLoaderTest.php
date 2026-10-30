@@ -26,15 +26,10 @@ class ModalCoreLoaderTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
-   *
-   * `path_alias` and `linkit` because `neo.linkit_resolver` takes
-   * `path_alias.manager`, and the container refuses to compile without it.
    */
   protected static $modules = [
     'system',
     'user',
-    'path_alias',
-    'linkit',
     'neo',
     'neo_settings',
     'neo_tooltip',

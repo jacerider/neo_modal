@@ -7,10 +7,10 @@
  * holds on a machine that has never seen this project — the shape CI needs.
  *
  * It asserts only what a clean install uniquely proves: that drupalInstallNeo()
- * produces a working Neo site with the requested theme's compiled assets on the
- * page. Behavioural coverage belongs in the smoke tests, where it costs a page
- * load rather than a site build, and a minimal site has no anonymous page that
- * opens a modal to exercise anyway.
+ * produces a working Neo site, rendered by the requested theme, with compiled
+ * Neo assets on the page. Behavioural coverage belongs in the smoke tests,
+ * where it costs a page load rather than a site build, and a minimal site has
+ * no anonymous page that opens a modal to exercise anyway.
  *
  * It targets **neo_base**, not `front`. Installing `front` hermetically pulls in
  * most of the site: its module dependencies live two base themes up on
@@ -42,22 +42,30 @@ module.exports = {
       .drupalRelativeURL('/')
       .waitForElementPresent('body', 10000)
       // The reason drupalInstallNeo installs a theme at all: Neo compiles its
-      // assets into the theme that owns the build scope, so a site left on the
-      // install profile's default would serve none of them.
+      // assets per scope into the theme that owns the scope, so a site left on
+      // the install profile's default would serve none of them. Those land in
+      // the owning theme's `dist/`, never under the requested theme's own path,
+      // so the theme is identified by the class it puts on <body> and the
+      // assets by where neo_build writes them.
       .execute(
         function () {
-          return Array.from(
-            document.querySelectorAll('link[href], script[src]'),
+          var themed = document.body.classList.contains('theme--neo-base');
+          var compiled = Array.from(
+            document.querySelectorAll('link[rel="stylesheet"][href]'),
           ).some(function (el) {
-            var url = el.getAttribute('href') || el.getAttribute('src') || '';
-            return url.indexOf('/neo_base/') > -1;
+            return el.getAttribute('href').indexOf('/dist/') > -1;
           });
+          return { themed: themed, compiled: compiled };
         },
         [],
         (result) => {
           browser.assert.ok(
-            result.value,
-            'The requested theme is installed and serving its assets.',
+            result.value.themed,
+            'The requested theme renders the page.',
+          );
+          browser.assert.ok(
+            result.value.compiled,
+            'The page serves compiled Neo stylesheets.',
           );
         },
       );

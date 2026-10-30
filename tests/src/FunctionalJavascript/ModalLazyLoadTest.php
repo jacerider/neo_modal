@@ -25,11 +25,8 @@ class ModalLazyLoadTest extends WebDriverTestBase {
 
   /**
    * {@inheritdoc}
-   *
-   * `linkit` ahead of the rest, because `neo.linkit_resolver` needs its
-   * services in place before `neo` installs.
    */
-  protected static $modules = ['path_alias', 'linkit', 'neo_modal_test'];
+  protected static $modules = ['neo_modal_test'];
 
   /**
    * {@inheritdoc}

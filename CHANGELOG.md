@@ -1,5 +1,14 @@
 # Changelog
 
+## Tests no longer install Linkit and Path alias just to start
+
+The kernel and FunctionalJavascript tests list only the modules they use, now
+that `neo` installs without Linkit and Path alias. The Nightwatch install test
+checks that the page is rendered by the requested theme and serves compiled
+Neo stylesheets. It used to look for the theme's name in asset URLs, but Neo
+compiles assets into the `dist/` of the theme that owns the scope, so that
+does not match.
+
 ## The modal code loads on demand
 
 **Breaking.** `neo_modal/modal`, the library every modal attaches, is now a
