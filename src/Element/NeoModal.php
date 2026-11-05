@@ -178,12 +178,17 @@ class NeoModal extends RenderElementBase {
     $modal->mergeTriggerAttributes($attributes);
     if ($inForm) {
       $modal->applyToForm($element['#title'], $content);
-      $element['content'] = $content;
     }
     else {
       $modal->applyTo($element['#title']);
     }
+    // The trigger goes first: the script finds a form modal's content as the
+    // trigger's next sibling. FormBuilder marks form elements #sorted, so the
+    // order the keys are added in is the order they render in.
     $element['trigger'] = $element['#title'];
+    if ($inForm) {
+      $element['content'] = $content;
+    }
     return $element;
   }
 

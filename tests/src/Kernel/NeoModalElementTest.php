@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\neo_modal\Kernel;
 
+use Drupal\Core\Render\Element;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\neo_modal\Element\NeoModal;
 use Drupal\neo_modal\Element\NeoModalConfirm;
@@ -49,6 +50,25 @@ class NeoModalElementTest extends KernelTestBase {
     $attributes = $this->triggerAttributes(['#parents' => ['thing']]);
     $this->assertArrayHasKey('data-neo-modal-smartActions', $attributes);
     $this->assertSame('true', $attributes['data-neo-modal-smartActions']);
+  }
+
+  /**
+   * A form modal renders its trigger before its content.
+   *
+   * The script resolves a form modal's content as the trigger's next sibling;
+   * with the content first, the modal opened empty.
+   */
+  public function testFormModalRendersTriggerBeforeContent(): void {
+    $info = $this->container->get('plugin.manager.element_info')
+      ->getInfo('neo_modal');
+    $element = [
+      '#title' => 'Open',
+      '#parents' => ['thing'],
+      '#children' => '',
+      'body' => ['#markup' => 'Body'],
+    ] + $info;
+    $result = NeoModal::preRenderModal($element);
+    $this->assertSame(['trigger', 'content'], Element::children($result));
   }
 
   /**

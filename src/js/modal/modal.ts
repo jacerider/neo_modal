@@ -1233,11 +1233,18 @@ class NeoModal {
     }
     if (backdropInsert) {
       if (this.wrapper && this.backdrop) {
+        this.wrapper.appendChild(this.backdrop);
+        // A stack built for a modal that asked for no backdrop still needs
+        // the element (a later modal may want it) but must not show it. It
+        // used to fade in regardless, so `backdrop: false` only took effect
+        // when another modal had built the stack first.
         if (this.options.backdrop) {
           this.backdrop.style.setProperty('visibility', '');
+          this.animateIn(this.backdrop, 'backdrop');
         }
-        this.wrapper.appendChild(this.backdrop);
-        this.animateIn(this.backdrop, 'backdrop');
+        else {
+          this.backdrop.style.display = 'none';
+        }
       }
     }
     else if (this.backdrop) {
